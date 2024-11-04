@@ -1,0 +1,67 @@
+name: Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+    branches:
+      - master
+    paths:
+      - "**"
+      - "!.gitignore"
+      - "!README.md"
+
+jobs:
+  checkout:
+    name: Checkout repo
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Save repo to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phd-portal-server
+          path: .
+          overwrite: true
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 0
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: checkout
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: ["21.0"]
+
+    steps:
+      - name: Download repo artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phd-portal-server
+          path: .
+
+      - name: Unit test
+        run: echo "It works!"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    needs: test
+
+    steps:
+      - name: Download repo artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phd-portal-server
+          path: .
