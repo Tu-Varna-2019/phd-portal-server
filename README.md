@@ -1,24 +1,62 @@
-# Introduction
+# phd
 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. ## Getting Started TODO: Repository contains the agreed folder structure that the project should contain. Each folder reflects an Azure resource. Please remove unnecessary folders from the repository. 1. Installation process
 
- TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
-1. Installation process
-2. Software dependencies
-3. Latest releases
-4. API references
+If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-1. Installation process
-Create virtual environment and install dependencies:
+## Running the application in dev mode
 
-## Build and Test
+You can run your application in dev mode that enables live coding using:
+```shell script
+./gradlew quarkusDev
+```
 
-TODO: Describe and show how to build your code and run the tests.
+> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
 
-## Contribute
+## Packaging and running the application
 
-TODO: Explain how other users and developers can contribute to make your code better.
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files: - [ASP.NET Core](https://github.com/aspnet/Home) - [Visual Studio Code](https://github.com/Microsoft/vscode)
+The application can be packaged using:
+```shell script
+./gradlew build
+```
+It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
+Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
 
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
+
+If you want to build an _über-jar_, execute the following command:
+```shell script
+./gradlew build -Dquarkus.package.type=uber-jar
+```
+
+The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
+
+## Creating a native executable
+
+You can create a native executable using:
+```shell script
+./gradlew build -Dquarkus.package.type=native
+```
+
+Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+```shell script
+./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+```
+
+You can then execute your native executable with: `./build/phd-1.0-runner`
+
+If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
+
+## Related Guides
+
+- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
+- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
+
+## Provided Code
+
+### REST
+
+Easily start your REST Web Services
+
+[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
