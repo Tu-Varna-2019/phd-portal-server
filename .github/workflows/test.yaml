@@ -82,7 +82,8 @@ jobs:
           java-version: ${{ matrix.java_version  }}
           distribution: "zulu"
 
-      - uses: dbelyaev/action-checkstyle@master
+      - name: Run checkstyle
+        uses: dbelyaev/action-checkstyle@master
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
