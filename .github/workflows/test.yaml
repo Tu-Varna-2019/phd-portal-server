@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: ["21.0"]
+        java_version: [21]
 
     steps:
       - name: Download repo artifact
@@ -49,6 +49,12 @@ jobs:
         with:
           name: phd-portal-server
           path: .
+
+      - name: Set up JDK ${{ matrix.java_version  }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java_version  }}
+          distribution: "zulu"
 
       - name: Unit test
         run: echo "It works!"
@@ -58,6 +64,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: [21]
 
     steps:
       - name: Download repo artifact
@@ -65,3 +75,18 @@ jobs:
         with:
           name: phd-portal-server
           path: .
+
+      - name: Set up JDK ${{ matrix.java_version  }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java_version  }}
+          distribution: "zulu"
+
+      - uses: dbelyaev/action-checkstyle@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          level: warning
+          checkstyle_version: "10.20.0"
+          workdir: .
+          properties_file: ./src/main/resources/application.properties
