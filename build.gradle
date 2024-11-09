@@ -8,9 +8,11 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
-
 dependencies {
+implementation("io.quarkus:quarkus-hibernate-orm")
+    implementation 'org.projectlombok:lombok:1.18.34'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
+    implementation 'io.quarkus:quarkus-hibernate-orm-panache'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-rest'
     implementation 'io.quarkus:quarkus-rest-jackson'
