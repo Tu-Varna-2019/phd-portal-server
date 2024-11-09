@@ -39,6 +39,15 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
+quarkus {
+    quarkusBuild {
+        nativeArgs {
+            containerBuild = true
+            builderImage = "quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21"
+        }
+    }
+}
+
 sonar {
   properties {
     property "sonar.projectKey", "Tu-Varna-2019_phd-portal-server"
