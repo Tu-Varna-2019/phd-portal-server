@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+// @Cacheable
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Teacher extends PanacheEntity {
-  // @Id
-  // @GeneratedValue(strategy = GenerationType.IDENTITY)
-  // private Integer id;
 
   @Column(nullable = false, unique = false)
   private String name;
