@@ -1,6 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.Teacher;
+import com.tuvarna.phd.exception.TeacherNotFoundException;
 import com.tuvarna.phd.service.TeacherService;
 import com.tuvarna.phd.service.dto.TeacherDTO;
 import jakarta.annotation.security.PermitAll;
@@ -9,6 +10,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -51,6 +53,34 @@ public class TeacherController {
                       schema = @Schema(implementation = TeacherDTO.class))))
   @Path("/create")
   public Teacher createTeacher(TeacherDTO teacherDTO) {
+    return this.teacherService.save(teacherDTO.toTeacher());
+  }
+
+  @GET
+  @PermitAll
+  @Transactional
+  @RolesAllowed({"USER", "ADMIN"})
+  @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Success",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TeacherDTO.class))),
+        @APIResponse(
+            responseCode = "404",
+            description = "Teacher not found",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TeacherNotFoundException.class)))
+      })
+  @Path("/get")
+  // TODO: Finish this
+  public Teacher getTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
     return this.teacherService.save(teacherDTO.toTeacher());
   }
 }
