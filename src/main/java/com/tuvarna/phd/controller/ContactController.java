@@ -23,7 +23,7 @@ public class ContactController {
 
   @GET
   @RolesAllowed({"USER", "ADMIN"})
-  @Operation(summary = "Get contacts", description = "Retrieve all teacher's contacts")
+  @Operation(summary = "Gets users", description = "Lists all available users")
   @APIResponses(
       value =
           @APIResponse(
