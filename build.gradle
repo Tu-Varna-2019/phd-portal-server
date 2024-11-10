@@ -2,14 +2,19 @@ plugins {
     id 'java'
     id 'io.quarkus'
     id "org.sonarqube" version "5.1.0.4882"
+    // FIX: for lombok
+    id "io.freefair.lombok" version "8.10.2"
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
 }
-
 dependencies {
+    implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
+    implementation 'io.quarkus:quarkus-hibernate-orm'
+    implementation 'io.quarkus:quarkus-hibernate-orm-panache'
+    implementation 'org.projectlombok:lombok:1.18.34'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-rest'
@@ -37,6 +42,15 @@ compileJava {
 
 compileTestJava {
     options.encoding = 'UTF-8'
+}
+
+quarkus {
+    quarkusBuild {
+        nativeArgs {
+            containerBuild = true
+            builderImage = "quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21"
+        }
+    }
 }
 
 sonar {
