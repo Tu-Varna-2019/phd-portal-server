@@ -1,7 +1,6 @@
 package com.tuvarna.phd.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.istack.logging.Logger;
 import com.tuvarna.phd.exception.TeacherNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -12,7 +11,7 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
-  @Inject Logger logger;
+  // @Inject Logger logger;
 
   @Inject ObjectMapper objectMapper;
 
