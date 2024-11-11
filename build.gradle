@@ -12,7 +12,7 @@ repositories {
 }
 dependencies {
     implementation 'io.quarkus:quarkus-smallrye-openapi'
-    implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
+    implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'
     implementation 'io.quarkus:quarkus-hibernate-orm'
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
     implementation 'org.projectlombok:lombok:1.18.34'

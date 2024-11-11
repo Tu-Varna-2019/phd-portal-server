@@ -7,17 +7,22 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.jboss.logging.Logger;
 
 @Provider
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
-  // @Inject Logger logger;
-
   @Inject ObjectMapper objectMapper;
+  @Inject private Logger log;
 
   @Override
   public Response toResponse(Exception exception) {
     Response response = mapExceptionToResponse(exception);
+    log.error(
+        "Error with exception: "
+            + exception.getClass()
+            + " with message: "
+            + exception.getMessage());
 
     return Response.fromResponse(response).type(MediaType.APPLICATION_JSON).build();
   }
@@ -29,7 +34,9 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
           Response.status(Response.Status.NOT_FOUND).entity(exception.getMessage()).build();
 
       default ->
-          Response.status(Response.Status.BAD_REQUEST).entity("Unexpected error occured!").build();
+          Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity("Unexpected error occured!")
+              .build();
     };
   }
 }
