@@ -33,6 +33,13 @@ public class TeacherServiceImpl implements TeacherService {
 
   @Override
   @Transactional
+  public Teacher getTeacher(Teacher teacher) throws TeacherNotFoundException {
+
+    return teacherRepository.getTeacherByName(teacher.getName());
+  }
+
+  @Override
+  @Transactional
   public void delete(Teacher teacher) {
     teacherRepository.delete(teacher);
   }

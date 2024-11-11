@@ -7,5 +7,7 @@ public interface TeacherService {
 
   Teacher save(Teacher teacher) throws TeacherNotFoundException;
 
+  Teacher getTeacher(Teacher teacher) throws TeacherNotFoundException;
+
   void delete(Teacher teacher);
 }

@@ -2,6 +2,9 @@ package com.tuvarna.phd.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuvarna.phd.exception.TeacherNotFoundException;
+import io.quarkus.security.ForbiddenException;
+import io.quarkus.security.UnauthorizedException;
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -10,6 +13,7 @@ import jakarta.ws.rs.ext.Provider;
 import org.jboss.logging.Logger;
 
 @Provider
+@Priority(1)
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
   @Inject ObjectMapper objectMapper;
@@ -31,12 +35,12 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
     return switch (exception) {
       case TeacherNotFoundException e ->
-          Response.status(Response.Status.NOT_FOUND).entity(exception.getMessage()).build();
+          Response.status(404).entity(exception.getMessage()).build();
 
-      default ->
-          Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity("Unexpected error occured!")
-              .build();
+      case ForbiddenException e -> Response.status(403).entity("Forbidden!").build();
+      case UnauthorizedException e -> Response.status(401).entity("Unauthorized!").build();
+
+      default -> Response.status(500).entity("Unexpected error occured!").build();
     };
   }
 }
