@@ -29,7 +29,6 @@ jobs:
           name: phd-portal-server
           path: .
           overwrite: true
-          include-hidden-files: true
           if-no-files-found: error
           retention-days: 0
 

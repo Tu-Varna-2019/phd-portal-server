@@ -21,7 +21,6 @@
 
   outputs = inputs@{ nixpkgs, flake-parts, devenv-root, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-
       imports = [
         inputs.devenv.flakeModule
       ];
@@ -31,9 +30,22 @@
 
         devenv.shells.default = {
           name = "Quarkus project";
-          languages.java.enable = true;
-          languages.java.jdk.package = pkgs.jdk;
-          languages.java.gradle.enable = true;
+
+          languages.java = {
+            enable = true;
+            jdk.package = pkgs.jdk;
+            gradle.enable = true;
+          };
+
+          git-hooks.hooks = {
+            # Common
+            markdownlint.enable = true;
+            actionlint.enable = true;
+            checkmake.enable = true;
+            prettier.enable = true;
+            # Nix
+            statix.enable = true;
+          };
 
           devenv.root =
             let
@@ -44,7 +56,6 @@
           packages = with pkgs; [
             quarkus
           ];
-
         };
       };
     };

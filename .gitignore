@@ -50,3 +50,4 @@ nb-configuration.xml
 .envrc
 .quarkus
 logs/*.log
+.pre-commit-config.yaml
