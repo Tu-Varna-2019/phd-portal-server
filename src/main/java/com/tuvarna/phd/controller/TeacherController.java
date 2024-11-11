@@ -5,7 +5,6 @@ import com.tuvarna.phd.exception.TeacherNotFoundException;
 import com.tuvarna.phd.service.TeacherService;
 import com.tuvarna.phd.service.dto.TeacherDTO;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -40,9 +39,10 @@ public class TeacherController {
   }
 
   @POST
-  @PermitAll
   @Transactional
-  @RolesAllowed({"USER", "ADMIN"})
+  @PermitAll
+  // @RolesAllowed({"USER", "ADMIN"})
+  //   @Authenticated
   @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
   @APIResponses(
       value =
@@ -54,15 +54,14 @@ public class TeacherController {
                       mediaType = "application/json",
                       schema = @Schema(implementation = TeacherDTO.class))))
   @Path("/create")
-  public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException{
+  public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
     log.info("Received a request to create teacher: " + teacherDTO);
     return this.teacherService.save(teacherDTO.toTeacher());
   }
 
   @GET
-  @PermitAll
   @Transactional
-  @RolesAllowed({"USER", "ADMIN"})
+  @PermitAll
   @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
   @APIResponses(
       value = {
@@ -82,8 +81,7 @@ public class TeacherController {
                     schema = @Schema(implementation = TeacherNotFoundException.class)))
       })
   @Path("/get")
-  // TODO: Finish this
   public Teacher getTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
-    return this.teacherService.save(teacherDTO.toTeacher());
+    return this.teacherService.getTeacher(teacherDTO.toTeacher());
   }
 }
