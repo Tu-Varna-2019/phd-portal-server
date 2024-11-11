@@ -5,11 +5,7 @@ import com.tuvarna.phd.exception.TeacherNotFoundException;
 
 public interface TeacherService {
 
-  // Teacher findbyName(Teacher teacher);
-
-  Teacher save(Teacher teacher);
-
-  Teacher getTeacherById(long id) throws TeacherNotFoundException;
+  Teacher save(Teacher teacher) throws TeacherNotFoundException;
 
   void delete(Teacher teacher);
 }

@@ -22,6 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.jboss.logging.Logger;
 
 @RequestScoped
 @Path("/teacher")
@@ -31,6 +32,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 public class TeacherController {
 
   private final TeacherService teacherService;
+  @Inject private Logger log;
 
   @Inject
   public TeacherController(TeacherService teacherService) {
@@ -52,7 +54,8 @@ public class TeacherController {
                       mediaType = "application/json",
                       schema = @Schema(implementation = TeacherDTO.class))))
   @Path("/create")
-  public Teacher createTeacher(TeacherDTO teacherDTO) {
+  public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException{
+    log.info("Received a request to create teacher: " + teacherDTO);
     return this.teacherService.save(teacherDTO.toTeacher());
   }
 
