@@ -40,7 +40,11 @@
           git-hooks.hooks = {
             # Common
             markdownlint.enable = true;
-            actionlint.enable = true;
+            actionlint =
+              {
+                enable = true;
+                excludes = [ "docker-publish.yaml" ];
+              };
             checkmake.enable = true;
             prettier.enable = true;
             # Nix
