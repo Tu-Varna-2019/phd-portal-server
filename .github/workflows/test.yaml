@@ -30,6 +30,7 @@ jobs:
           path: .
           overwrite: true
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 0
 
   test:
