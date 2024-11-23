@@ -43,7 +43,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: phd-portal-server
-          path: .
+          path: ./
 
       - name: Set up JDK ${{ matrix.java_version  }}
         uses: actions/setup-java@v4
