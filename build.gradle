@@ -11,6 +11,10 @@ repositories {
     mavenLocal()
 }
 dependencies {
+    // Grafana
+    // implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.44.1'
+    // implementation 'io.quarkus:quarkus-observability-devservices-lgtm'
+    // implementation 'io.quarkus:quarkus-opentelemetry'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'

@@ -49,4 +49,5 @@ nb-configuration.xml
 .direnv
 .envrc
 .quarkus
-logs/*.log
+logs/*.log*
+.pre-commit-config.yaml

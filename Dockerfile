@@ -15,7 +15,7 @@ COPY --chown=${DOCKER_USER}:${DOCKER_USER} gradle.properties /phd-portal-server/
 WORKDIR /phd-portal-server
 
 COPY src /phd-portal-server/src
-RUN /phd-portal-server/gradlew clean build -Dquarkus.profile=dev
+RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=dev
 
 LABEL org.opencontainers.image.source=https://github.com/Tu-Varna-2019/phd-portal-server \
 	version="0.0.1-RELEASE" \

@@ -26,9 +26,9 @@ jobs:
           name: phd-portal-server
           path: .
           overwrite: true
-          include-hidden-files: true
           if-no-files-found: error
-          retention-days: 0
+          retention-days: 1
+          include-hidden-files: true
 
   scanning:
     name: Scan for security checks
@@ -83,7 +83,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
-
-      - name: "SonarQube Quality result"
-        run: |
-          echo "Quality Gate status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
