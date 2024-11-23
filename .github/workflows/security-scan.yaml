@@ -24,7 +24,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phd-portal-server
-          path: ./
+          path: |
+            ./
+            ./.git
           overwrite: true
           if-no-files-found: error
           retention-days: 1
@@ -43,9 +45,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: phd-portal-server
-          path: |
-            ./
-            ./.git
+          path: ./
+
+      - name: LS
+        run: ls -1 -a
 
       - name: Set up JDK ${{ matrix.java_version  }}
         uses: actions/setup-java@v4
