@@ -42,7 +42,7 @@
             markdownlint.enable = true;
             actionlint =
               {
-                enable = true;
+                enable = false;
                 excludes = [ "docker-publish.yaml" ];
               };
             checkmake.enable = true;

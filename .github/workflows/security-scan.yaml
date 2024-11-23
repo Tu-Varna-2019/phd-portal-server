@@ -20,16 +20,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: LS
+        run: ls -1 -a
+
       - name: Save repo to artifact
         uses: actions/upload-artifact@v4
         with:
           name: phd-portal-server
-          path: |
-            ./
-            ./.git
+          path: .
           overwrite: true
           if-no-files-found: error
           retention-days: 1
+          include-hidden-files: true
 
   scanning:
     name: Scan for security checks
