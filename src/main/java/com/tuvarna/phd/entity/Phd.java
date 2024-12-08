@@ -43,10 +43,10 @@ public class Phd extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
-  @Column(name = "enroll_date", nullable = false, unique = false)
+  @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 
-  @Column(name = "grad_date", nullable = false, unique = false)
+  @Column(name = "grad_date", nullable = true, unique = false)
   private Date gradDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -54,14 +54,14 @@ public class Phd extends PanacheEntityBase {
   private StatusPhd status;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Curriculum", nullable = false)
+  @JoinColumn(name = "Curriculum", nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Supervisor", nullable = false)
+  @JoinColumn(name = "Supervisor", nullable = true)
   private Supervisor supervisor;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department", nullable = false)
+  @JoinColumn(name = "Department", nullable = true)
   private Department department;
 }

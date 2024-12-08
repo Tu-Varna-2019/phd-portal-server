@@ -1,7 +1,7 @@
 package com.tuvarna.phd.service.impl;
 
 import com.tuvarna.phd.entity.Teacher;
-import com.tuvarna.phd.exception.TeacherNotFoundException;
+import com.tuvarna.phd.exception.DoctoralCenterRoleNotFoundException;
 import com.tuvarna.phd.repository.TeacherRepository;
 import com.tuvarna.phd.service.TeacherService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,7 +22,7 @@ public class TeacherServiceImpl implements TeacherService {
 
   @Override
   @Transactional
-  public Teacher save(Teacher teacher) throws TeacherNotFoundException {
+  public Teacher save(Teacher teacher) throws DoctoralCenterRoleNotFoundException {
     teacherRepository.persistAndFlush(teacher);
     log.info(
         "Teacher created with id: "
@@ -33,7 +33,7 @@ public class TeacherServiceImpl implements TeacherService {
 
   @Override
   @Transactional
-  public Teacher getTeacher(Teacher teacher) throws TeacherNotFoundException {
+  public Teacher getTeacher(Teacher teacher) throws DoctoralCenterRoleNotFoundException {
 
     return teacherRepository.getTeacherByName(teacher.getName());
   }

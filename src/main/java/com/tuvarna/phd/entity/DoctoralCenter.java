@@ -1,7 +1,11 @@
 package com.tuvarna.phd.entity;
 
+import com.tuvarna.phd.utils.Generator;
+
+import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.smallrye.common.constraint.NotNull;
+import io.quarkus.security.jpa.Password;
+import io.quarkus.security.jpa.Username;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,14 +34,23 @@ public class DoctoralCenter extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterSequence")
   private Long id;
 
+  @Username
   @Column(nullable = false, unique = false)
-  @NotNull
   private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
 
+  @Column(nullable = false, unique = false)
+  @Password
+  private String password;
+
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "DoctoralCenterRole",nullable = false)
+  @JoinColumn(name = "DoctoralCenterRole", nullable = false)
   private DoctoralCenterRole role;
+
+  public void hashPassword(Integer length) {
+    String randomPassoword = Generator.generateRandomString(length);
+    this.password = BcryptUtil.bcryptHash(randomPassoword);
+  }
 }

@@ -1,7 +1,7 @@
 package com.tuvarna.phd.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tuvarna.phd.exception.TeacherNotFoundException;
+import com.tuvarna.phd.exception.PhdNotFoundException;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.annotation.Priority;
@@ -34,7 +34,7 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
   private Response mapExceptionToResponse(Exception exception) {
 
     return switch (exception) {
-      case TeacherNotFoundException e ->
+      case PhdNotFoundException e ->
           Response.status(404).entity(exception.getMessage()).build();
 
       case ForbiddenException e -> Response.status(403).entity("Forbidden!").build();

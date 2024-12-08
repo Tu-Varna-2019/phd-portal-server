@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.Teacher;
-import com.tuvarna.phd.exception.TeacherNotFoundException;
+import com.tuvarna.phd.exception.DoctoralCenterRoleNotFoundException;
 import com.tuvarna.phd.service.TeacherService;
 import com.tuvarna.phd.service.dto.TeacherDTO;
 import jakarta.annotation.security.PermitAll;
@@ -46,7 +46,7 @@ public class TeacherController {
     @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
     @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))))
     @Path("/create")
-    public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
+    public Teacher createTeacher(TeacherDTO teacherDTO) throws DoctoralCenterRoleNotFoundException {
         log.info("Received a request to create teacher: " + teacherDTO);
         return this.teacherService.save(teacherDTO.toTeacher());
     }
@@ -57,10 +57,10 @@ public class TeacherController {
     @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
     @APIResponses(value = {
             @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))),
-            @APIResponse(responseCode = "404", description = "Teacher not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherNotFoundException.class)))
+            @APIResponse(responseCode = "404", description = "Teacher not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterRoleNotFoundException.class)))
     })
     @Path("/get")
-    public Teacher getTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
+    public Teacher getTeacher(TeacherDTO teacherDTO) throws DoctoralCenterRoleNotFoundException {
         return this.teacherService.getTeacher(teacherDTO.toTeacher());
     }
 }

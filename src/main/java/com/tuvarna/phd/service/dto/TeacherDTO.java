@@ -13,11 +13,6 @@ public class TeacherDTO {
   @Schema(title = "name", required = true)
   private String name;
 
-  // @Min(value = 1, message = "The value must be more than 0")
-  // @Max(value = 200, message = "The value must be less than 200")
-  // @Schema(title="User age between 1 to 200", required = true)
-  // private int age;
-
   public Teacher toTeacher() {
     Teacher teacher = new Teacher();
     teacher.setName(this.name);
