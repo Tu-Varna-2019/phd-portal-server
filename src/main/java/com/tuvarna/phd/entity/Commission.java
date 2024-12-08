@@ -1,7 +1,9 @@
 package com.tuvarna.phd.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.smallrye.common.constraint.NotNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,22 +24,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "teacher")
-public class Teacher extends PanacheEntityBase {
+@Table(name = "commission")
+public class Commission extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "teacherSequence", sequenceName = "teacher_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacherSequence")
+  @SequenceGenerator(name = "commissionSequence", sequenceName = "commission_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commissionSequence")
   private Long id;
 
   @Column(nullable = false, unique = false)
-  @NotNull
   private String name;
 
-  @Column(nullable = false, unique = false)
-  private String email;
-
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department",nullable = false)
-  private Department department;
+  @JoinColumn(name = "Committee", nullable = false)
+  private Committee chairman;
+
+  @Column(nullable = false, unique = false)
+  private ArrayList<Committee> members;
 }

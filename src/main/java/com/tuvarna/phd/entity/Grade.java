@@ -1,5 +1,7 @@
 package com.tuvarna.phd.entity;
 
+import java.sql.Date;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.persistence.Column;
@@ -22,22 +24,34 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "teacher")
-public class Teacher extends PanacheEntityBase {
+@Table(name = "grade")
+public class Grade extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "teacherSequence", sequenceName = "teacher_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacherSequence")
+  @SequenceGenerator(name = "gradeSequence", sequenceName = "grade_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gradeSequence")
   private Long id;
 
   @Column(nullable = false, unique = false)
   @NotNull
-  private String name;
+  private Double grade;
 
-  @Column(nullable = false, unique = false)
-  private String email;
+  @Column(name = "start_date", nullable = false, unique = false)
+  private Date startDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department",nullable = false)
-  private Department department;
+  @JoinColumn(name = "Teacher", nullable = true)
+  private Teacher teacher;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "Commission", nullable = true)
+  private Commission commission;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "GradeType", nullable = false)
+  private GradeType gradeType;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "Phd", nullable = false)
+  private Phd phd;
 }

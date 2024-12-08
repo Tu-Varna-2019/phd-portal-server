@@ -4,9 +4,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,27 +22,22 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
-public class User extends PanacheEntityBase {
+@Table(name = "committee")
+public class Committee extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "nameSequence", sequenceName = "name_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nameSequence")
-  private Integer id;
+  @SequenceGenerator(name = "committeeSequence", sequenceName = "committee_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
+  private Long id;
 
   @Column(nullable = false, unique = false)
   @NotNull
-  private String firstName;
+  private String name;
 
   @Column(nullable = false, unique = false)
-  @NotNull
-  private String middleName;
+  private Double grade;
 
-  @Column(nullable = false, unique = false)
-  @NotNull
-  private String lastName;
-
-  @Column(nullable = false, unique = false)
-  @NotNull
-  private String email;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "committeeType", nullable = false)
+  private CommitteeType committeeType;
 }
