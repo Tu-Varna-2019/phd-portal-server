@@ -9,7 +9,6 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -30,58 +29,38 @@ import org.jboss.logging.Logger;
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public class TeacherController {
 
-  private final TeacherService teacherService;
-  @Inject private Logger log;
+    private final TeacherService teacherService;
+    @Inject
+    private Logger log;
 
-  @Inject
-  public TeacherController(TeacherService teacherService) {
-    this.teacherService = teacherService;
-  }
+    @Inject
+    public TeacherController(TeacherService teacherService) {
+        this.teacherService = teacherService;
+    }
 
-  @POST
-  @Transactional
-  @PermitAll
-  // @RolesAllowed({"USER", "ADMIN"})
-  //   @Authenticated
-  @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
-  @APIResponses(
-      value =
-          @APIResponse(
-              responseCode = "200",
-              description = "Success",
-              content =
-                  @Content(
-                      mediaType = "application/json",
-                      schema = @Schema(implementation = TeacherDTO.class))))
-  @Path("/create")
-  public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
-    log.info("Received a request to create teacher: " + teacherDTO);
-    return this.teacherService.save(teacherDTO.toTeacher());
-  }
+    @POST
+    @Transactional
+    @PermitAll
+    // @RolesAllowed({"USER", "ADMIN"})
+    // @Authenticated
+    @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
+    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))))
+    @Path("/create")
+    public Teacher createTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
+        log.info("Received a request to create teacher: " + teacherDTO);
+        return this.teacherService.save(teacherDTO.toTeacher());
+    }
 
-  @GET
-  @Transactional
-  @PermitAll
-  @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
-  @APIResponses(
-      value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "Success",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = TeacherDTO.class))),
-        @APIResponse(
-            responseCode = "404",
-            description = "Teacher not found",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = TeacherNotFoundException.class)))
-      })
-  @Path("/get")
-  public Teacher getTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
-    return this.teacherService.getTeacher(teacherDTO.toTeacher());
-  }
+    @POST
+    @Transactional
+    @PermitAll
+    @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))),
+            @APIResponse(responseCode = "404", description = "Teacher not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherNotFoundException.class)))
+    })
+    @Path("/get")
+    public Teacher getTeacher(TeacherDTO teacherDTO) throws TeacherNotFoundException {
+        return this.teacherService.getTeacher(teacherDTO.toTeacher());
+    }
 }

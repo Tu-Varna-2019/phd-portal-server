@@ -1,0 +1,45 @@
+package com.tuvarna.phd.entity;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.smallrye.common.constraint.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "user")
+public class User extends PanacheEntityBase {
+
+  @Id
+  @SequenceGenerator(name = "nameSequence", sequenceName = "name_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nameSequence")
+  private Integer id;
+
+  @Column(nullable = false, unique = false)
+  @NotNull
+  private String firstName;
+
+  @Column(nullable = false, unique = false)
+  @NotNull
+  private String middleName;
+
+  @Column(nullable = false, unique = false)
+  @NotNull
+  private String lastName;
+
+  @Column(nullable = false, unique = false)
+  @NotNull
+  private String email;
+}
