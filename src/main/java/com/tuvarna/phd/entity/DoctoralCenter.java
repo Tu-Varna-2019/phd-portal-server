@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,13 +46,19 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Password
   private String password;
 
+  @Column(nullable = false, unique = false)
+  private boolean shouldPasswordReset;
+
+  @Transient
+  private String unhashedPassword;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "DoctoralCenterRole", nullable = false)
   private DoctoralCenterRole role;
 
-  public void hashPassword(Integer length) {
-    String randomPassoword = Generator.generateRandomString(length);
-    this.password = BcryptUtil.bcryptHash(randomPassoword);
+  public void hashPassword() {
+    unhashedPassword = this.password;
+    this.password = BcryptUtil.bcryptHash(this.password);
   }
 
   public void generatePassword(Integer length) {

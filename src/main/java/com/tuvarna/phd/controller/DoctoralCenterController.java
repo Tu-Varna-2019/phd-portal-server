@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.DoctoralCenter;
-import com.tuvarna.phd.exception.DoctoralCenterRoleNotFoundException;
+import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
@@ -47,22 +47,25 @@ public class DoctoralCenterController {
     }
 
     @POST
-    @Transactional
     @PermitAll
+    @Transactional
     @Operation(summary = "Create Expert Doctor Center", description = "Creates Expert Doctor Center in the system")
-    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Expert user created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))),
+            @APIResponse(responseCode = "400", description = "Error when trying to create expert user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))),
+    })
     @Path("/create/expert")
-    public Uni<Void> createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
-        LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
-        DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
+    public Uni<Void> createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
 
-        // NOTE: Send email only for expert role
-        if (doctoralCenter.getRole().getRole().equals("expert")) {
-            LOG.info("Email sent to expert user: " + doctoralCenter.getEmail());
-            return doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getPassword());
-        }
-        ;
-        return null;
+        LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
+        this.doctoralCenterValidator.validateRoleIsExpert(doctoralCenterDTO);
+        LOG.info("Role received is valid: " + doctoralCenterDTO.getRole() + " , moving on...");
+
+        DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
+        LOG.info("User created!");
+
+        LOG.info("Email is being sent to expert user: " + doctoralCenter.getEmail());
+        return doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getUnhashedPassword());
     }
 
     @PUT
@@ -71,7 +74,7 @@ public class DoctoralCenterController {
     @Operation(summary = "Reset password for doctoral center member", description = "Reset password for doctoral center member")
     @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
     @Path("/change/password")
-    public void changePassword(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
+    public void changePassword(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
         LOG.info("Received a request to change password for  doctor center member: " + doctoralCenterDTO);
     };
 
@@ -81,7 +84,7 @@ public class DoctoralCenterController {
     @Operation(summary = "Create a Manager Doctor Center", description = "Creates Manager Doctor Center in the system")
     @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
     @Path("/create/manager")
-    public void createManager(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
+    public void createManager(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
         LOG.info("Received a request to create a manager doctor center expert (admin): " + doctoralCenterDTO);
         DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
 

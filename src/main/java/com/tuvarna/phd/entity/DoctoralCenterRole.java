@@ -24,10 +24,10 @@ public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Id
   @SequenceGenerator(name = "doctoralCenterRoleSequence", sequenceName = "doctoralCenterRole_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterRoleSequence")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterRoleGenerator")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   @Roles
   private String role;
 }
