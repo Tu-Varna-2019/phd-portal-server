@@ -4,14 +4,17 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterRoleNotFoundException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
+import com.tuvarna.phd.validator.DoctoralCenterValidator;
 
 import io.smallrye.mutiny.Uni;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -32,34 +35,56 @@ import org.jboss.logging.Logger;
 public class DoctoralCenterController {
 
     private final DoctoralCenterService doctoralCenterService;
+    private final DoctoralCenterValidator doctoralCenterValidator;
     @Inject
     private final static Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
     @Inject
-    public DoctoralCenterController(DoctoralCenterService doctoralCenterService) {
+    public DoctoralCenterController(DoctoralCenterService doctoralCenterService,
+            DoctoralCenterValidator doctoralCenterValidator) {
         this.doctoralCenterService = doctoralCenterService;
+        this.doctoralCenterValidator = doctoralCenterValidator;
     }
 
     @POST
     @Transactional
     @PermitAll
-    // @RolesAllowed({"USER", "ADMIN"})
-    // @Authenticated
-    @Operation(summary = "Create Expert/Manager Doctor Center", description = "Creates  Expert or Manager Doctor Center in the system")
+    @Operation(summary = "Create Expert Doctor Center", description = "Creates Expert Doctor Center in the system")
     @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
-    @Path("/create")
+    @Path("/create/expert")
     public Uni<Void> createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
-        LOG.info("Received a request to create doctor center expert (super admin): " + doctoralCenterDTO);
-
+        LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
         DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
 
         // NOTE: Send email only for expert role
         if (doctoralCenter.getRole().getRole().equals("expert")) {
             LOG.info("Email sent to expert user: " + doctoralCenter.getEmail());
-            return  doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getPassword());
+            return doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getPassword());
         }
         ;
         return null;
+    }
 
+    @PUT
+    @Transactional
+    @PermitAll
+    @Operation(summary = "Reset password for doctoral center member", description = "Reset password for doctoral center member")
+    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
+    @Path("/change/password")
+    public void changePassword(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
+        LOG.info("Received a request to change password for  doctor center member: " + doctoralCenterDTO);
+    };
+
+    @POST
+    @Transactional
+    @RolesAllowed({ "ADMIN" })
+    @Operation(summary = "Create a Manager Doctor Center", description = "Creates Manager Doctor Center in the system")
+    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
+    @Path("/create/manager")
+    public void createManager(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
+        LOG.info("Received a request to create a manager doctor center expert (admin): " + doctoralCenterDTO);
+        DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
+
+        // TODO: add something
     }
 }
