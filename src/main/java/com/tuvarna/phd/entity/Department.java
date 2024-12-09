@@ -1,15 +1,12 @@
 package com.tuvarna.phd.entity;
 
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.smallrye.common.constraint.NotNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,22 +19,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "teacher")
-public class Teacher extends PanacheEntityBase {
+@Table(name = "department")
+public class Department extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "teacherSequence", sequenceName = "teacher_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacherSequence")
+  @SequenceGenerator(name = "departmentSequence", sequenceName = "department_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "departmentSequence")
   private Long id;
 
   @Column(nullable = false, unique = false)
-  @NotNull
   private String name;
-
-  @Column(nullable = false, unique = false)
-  private String email;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department",nullable = false)
-  private Department department;
 }

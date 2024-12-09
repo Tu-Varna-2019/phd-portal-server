@@ -22,12 +22,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "teacher")
-public class Teacher extends PanacheEntityBase {
+@Table(name = "committee")
+public class Committee extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "teacherSequence", sequenceName = "teacher_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacherSequence")
+  @SequenceGenerator(name = "committeeSequence", sequenceName = "committee_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
   private Long id;
 
   @Column(nullable = false, unique = false)
@@ -35,9 +35,9 @@ public class Teacher extends PanacheEntityBase {
   private String name;
 
   @Column(nullable = false, unique = false)
-  private String email;
+  private Double grade;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department",nullable = false)
-  private Department department;
+  @JoinColumn(name = "committeeType", nullable = false)
+  private CommitteeType committeeType;
 }
