@@ -5,7 +5,7 @@ import com.tuvarna.phd.exception.DoctoralCenterRoleNotFoundException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 
-import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -48,17 +48,18 @@ public class DoctoralCenterController {
     @Operation(summary = "Create Expert/Manager Doctor Center", description = "Creates  Expert or Manager Doctor Center in the system")
     @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
     @Path("/create")
-    public void createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
+    public Uni<Void> createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleNotFoundException {
         LOG.info("Received a request to create doctor center expert (super admin): " + doctoralCenterDTO);
 
         DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
 
         // NOTE: Send email only for expert role
         if (doctoralCenter.getRole().getRole().equals("expert")) {
-            doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getPassword());
             LOG.info("Email sent to expert user: " + doctoralCenter.getEmail());
+            return  doctoralCenterService.sendEmail(doctoralCenter.getEmail(), doctoralCenter.getPassword());
         }
         ;
+        return null;
 
     }
 }

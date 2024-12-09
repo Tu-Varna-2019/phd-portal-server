@@ -53,4 +53,8 @@ public class DoctoralCenter extends PanacheEntityBase {
     String randomPassoword = Generator.generateRandomString(length);
     this.password = BcryptUtil.bcryptHash(randomPassoword);
   }
+
+  public void generatePassword(Integer length) {
+    this.password = Generator.generateRandomString(length);
+  }
 }
