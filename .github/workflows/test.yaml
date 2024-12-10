@@ -92,3 +92,4 @@ jobs:
           checkstyle_version: "10.20.0"
           workdir: .
           properties_file: ./src/main/resources/application.properties
+          checkstyle_config: checkstyle.xml

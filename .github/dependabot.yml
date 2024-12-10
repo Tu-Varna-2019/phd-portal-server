@@ -4,3 +4,47 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      timezone: "Europe/Sofia"
+    commit-message:
+      prefix: "[github-action] "
+    asignees:
+      - "IliyanKostov9"
+    reviewers:
+      - "IliyanKostov9"
+    labels:
+      - "github-action"
+      - "dependencies"
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      timezone: "Europe/Sofia"
+    commit-message:
+      prefix: "[github-action] "
+    asignees:
+      - "IliyanKostov9"
+    reviewers:
+      - "IliyanKostov9"
+    labels:
+      - "java"
+      - "dependencies"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      timezone: "Europe/Sofia"
+    commit-message:
+      prefix: "[github-action] "
+    asignees:
+      - "IliyanKostov9"
+    reviewers:
+      - "IliyanKostov9"
+    labels:
+      - "docker"
+      - "dependencies"
+    # milestone: 4
+    #    open-pull-requests-limit: 0
