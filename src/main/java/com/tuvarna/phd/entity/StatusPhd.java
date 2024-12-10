@@ -22,7 +22,10 @@ import lombok.Setter;
 public class StatusPhd extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "statusPhdSequence", sequenceName = "statusPhd_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "statusPhdSequence",
+      sequenceName = "statusPhd_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statusPhdSequence")
   private Long id;
 

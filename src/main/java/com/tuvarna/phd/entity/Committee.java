@@ -26,7 +26,10 @@ import lombok.Setter;
 public class Committee extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "committeeSequence", sequenceName = "committee_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "committeeSequence",
+      sequenceName = "committee_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
   private Long id;
 

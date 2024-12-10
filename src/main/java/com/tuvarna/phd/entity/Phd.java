@@ -1,7 +1,5 @@
 package com.tuvarna.phd.entity;
 
-import java.sql.Date;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.sql.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +30,9 @@ public class Phd extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
   private Long id;
 
+  @Column(name = "oid", nullable = false, unique = true, updatable = false)
+  private String oid;
+
   @Column(name = "first_name", nullable = false, unique = false)
   private String firstName;
 
@@ -43,6 +45,7 @@ public class Phd extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
+  // TODO: Can be removed ?
   @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 

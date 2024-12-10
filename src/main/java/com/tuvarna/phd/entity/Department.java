@@ -1,6 +1,5 @@
 package com.tuvarna.phd.entity;
 
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +22,10 @@ import lombok.Setter;
 public class Department extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "departmentSequence", sequenceName = "department_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "departmentSequence",
+      sequenceName = "department_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "departmentSequence")
   private Long id;
 

@@ -1,7 +1,6 @@
 package com.tuvarna.phd.entity;
 
 import com.tuvarna.phd.utils.Generator;
-
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
@@ -31,7 +30,10 @@ import lombok.Setter;
 public class DoctoralCenter extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "doctoralCenterSequence", sequenceName = "doctoralCenter_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "doctoralCenterSequence",
+      sequenceName = "doctoralCenter_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterSequence")
   private Long id;
 
@@ -49,8 +51,7 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private boolean isPasswordChangeRequired;
 
-  @Transient
-  private String unhashedPassword;
+  @Transient private String unhashedPassword;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "DoctoralCenterRole", nullable = false)
@@ -67,6 +68,6 @@ public class DoctoralCenter extends PanacheEntityBase {
 
   public boolean doesPasswordMatch(String plainPassword) {
 
-    return BcryptUtil.matches(plainPassword,this.password);
+    return BcryptUtil.matches(plainPassword, this.password);
   }
 }

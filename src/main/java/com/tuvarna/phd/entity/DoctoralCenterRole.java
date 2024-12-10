@@ -23,7 +23,10 @@ import lombok.Setter;
 public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "doctoralCenterRoleSequence", sequenceName = "doctoralCenterRole_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "doctoralCenterRoleSequence",
+      sequenceName = "doctoralCenterRole_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterRoleGenerator")
   private Long id;
 

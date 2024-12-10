@@ -4,7 +4,6 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.service.dto.DoctoralCenterPasswordChangeDTO;
-
 import io.smallrye.mutiny.Uni;
 
 public interface DoctoralCenterService {

@@ -38,6 +38,6 @@ public class Teacher extends PanacheEntityBase {
   private String email;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department",nullable = false)
+  @JoinColumn(name = "Department", nullable = false)
   private Department department;
 }

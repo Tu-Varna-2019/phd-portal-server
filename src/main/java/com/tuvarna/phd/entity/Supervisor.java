@@ -25,7 +25,10 @@ import lombok.Setter;
 public class Supervisor extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "supervisorSequence", sequenceName = "supervisor_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "supervisorSequence",
+      sequenceName = "supervisor_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supervisorSequence")
   private Long id;
 

@@ -12,4 +12,10 @@ public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
     return findByIdOptional(id)
         .orElseThrow(() -> new PhdNotFoundException("Phd doesn't exist!"));
   }
+
+  public Phd getByOid(String oid) {
+    return find("oid", oid)
+        .firstResultOptional()
+        .orElseThrow(() -> new PhdNotFoundException("Phd user with oid: " + oid + " doesn't exist!"));
+  }
 }

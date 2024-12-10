@@ -3,10 +3,11 @@ package com.tuvarna.phd.service.dto;
 import io.smallrye.common.constraint.NotNull;
 import lombok.Data;
 import lombok.Getter;
-
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "DoctoralCenterPasswordChangeDTO", description = "Doctoral Center Password change DTO")
+@Schema(
+    name = "DoctoralCenterPasswordChangeDTO",
+    description = "Doctoral Center Password change DTO")
 @Data
 @Getter
 public class DoctoralCenterPasswordChangeDTO {

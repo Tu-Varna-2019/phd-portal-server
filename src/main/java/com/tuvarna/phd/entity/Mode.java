@@ -1,6 +1,5 @@
 package com.tuvarna.phd.entity;
 
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
