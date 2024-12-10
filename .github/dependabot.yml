@@ -8,7 +8,7 @@ updates:
       timezone: "Europe/Sofia"
     commit-message:
       prefix: "[github-action] "
-    asignees:
+    assignees:
       - "IliyanKostov9"
     reviewers:
       - "IliyanKostov9"
@@ -23,7 +23,7 @@ updates:
       timezone: "Europe/Sofia"
     commit-message:
       prefix: "[github-action] "
-    asignees:
+    assignees:
       - "IliyanKostov9"
     reviewers:
       - "IliyanKostov9"
@@ -39,7 +39,7 @@ updates:
       timezone: "Europe/Sofia"
     commit-message:
       prefix: "[github-action] "
-    asignees:
+    assignees:
       - "IliyanKostov9"
     reviewers:
       - "IliyanKostov9"
