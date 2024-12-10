@@ -17,6 +17,6 @@ public class DoctoralCenterDTO {
   private String email;
 
   @NotNull
-  @Schema(title = "role", required = true)
+  @Schema(title = "role", required = false)
   private String role;
 }

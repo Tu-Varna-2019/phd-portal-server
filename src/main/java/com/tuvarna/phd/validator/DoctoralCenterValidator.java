@@ -28,4 +28,13 @@ public class DoctoralCenterValidator {
 		}
 		;
 	}
+
+	public void validateRole(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleException {
+		try {
+			VALID_ROLES.valueOf(doctoralCenterDTO.getRole());
+		} catch (IllegalArgumentException e) {
+			throw new DoctoralCenterRoleException("Role is not valid!");
+		}
+		;
+	}
 }

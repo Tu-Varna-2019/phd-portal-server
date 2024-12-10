@@ -14,6 +14,8 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -27,6 +29,9 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
         @Inject
         private ReactiveMailer mailer;
 
+        @ConfigProperty(name = "client.base-url")
+        private String clientBaseURL;
+
         @Inject
         public DoctoralCenterServiceImpl(DoctoralCenterRepository doctoralCenterRepository,
                         DoctoralCenterMapper doctoralCenterMapper,
@@ -34,7 +39,6 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
                 this.doctoralCenterRepository = doctoralCenterRepository;
                 this.doctoralCenterMapper = doctoralCenterMapper;
                 this.doctoralCenterRoleRepository = doctoralCenterRoleRepository;
-
         }
 
         @Override
@@ -48,7 +52,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
                 doctoralCenter
                                 .setRole(this.doctoralCenterRoleRepository.getRoleByRole(doctoralCenterDTO.getRole()));
 
-                LOG.info("Check if user for the given email exists: " + email);
+                LOG.info("Check if user for the given email already exists: " + email);
                 if (doctoralCenterRepository.existsByEmail(email))
                         throw new DoctoralCenterException("User with email: " + email + " already exists!");
 
@@ -71,12 +75,14 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
                                     <p>You have been added to the PHD platform as an expert of the doctoral center.</p>
                                     <p>Please don't share your password with anyone!</p>
                                     <p><strong>Password:</strong> %s </p>
+                                    <p><strong>Link:</strong> %s </p>
                                     <p>Best regards,</p>
                                     <p>The PHD Platform Team</p>
                                 </body>
                                 </html>
                                 """,
-                                password);
+                                password,
+                                this.clientBaseURL + "/reset/password");
 
                 return this.mailer.send(
                                 Mail.withHtml(
