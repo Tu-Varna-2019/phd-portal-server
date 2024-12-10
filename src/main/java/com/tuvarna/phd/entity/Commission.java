@@ -1,8 +1,5 @@
 package com.tuvarna.phd.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,10 @@ import lombok.Setter;
 public class Commission extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(name = "commissionSequence", sequenceName = "commission_id_seq", allocationSize = 1)
+  @SequenceGenerator(
+      name = "commissionSequence",
+      sequenceName = "commission_id_seq",
+      allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commissionSequence")
   private Long id;
 

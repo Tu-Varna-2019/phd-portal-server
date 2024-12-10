@@ -9,6 +9,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class PhdDTO {
 
   @NotNull
+  @Schema(title = "oid", required = true)
+  private String oid;
+
+  @NotNull
   @Schema(title = "first_name", required = true)
   private String firstName;
 
@@ -23,5 +27,4 @@ public class PhdDTO {
   @NotNull
   @Schema(title = "email", required = true)
   private String email;
-
 }

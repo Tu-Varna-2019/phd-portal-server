@@ -16,7 +16,7 @@ public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralC
   public DoctoralCenter getDoctoralCenterByEmail(String email) {
     return find("email", email)
         .firstResultOptional()
-        .orElseThrow(() -> new DoctoralCenterException("User with email: " + email + " already exists!"));
+        .orElseThrow(() -> new DoctoralCenterException("User with email: " + email + " doesn't exists!"));
   }
 
   public boolean existsByEmail(String email) {
