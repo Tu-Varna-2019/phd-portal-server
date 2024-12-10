@@ -1,10 +1,11 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.DoctoralCenter;
-import com.tuvarna.phd.entity.exception.ControllerResponse;
+import com.tuvarna.phd.models.ControllerResponse;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
+import com.tuvarna.phd.service.dto.DoctoralCenterPasswordChangeDTO;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 
 import io.smallrye.mutiny.Uni;
@@ -37,78 +38,87 @@ import org.jboss.logging.Logger;
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public class DoctoralCenterController {
 
-    private final DoctoralCenterService doctoralCenterService;
-    private final DoctoralCenterValidator doctoralCenterValidator;
-    @Inject
-    private final static Logger LOG = Logger.getLogger(DoctoralCenterController.class);
+        private final DoctoralCenterService doctoralCenterService;
+        private final DoctoralCenterValidator doctoralCenterValidator;
+        @Inject
+        private final static Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
-    @Inject
-    public DoctoralCenterController(DoctoralCenterService doctoralCenterService,
-            DoctoralCenterValidator doctoralCenterValidator) {
-        this.doctoralCenterService = doctoralCenterService;
-        this.doctoralCenterValidator = doctoralCenterValidator;
-    }
+        @Inject
+        public DoctoralCenterController(DoctoralCenterService doctoralCenterService,
+                        DoctoralCenterValidator doctoralCenterValidator) {
+                this.doctoralCenterService = doctoralCenterService;
+                this.doctoralCenterValidator = doctoralCenterValidator;
+        }
 
-    @POST
-    @PermitAll
-    @Transactional
-    @Operation(summary = "Create Expert Doctor Center", description = "Creates Expert Doctor Center in the system")
-    @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Expert user created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))),
-            @APIResponse(responseCode = "400", description = "Error when trying to create expert user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))),
-    })
-    @Path("/create/expert")
-    public Uni<Response> createExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
+        @POST
+        @PermitAll
+        @Transactional
+        @Operation(summary = "Create Expert Doctor Center", description = "Creates Expert Doctor Center in the system")
+        @APIResponses(value = {
+                        @APIResponse(responseCode = "200", description = "Expert user created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterPasswordChangeDTO.class))),
+                        @APIResponse(responseCode = "400", description = "Error when trying to create expert user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterPasswordChangeDTO.class))),
+        })
+        @Path("/create/expert")
+        public Uni<Response> createExpert(DoctoralCenterDTO doctoralCenterDTO)
+                        throws DoctoralCenterException {
 
-        LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
-        doctoralCenterDTO.setRole("expert");
-        DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
-        LOG.info("User created!");
+                LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
+                doctoralCenterDTO.setRole("expert");
+                DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
+                LOG.info("User created!");
 
-        LOG.info("Email is being sent to expert user: " + doctoralCenter.getEmail());
-        Uni<Void> emailSent = this.doctoralCenterService.sendEmail(doctoralCenter.getEmail(),
-                doctoralCenter.getUnhashedPassword());
+                LOG.info("Email is being sent to expert user: " + doctoralCenter.getEmail());
+                Uni<Void> emailSent = this.doctoralCenterService.sendEmail(doctoralCenter.getEmail(),
+                                doctoralCenter.getUnhashedPassword());
 
-        return emailSent.onItem()
-                .transform(v -> {
-                    return new ControllerResponse(200, "Expert user is ok").getResponse();
-                    // return Response.status(200)
-                    // .entity("Expert user " + doctoralCenterDTO.getEmail()
-                    // + " created and email sent successfully!")
-                    // .build();
-                });
-                // .onFailure()
-                // .recoverWithItem(throwable -> {
-                //     LOG.error("Failed to send email: %s with exception %s", doctoralCenterDTO.getEmail(), throwable);
-                //     return Response.status(500)
-                //             .entity("Expert user " + doctoralCenterDTO.getEmail()
-                //                     + "created, but failed to send email!")
-                //             .build();
-                // });
-    }
+                return emailSent.onItem()
+                                .transform(v -> {
+                                        return new ControllerResponse(200, "Expert user created!").getResponse();
+                                })
+                                .onFailure()
+                                .recoverWithItem(throwable -> {
+                                        LOG.error("Failed to send email: %s with exception %s",
+                                                        doctoralCenterDTO.getEmail(), throwable);
+                                        return new ControllerResponse(400,
+                                                        "Failed to send email: " + doctoralCenterDTO.getEmail())
+                                                        .getResponse();
+                                });
+        }
 
-    @PUT
-    @Transactional
-    @PermitAll
-    @Operation(summary = "Reset password for doctoral center member", description = "Reset password for doctoral center member")
-    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
-    @Path("/reset/password")
-    public void changePassword(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
-        LOG.info("Received a request to change password for  doctor center member: " + doctoralCenterDTO);
-    };
+        @PUT
+        @Transactional
+        // TODO: Change Permit all to auth only
+        @PermitAll
+        @Operation(summary = "Change password for doctoral center member", description = "Reset password for doctoral center member")
+        @APIResponses(value = {
+                        @APIResponse(responseCode = "200", description = "Success creating password for doctoral center user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterPasswordChangeDTO.class))),
+                        @APIResponse(responseCode = "400", description = "Error creating password for doctoral center user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterPasswordChangeDTO.class)))
+        })
+        @Path("/change/password")
+        public Response changePassword(DoctoralCenterPasswordChangeDTO dCenterPasswordChangeDTO)
+                        throws DoctoralCenterException {
+                this.doctoralCenterValidator.validatePassword(dCenterPasswordChangeDTO);
+                LOG.info("Received a request to change password for  doctor center member: " + dCenterPasswordChangeDTO);
+                 this.doctoralCenterService.changePassword(dCenterPasswordChangeDTO);
 
-    @POST
-    @Transactional
-    @RolesAllowed({ "EXPERT" })
-    @Operation(summary = "Create a Manager Doctor Center", description = "Creates Manager Doctor Center in the system")
-    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterDTO.class))))
-    @Path("/create/manager")
-    public void createManager(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
-        LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
-        this.doctoralCenterValidator.validateRoleIsExpert(doctoralCenterDTO);
-        LOG.info("Role received is valid: " + doctoralCenterDTO.getRole() + " , moving on...");
+                LOG.info("Password changed for user: " + dCenterPasswordChangeDTO.getEmail());
+                return new ControllerResponse(200, "Password change done!").getResponse();
+        };
 
-        DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
-        LOG.info("User created!");
-    }
+        @POST
+        @Transactional
+        @RolesAllowed({ "EXPERT" })
+        @Operation(summary = "Create a Manager Doctor Center", description = "Creates Manager Doctor Center in the system")
+        @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterPasswordChangeDTO.class))))
+        @Path("/create/manager")
+        public Response createManager(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException {
+                LOG.info("Received a request to create an expert doctor center (super admin): " + doctoralCenterDTO);
+                this.doctoralCenterValidator.validateRoleIsExpert(doctoralCenterDTO);
+                LOG.info("Role received is valid: " + doctoralCenterDTO.getRole() + " , moving on...");
+
+                DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
+                LOG.info("User created!");
+
+                return new ControllerResponse(200, "Manager user is created").getResponse();
+        }
 }

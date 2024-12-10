@@ -13,5 +13,8 @@ public interface DoctoralCenterMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "passwordChangeRequired", ignore = true)
+    @Mapping(target = "unhashedPassword", ignore = true)
     DoctoralCenter toEntity(DoctoralCenterDTO doctoralCenterDTO);
 }

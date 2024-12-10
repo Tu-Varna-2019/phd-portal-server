@@ -4,10 +4,10 @@ import jakarta.ws.rs.core.Response;
 import lombok.Getter;
 
 @Getter
-public class ControllerResponse<T> {
+public class ControllerResponse {
   private Response response;
 
-  public ControllerResponse(Integer status, T data) {
+  public ControllerResponse(Integer status, Object data) {
     this.response = Response.status(status).entity(data).build();
   }
 }

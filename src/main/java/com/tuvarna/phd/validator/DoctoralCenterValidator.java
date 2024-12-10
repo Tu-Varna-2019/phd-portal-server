@@ -2,8 +2,12 @@ package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.exception.DoctoralCenterRoleException;
 
+import java.util.regex.Pattern;
+
 import org.jboss.logging.Logger;
+
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
+import com.tuvarna.phd.service.dto.DoctoralCenterPasswordChangeDTO;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,6 +21,9 @@ public class DoctoralCenterValidator {
 	private enum VALID_ROLES {
 		expert, manager;
 	}
+
+	private static final Pattern passwordPattern = Pattern
+			.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
 
 	public void validateRoleIsExpert(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleException {
 		try {
@@ -36,5 +43,19 @@ public class DoctoralCenterValidator {
 			throw new DoctoralCenterRoleException("Role is not valid!");
 		}
 		;
+	}
+
+	public void validatePassword(DoctoralCenterPasswordChangeDTO dCenterPasswordChangeDTO)
+			throws DoctoralCenterRoleException {
+		/**
+		 * Validate the password
+		 * Should At least 8 characters long.
+		 * Should contain at least one uppercase letter
+		 * Should contain at least one lowercase letter
+		 * Should contain at least one digit
+		 * Should contain at least one special character (e.g., @, $, !, %, *, ?, &).
+		 */
+		if (!passwordPattern.matcher(dCenterPasswordChangeDTO.getNewPassword()).matches())
+			throw new DoctoralCenterRoleException("Password does not conform pattern!");
 	}
 }

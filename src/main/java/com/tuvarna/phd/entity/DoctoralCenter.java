@@ -47,7 +47,7 @@ public class DoctoralCenter extends PanacheEntityBase {
   private String password;
 
   @Column(nullable = false, unique = false)
-  private boolean shouldPasswordReset;
+  private boolean isPasswordChangeRequired;
 
   @Transient
   private String unhashedPassword;
@@ -63,5 +63,10 @@ public class DoctoralCenter extends PanacheEntityBase {
 
   public void generatePassword(Integer length) {
     this.password = Generator.generateRandomString(length);
+  }
+
+  public boolean doesPasswordMatch(String plainPassword) {
+
+    return BcryptUtil.matches(plainPassword,this.password);
   }
 }
