@@ -86,7 +86,7 @@ jobs:
         uses: dbelyaev/action-checkstyle@master
         with:
           github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
+          reporter: github-check
           level: failure # warning
           fail_on_error: true
           checkstyle_version: "10.20.0"
