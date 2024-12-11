@@ -2,7 +2,6 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
-import com.tuvarna.phd.models.ControllerResponse;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.service.dto.DoctoralCenterPasswordChangeDTO;
@@ -34,7 +33,7 @@ import org.jboss.logging.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
-public class DoctoralCenterController {
+public class DoctoralCenterController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;
   private final DoctoralCenterValidator doctoralCenterValidator;
@@ -90,17 +89,7 @@ public class DoctoralCenterController {
         .onItem()
         .transform(
             v -> {
-              return new ControllerResponse(200, "Expert user created!").getResponse();
-            })
-        .onFailure()
-        .recoverWithItem(
-            throwable -> {
-              LOG.error(
-                  "Failed to send email: %s with exception %s",
-                  doctoralCenterDTO.getEmail(), throwable);
-              return new ControllerResponse(
-                      400, "Failed to send email: " + doctoralCenterDTO.getEmail())
-                  .getResponse();
+              return send("Expert user created!");
             });
   }
 
@@ -138,7 +127,7 @@ public class DoctoralCenterController {
     this.doctoralCenterService.changePassword(dCenterPasswordChangeDTO);
 
     LOG.info("Password changed for user: " + dCenterPasswordChangeDTO.getEmail());
-    return new ControllerResponse(200, "Password change done!").getResponse();
+    return send("Password change done!");
   }
   ;
 
@@ -168,6 +157,6 @@ public class DoctoralCenterController {
     DoctoralCenter doctoralCenter = this.doctoralCenterService.create(doctoralCenterDTO);
     LOG.info("User created!");
 
-    return new ControllerResponse(200, "Manager user is created").getResponse();
+    return send("Manager user is created");
   }
 }

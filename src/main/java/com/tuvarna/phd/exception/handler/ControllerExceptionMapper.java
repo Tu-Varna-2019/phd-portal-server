@@ -2,12 +2,11 @@ package com.tuvarna.phd.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuvarna.phd.exception.HttpException;
-
+import com.tuvarna.phd.models.ControllerResponse;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -18,10 +17,8 @@ import org.jboss.logging.Logger;
 @Priority(1)
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
-  @Inject
-  ObjectMapper objectMapper;
-  @Inject
-  private Logger log;
+  @Inject ObjectMapper objectMapper;
+  @Inject private Logger log;
 
   @Override
   public Response toResponse(Exception exception) {
@@ -36,16 +33,24 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
   }
 
   private Response mapExceptionToResponse(Exception exception) {
+    ControllerResponse controllerResponse = new ControllerResponse(exception.getMessage());
     return switch (exception) {
+      case HttpException e -> Response.status(e.getStatus()).entity(controllerResponse).build();
 
-      case HttpException e ->
-        Response.status(e.getStatus()).entity(e.getMessage()).build();
+      case ForbiddenException e -> {
+        controllerResponse.setMessage("You are not permitted to do this operation");
+        yield Response.status(403).entity(controllerResponse).build();
+      }
 
-      case ForbiddenException e -> Response.status(403).entity("You are not permitted to do this operation").build();
+      case UnauthorizedException e -> {
+        controllerResponse.setMessage("Unauthorized!");
+        yield Response.status(401).entity(controllerResponse).build();
+      }
 
-      case UnauthorizedException e -> Response.status(401).entity("Unauthorized!").build();
-
-      default -> Response.status(500).entity("Unexpected error occured. Try again at later time!").build();
+      default -> {
+        controllerResponse.setMessage("Unexpected error occured. Try again at later time!");
+        yield Response.status(500).entity(controllerResponse).build();
+      }
     };
   }
 }

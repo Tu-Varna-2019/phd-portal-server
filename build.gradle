@@ -14,8 +14,8 @@ repositories {
 dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-// https://mvnrepository.com/artifact/io.quarkus/quarkus-hibernate-validator
-implementation 'io.quarkus:quarkus-hibernate-validator:3.17.3'
+    implementation("io.quarkus:quarkus-oidc")
+
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'io.quarkus:quarkus-mailer:3.17.3'
     // Grafana
