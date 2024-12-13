@@ -34,18 +34,12 @@
     <property name="optional" value="true"/>
   </module>
 
-<module name="SuppressionXpathFilter">
-  <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"
-           default="checkstyle-xpath-suppressions.xml"/>
-  <property name="optional" value="true"/>
-</module>
-
-<module name="Indentation">
-  <module name="SuppressionXpathSingleFilter">
-    <property name="id" value="Indentation"/>
-    <property name="query" value="//METHOD_DEF/DEF_IDENTIFIER[@indention='2']"/>
+  <module name="Indentation">
+    <module name="SuppressionXpathSingleFilter">
+      <property name="id" value="Indentation"/>
+      <property name="query" value="//METHOD_DEF/DEF_IDENTIFIER[@indention='2']"/>
+    </module>
   </module>
-</module>
 
   <module name="SuppressionXpathSingleFilter">
     <property name="id" value="Indentation"/>
