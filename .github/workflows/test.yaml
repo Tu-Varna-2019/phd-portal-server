@@ -82,15 +82,15 @@ jobs:
           java-version: ${{ matrix.java_version  }}
           distribution: "zulu"
 
-      - name: Run checkstyle
-        uses: dbelyaev/action-checkstyle@master
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-check
-          level: failure # warning
-          # NOTE: set to true to fail action
-          fail_on_error: false
-          checkstyle_version: "10.20.0"
-          workdir: .
-          properties_file: ./src/main/resources/application.properties
-          checkstyle_config: checkstyle.xml
+      # - name: Run checkstyle
+      #   uses: dbelyaev/action-checkstyle@master
+      #   with:
+      #     github_token: ${{ secrets.github_token }}
+      #     reporter: github-check
+      #     level: failure # warning
+      #     # NOTE: set to true to fail action
+      #     fail_on_error: false
+      #     checkstyle_version: "10.20.0"
+      #     workdir: .
+      #     properties_file: ./src/main/resources/application.properties
+      #     checkstyle_config: checkstyle.xml

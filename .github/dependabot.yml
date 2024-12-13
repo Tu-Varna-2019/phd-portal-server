@@ -22,7 +22,7 @@ updates:
       interval: "daily"
       timezone: "Europe/Sofia"
     commit-message:
-      prefix: "[github-action] "
+      prefix: "[gradle] "
     assignees:
       - "IliyanKostov9"
     reviewers:
@@ -38,7 +38,7 @@ updates:
       day: "sunday"
       timezone: "Europe/Sofia"
     commit-message:
-      prefix: "[github-action] "
+      prefix: "[docker] "
     assignees:
       - "IliyanKostov9"
     reviewers:

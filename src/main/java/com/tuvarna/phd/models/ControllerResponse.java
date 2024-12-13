@@ -1,13 +1,24 @@
 package com.tuvarna.phd.models;
 
-import jakarta.ws.rs.core.Response;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class ControllerResponse {
-  private Response response;
 
-  public ControllerResponse(Integer status, Object data) {
-    this.response = Response.status(status).entity(data).build();
+  private String message;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Object data;
+
+  public ControllerResponse(String message, Object data) {
+    this.message = message;
+    this.data = data;
+  }
+
+  public ControllerResponse(String message) {
+    this.message = message;
   }
 }

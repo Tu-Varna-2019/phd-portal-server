@@ -27,40 +27,60 @@ import org.jboss.logging.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
-public class TeacherController {
+public class TeacherController extends BaseController {
 
-    private final TeacherService teacherService;
-    @Inject
-    private Logger log;
+  private final TeacherService teacherService;
+  @Inject private Logger log;
 
-    @Inject
-    public TeacherController(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
+  @Inject
+  public TeacherController(TeacherService teacherService) {
+    this.teacherService = teacherService;
+  }
 
-    @POST
-    @Transactional
-    @PermitAll
-    // @RolesAllowed({"USER", "ADMIN"})
-    // @Authenticated
-    @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
-    @APIResponses(value = @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))))
-    @Path("/create")
-    public Teacher createTeacher(TeacherDTO teacherDTO) throws DoctoralCenterException {
-        log.info("Received a request to create teacher: " + teacherDTO);
-        return this.teacherService.save(teacherDTO.toTeacher());
-    }
+  @POST
+  @Transactional
+  @PermitAll
+  // @RolesAllowed({"USER", "ADMIN"})
+  // @Authenticated
+  @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
+  @APIResponses(
+      value =
+          @APIResponse(
+              responseCode = "200",
+              description = "Success",
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = TeacherDTO.class))))
+  @Path("/create")
+  public Teacher createTeacher(TeacherDTO teacherDTO) throws DoctoralCenterException {
+    log.info("Received a request to create teacher: " + teacherDTO);
+    return this.teacherService.save(teacherDTO.toTeacher());
+  }
 
-    @POST
-    @Transactional
-    @PermitAll
-    @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
-    @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDTO.class))),
-            @APIResponse(responseCode = "404", description = "Teacher not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DoctoralCenterException.class)))
-    })
-    @Path("/get")
-    public Teacher getTeacher(TeacherDTO teacherDTO) throws DoctoralCenterException {
-        return this.teacherService.getTeacher(teacherDTO.toTeacher());
-    }
+  @POST
+  @Transactional
+  @PermitAll
+  @Operation(summary = "Get a teacher", description = "Get a teacher from the system")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Success",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TeacherDTO.class))),
+        @APIResponse(
+            responseCode = "404",
+            description = "Teacher not found",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = DoctoralCenterException.class)))
+      })
+  @Path("/get")
+  public Teacher getTeacher(TeacherDTO teacherDTO) throws DoctoralCenterException {
+    return this.teacherService.getTeacher(teacherDTO.toTeacher());
+  }
 }
