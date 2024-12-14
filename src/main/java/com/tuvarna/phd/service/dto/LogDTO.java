@@ -12,7 +12,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class LogDTO {
 
   @NotNull
-  @Schema(title = "first_name", required = true)
+  @Schema(title = "description", required = true)
   private String description;
 
   @NotNull
@@ -32,6 +32,6 @@ public class LogDTO {
   private String status;
 
   @NotNull
-  @Schema(title = "userPrincipalDTO", required = true)
+  @Schema(title = "userPrincipal", required = true)
   private UserPrincipalDTO userPrincipalDTO;
 }
