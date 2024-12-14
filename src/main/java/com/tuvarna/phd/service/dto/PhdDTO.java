@@ -1,11 +1,13 @@
 package com.tuvarna.phd.service.dto;
 
 import io.smallrye.common.constraint.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(name = "PhdDTO", description = "PHD DTO")
 @Data
+@AllArgsConstructor
 public class PhdDTO {
 
   @NotNull

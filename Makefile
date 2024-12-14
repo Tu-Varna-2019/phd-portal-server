@@ -2,10 +2,21 @@
 # TARGETS
 ###############
 
-.PHONY: run
+.PHONY: all clean build run test
+all: run build test
+
 run:
 	quarkus dev
 
-.PHONY: jar
-jar:
+test:
+	quarkus test
+
+build:
 	quarkus build
+
+clean:
+	echo "clean"
+
+.PHONY: help
+help:
+	quarkus --help
