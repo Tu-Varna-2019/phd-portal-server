@@ -56,41 +56,44 @@ jobs:
           java-version: ${{ matrix.java_version  }}
           distribution: "zulu"
 
-      - name: Unit test
-        run: echo "It works!"
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
-    needs: test
-    strategy:
-      fail-fast: false
-      matrix:
-        java_version: [21]
+      - name: Test
+        run: ./gradlew test
 
-    steps:
-      - name: Download repo artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: phd-portal-server
-          path: .
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.actor != 'dependabot[bot]' }}
+  #   needs: test
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       java_version: [21]
+  #
+  #   steps:
+  #     - name: Download repo artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: phd-portal-server
+  #         path: .
+  #
+  #     - name: Set up JDK ${{ matrix.java_version  }}
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         java-version: ${{ matrix.java_version  }}
+  #         distribution: "zulu"
 
-      - name: Set up JDK ${{ matrix.java_version  }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ matrix.java_version  }}
-          distribution: "zulu"
-
-      # - name: Run checkstyle
-      #   uses: dbelyaev/action-checkstyle@master
-      #   with:
-      #     github_token: ${{ secrets.github_token }}
-      #     reporter: github-check
-      #     level: failure # warning
-      #     # NOTE: set to true to fail action
-      #     fail_on_error: false
-      #     checkstyle_version: "10.20.0"
-      #     workdir: .
-      #     properties_file: ./src/main/resources/application.properties
-      #     checkstyle_config: checkstyle.xml
+  # - name: Run checkstyle
+  #   uses: dbelyaev/action-checkstyle@master
+  #   with:
+  #     github_token: ${{ secrets.github_token }}
+  #     reporter: github-check
+  #     level: failure # warning
+  #     # NOTE: set to true to fail action
+  #     fail_on_error: false
+  #     checkstyle_version: "10.20.0"
+  #     workdir: .
+  #     properties_file: ./src/main/resources/application.properties
+  #     checkstyle_config: checkstyle.xml
