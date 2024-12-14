@@ -2,38 +2,36 @@ package com.tuvarna.phd.controller;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.is;
+// import static org.mockito.Mockito.verify;
 
-import com.tuvarna.phd.models.ControllerResponse;
 import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
-import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
-import java.net.URL;
+import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-
-// import org.mockito.Mockito;
 
 @QuarkusTest
 @TestHTTPEndpoint(PhdController.class)
 public class TestPhd {
 
-  @InjectMock PhdService phdService;
-
-  @TestHTTPResource("/login")
-  URL loginEndpoint;
+  @Inject PhdService phdService;
 
   @Test
   void testLogin() {
     PhdDTO phdDTO = new PhdDTO("1111111", "John", "Johnatan", "Doe", "john.doe@mail.com");
-    Mockito.when(this.phdService.login(phdDTO).thenReturn(true));
+    // Mockito.doNothing().when(phdServiceMock).login(phdDTO);
 
     given()
+        .contentType(ContentType.JSON)
+        .body(phdDTO)
         .when()
-        .post(loginEndpoint)
+        .post("/login")
         .then()
         .statusCode(200)
-        .body(is(new ControllerResponse("Phd user logged in!")));
+        .body("message", is("Phd user logged in!"));
+
+    // verify(phdService).login(phdDTO);
   }
 }

@@ -9,7 +9,7 @@ run:
 	quarkus dev
 
 test:
-	quarkus test
+	quarkus test --verbose
 
 build:
 	quarkus build
