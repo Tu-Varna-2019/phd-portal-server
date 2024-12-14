@@ -63,7 +63,8 @@ public class LogController extends BaseController {
       })
   @Path("/save")
   public Response save(LogDTO logDTO) throws LogException {
-    LOG.info("Received a request to save log from user role: " + logDTO.getRole());
+    LOG.info(
+        "Received a request to save log from user role: " + logDTO.getUserPrincipalDTO().getRole());
     this.logValidator.validateRoleExists(logDTO);
 
     LOG.info("Log saved!");

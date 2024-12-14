@@ -8,11 +8,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class LogValidator {
 
   public void validateRoleExists(LogDTO logDTO) throws LogException {
+    String role = logDTO.getUserPrincipalDTO().getRole();
+
     try {
-      if (!"user".equals(logDTO.getRole()))
-        DoctoralCenterValidator.VALID_ROLES.valueOf(logDTO.getRole());
+      if (!"user".equals(role)) DoctoralCenterValidator.VALID_ROLES.valueOf(role);
     } catch (IllegalArgumentException e) {
-      throw new LogException("Role " + logDTO.getRole() + " doesn't exist!");
+      throw new LogException("Role " + role + " doesn't exist!");
     }
     ;
   }

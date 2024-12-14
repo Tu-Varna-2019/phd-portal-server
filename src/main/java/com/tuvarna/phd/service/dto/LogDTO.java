@@ -16,10 +16,6 @@ public class LogDTO {
   private String description;
 
   @NotNull
-  @Schema(title = "middle_name", required = true)
-  private String user;
-
-  @NotNull
   @Schema(title = "timestamp", required = true)
   private Timestamp timestamp;
 
@@ -28,6 +24,14 @@ public class LogDTO {
   private String action;
 
   @NotNull
-  @Schema(title = "role", required = true)
-  private String role;
+  @Schema(title = "status", required = true)
+  /* Status:
+   * SUCCESS
+   * FAILURE
+   */
+  private String status;
+
+  @NotNull
+  @Schema(title = "userPrincipalDTO", required = true)
+  private UserPrincipalDTO userPrincipalDTO;
 }
