@@ -18,7 +18,7 @@ public class PhdServiceImpl implements PhdService {
   private final StatusPhdRepository sPhdRepository;
   private final PhdMapper pMapper;
 
-  @Inject private static final Logger LOG = Logger.getLogger(PhdServiceImpl.class);
+  @Inject private Logger LOG = Logger.getLogger(PhdServiceImpl.class);
 
   @Inject
   public PhdServiceImpl(

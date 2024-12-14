@@ -40,8 +40,6 @@ public class TeacherController extends BaseController {
   @POST
   @Transactional
   @PermitAll
-  // @RolesAllowed({"USER", "ADMIN"})
-  // @Authenticated
   @Operation(summary = "Create teacher", description = "Creates a teacher in the system")
   @APIResponses(
       value =
