@@ -4,16 +4,12 @@ import com.tuvarna.phd.exception.DoctoralCenterRoleException;
 import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.service.dto.DoctoralCenterPasswordChangeDTO;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.util.regex.Pattern;
-import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class DoctoralCenterValidator {
 
-  @Inject private static final Logger LOG = Logger.getLogger(DoctoralCenterValidator.class);
-
-  private enum VALID_ROLES {
+  protected enum VALID_ROLES {
     expert,
     manager;
   }
@@ -36,6 +32,15 @@ public class DoctoralCenterValidator {
   public void validateRole(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterRoleException {
     try {
       VALID_ROLES.valueOf(doctoralCenterDTO.getRole());
+    } catch (IllegalArgumentException e) {
+      throw new DoctoralCenterRoleException("Role is not valid!");
+    }
+    ;
+  }
+
+  public void validateRole(String role) throws DoctoralCenterRoleException {
+    try {
+      VALID_ROLES.valueOf(role);
     } catch (IllegalArgumentException e) {
       throw new DoctoralCenterRoleException("Role is not valid!");
     }

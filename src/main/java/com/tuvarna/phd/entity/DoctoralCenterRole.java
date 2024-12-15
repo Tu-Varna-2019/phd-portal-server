@@ -27,7 +27,7 @@ public class DoctoralCenterRole extends PanacheEntityBase {
       name = "doctoralCenterRoleSequence",
       sequenceName = "doctoralCenterRole_id_seq",
       allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterRoleGenerator")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterRoleSequence")
   private Long id;
 
   @Column(nullable = false, unique = true)

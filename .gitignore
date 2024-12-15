@@ -51,3 +51,4 @@ nb-configuration.xml
 .quarkus
 logs/*.log*
 .pre-commit-config.yaml
+.elastic.env

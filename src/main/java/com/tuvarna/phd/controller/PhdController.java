@@ -3,7 +3,6 @@ package com.tuvarna.phd.controller;
 import com.tuvarna.phd.exception.PhdNotFoundException;
 import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
-import io.quarkus.security.Authenticated;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -38,7 +37,6 @@ public class PhdController extends BaseController {
   }
 
   @POST
-  @Authenticated
   @Transactional
   @Operation(
       summary = "Login to the Phd portal",
@@ -64,7 +62,7 @@ public class PhdController extends BaseController {
   @Path("/login")
   public Response login(PhdDTO pDto) throws PhdNotFoundException {
     LOG.info("Received a request to login from using Phd user creds: " + pDto);
-    // this.phdService.login(pDto);
+    this.phdService.login(pDto);
 
     LOG.info("Phd user logged on!");
 
