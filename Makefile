@@ -6,7 +6,7 @@
 all: run build test
 
 run:
-	quarkus dev
+	quarkus dev -Dquarkus.profile=dev
 
 test:
 	quarkus test --verbose
