@@ -18,7 +18,7 @@ COPY src /phd-portal-server/src
 RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=dev
 
 LABEL org.opencontainers.image.source=https://github.com/Tu-Varna-2019/phd-portal-server \
-	version="0.0.1-RELEASE" \
+	version="0.1.0-RELEASE" \
 	description="Masters thesis for developing REST API backend server" \
 	author="Iliyan Kostov" \
 	env="prod"
