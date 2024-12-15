@@ -38,6 +38,15 @@ public class DoctoralCenterValidator {
     ;
   }
 
+  public void validateRole(String role) throws DoctoralCenterRoleException {
+    try {
+      VALID_ROLES.valueOf(role);
+    } catch (IllegalArgumentException e) {
+      throw new DoctoralCenterRoleException("Role is not valid!");
+    }
+    ;
+  }
+
   public void validatePassword(DoctoralCenterPasswordChangeDTO dCenterPasswordChangeDTO)
       throws DoctoralCenterRoleException {
     /**

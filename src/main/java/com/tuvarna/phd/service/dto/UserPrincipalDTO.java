@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "LogDTO", description = "Log DTO")
+@Schema(name = "UserPrincipalDTO", description = "User Principal DTO")
 @Data
 @AllArgsConstructor
 public class UserPrincipalDTO {
