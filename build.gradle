@@ -13,15 +13,24 @@ repositories {
 
 dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    // AWS
+    // implementation 'io.quarkiverse.amazonservices:quarkus-amazon-cloudwatch:3.2.0'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.2.0'
+    implementation 'software.amazon.awssdk:aws-crt-client:2.29.35'
 
+    // Elastisearch
     implementation("io.quarkus:quarkus-elasticsearch-java-client")
+
+    // Azure
     implementation("io.quarkus:quarkus-oidc")
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    implementation 'io.quarkus:quarkus-mailer:3.17.4'
+
     // Grafana
     // implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.44.1'
     // implementation 'io.quarkus:quarkus-observability-devservices-lgtm'
     // implementation 'io.quarkus:quarkus-opentelemetry'
+
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'io.quarkus:quarkus-mailer:3.17.4'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'

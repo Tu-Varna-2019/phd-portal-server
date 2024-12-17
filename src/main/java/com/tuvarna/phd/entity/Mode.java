@@ -28,4 +28,7 @@ public class Mode extends PanacheEntityBase {
 
   @Column(nullable = false, unique = false)
   private String mode;
+  // редовно
+  // задочно
+  // самостоятелна
 }

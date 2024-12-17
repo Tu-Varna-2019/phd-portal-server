@@ -28,6 +28,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "doctoralCenter")
 public class DoctoralCenter extends PanacheEntityBase {
+  // Решат дали докторанта е одобрен или ne -
+  //  Справка от всички докторанти за техните изпити и оценки, от които са получили
+  //  Експерта назначава коя комисия/преподавател на кой изпит
 
   @Id
   @SequenceGenerator(
@@ -47,6 +50,11 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   @Password
   private String password;
+
+  ////////////////////////////// ADMIN ONLY///////////////////////////
+
+  // NOTE: only admin
+  // expert doctor center and manager are going to be added to AAD
 
   @Column(nullable = false, unique = false)
   private boolean isPasswordChangeRequired;

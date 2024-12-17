@@ -25,6 +25,29 @@ import lombok.Setter;
 @Table(name = "phd")
 public class Phd extends PanacheEntityBase {
 
+  // отчетите са в базата
+  //
+  // Лични данни
+  // БГ и Англииски - в таблица
+  // Fill in autobiografy via PDF or form
+  // He can and cannot be in AAD
+  // expert/manager doctoral center download report ->  csv за акаунт за създаване на AAD и акаунт в
+  // Мейл сървъра в TuVarna
+  // (само за одобрените phd)
+  //
+  // Твоа е учебния план
+  // 2 задължителни
+  // Английски език	срок: 30.11.2020 г.
+  // Методика на научните изследвания и разработка на
+  // дисертационен труд           	срок: 30.11.2020 г.
+  // Прослушване на лекции и полагане на изпит на не повече от две свободно- избираемите дисциплини
+  // – бл.В от груповия учебен план.
+
+  // код	срок: 30.06.2021 г.
+  // 1-2 желателни
+  // код 09: „Машинно обучение“
+  // 1 дисертация
+
   @Id
   @SequenceGenerator(name = "phdSequence", sequenceName = "phd_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
@@ -42,12 +65,20 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "last_name", nullable = false, unique = false)
   private String lastName;
 
+  // address
+
   @Column(nullable = false, unique = false)
   private String email;
 
+  /////////////////////
   // TODO: Can be removed ?
   @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
+
+  @Column(name = "enroll_date", nullable = true, unique = false)
+  private Date nomerZapoved;
+
+  ////////////// Expert добавя тези атрибути
 
   @Column(name = "grad_date", nullable = true, unique = false)
   private Date gradDate;
@@ -66,5 +97,6 @@ public class Phd extends PanacheEntityBase {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Department", nullable = true)
+  // NOTE: План за обучениe
   private Department department;
 }

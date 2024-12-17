@@ -26,6 +26,17 @@ import lombok.Setter;
 @Table(name = "grade")
 public class Grade extends PanacheEntityBase {
 
+  // Докторантски изпит 1:
+  // pdf на англииски език учебник - commission одобрил дали става за изпит - expert ili comisiya -
+  // experta dobavq 2 член от комисията за оценка
+  // ако е одобрен, се явява на изпит за Англииски език и получава оценка
+  // ако е одобрен (над 4:50 оценка)
+  //
+  // Докторантски изпит 2: (по докторантската програма при кандидадстването) - experta dobavq 3 член
+  // от комисията за оценка
+  // phd изпраща презентация файл и реферат върху тема на изпита - 2 pdfa
+  // ако е одобрен (над 4:50 оценка), тогава е приет
+
   @Id
   @SequenceGenerator(name = "gradeSequence", sequenceName = "grade_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gradeSequence")
