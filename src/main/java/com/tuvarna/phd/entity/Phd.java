@@ -75,8 +75,8 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 
-  @Column(name = "enroll_date", nullable = true, unique = false)
-  private Date nomerZapoved;
+  // @Column(name = "enroll_date", nullable = true, unique = false)
+  // private Date nomerZapoved;
 
   ////////////// Expert добавя тези атрибути
 
