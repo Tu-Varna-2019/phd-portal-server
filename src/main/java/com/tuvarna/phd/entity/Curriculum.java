@@ -26,6 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "curriculum")
+// ALWAYS individualen
 public class Curriculum extends PanacheEntityBase {
 
   @Id
@@ -38,6 +39,9 @@ public class Curriculum extends PanacheEntityBase {
 
   @Column(nullable = false, unique = false)
   private String description;
+
+  @Column(nullable = true, unique = false)
+  private Integer order;
 
   @Column(name = "start_date", nullable = false, unique = false)
   private Date startDate;

@@ -31,6 +31,4 @@ public class StatusPhd extends PanacheEntityBase {
 
   @Column(nullable = false, unique = false)
   private String status;
-  // expert terminates ако изпита е pod 4.50
-  // expert accpets ако изпита е pod 4.50
 }

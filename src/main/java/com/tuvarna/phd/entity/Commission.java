@@ -30,15 +30,6 @@ public class Commission extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commissionSequence")
   private Long id;
 
-  // NOTE: can be removed
-  // @Column(nullable = false, unique = false)
-  // // NOTE: името на дисциплината
-  // private String name;
-
-  // @ManyToOne(fetch = FetchType.LAZY)
-  // @JoinColumn(name = "Committee", nullable = false)
-  // private Committee chairman;
-
   @Column(nullable = false, unique = false)
   private ArrayList<Committee> members;
 }

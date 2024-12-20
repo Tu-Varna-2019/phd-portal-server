@@ -1,7 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.smallrye.common.constraint.NotNull;
+import io.quarkus.security.jpa.Username;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,12 +33,16 @@ public class Committee extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
-  @NotNull
+  @Username
+  @Column(nullable = false, unique = true)
   private String name;
 
   @Column(nullable = false, unique = false)
   private Double grade;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "Department", nullable = false)
+  private Department department;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "committeeType", nullable = false)

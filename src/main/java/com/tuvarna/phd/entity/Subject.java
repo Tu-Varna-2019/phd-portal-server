@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.util.Date;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,17 +32,22 @@ public class Subject extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subjectSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Grade", nullable = false)
+  @JoinColumn(name = "Grade", nullable = true)
   private Grade grade;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "examDate", nullable = true)
+  private Date examDate;
 
   @ManyToMany(mappedBy = "subjects", fetch = FetchType.EAGER)
   private Set<Curriculum> curriculums;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Teacher", nullable = false)
-  private Teacher teacher;
+  // TODO: maybe set nullable to false again ?
+  @JoinColumn(name = "Committee", nullable = true)
+  private Committee teacher;
 }
