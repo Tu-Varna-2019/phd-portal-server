@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.util.Date;
+import java.sql.Date;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

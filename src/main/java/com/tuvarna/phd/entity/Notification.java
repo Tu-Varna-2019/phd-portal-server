@@ -1,6 +1,5 @@
 package com.tuvarna.phd.entity;
 
-import co.elastic.clients.util.DateTime;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.sql.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class Notification extends PanacheEntityBase {
   private String description;
 
   @Column(nullable = false, unique = false)
-  private DateTime creation;
+  private Date creation;
 
   @Column(nullable = false, unique = false)
   private List<String> oidRecipients;

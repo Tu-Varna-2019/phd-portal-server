@@ -2,7 +2,6 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
-import io.quarkus.security.jpa.UserDefinition;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,7 +23,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@UserDefinition
 @Table(name = "phd")
 public class Phd extends PanacheEntityBase {
 
@@ -76,9 +74,9 @@ public class Phd extends PanacheEntityBase {
   @JoinColumn(name = "StatusPhd", nullable = false)
   private StatusPhd status;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Curriculum", nullable = true)
-  private Curriculum curriculum;
+  // @ManyToOne(fetch = FetchType.LAZY)
+  // @JoinColumn(name = "Curriculum", nullable = true)
+  // private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Supervisor", nullable = true)

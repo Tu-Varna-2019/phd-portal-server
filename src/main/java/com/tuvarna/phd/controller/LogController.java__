@@ -35,7 +35,7 @@ public class LogController extends BaseController {
   private final LogService logService;
   private final LogValidator logValidator;
   private final DoctoralCenterValidator dValidator;
-  @Inject private static final Logger LOG = Logger.getLogger(LogController.class);
+  @Inject private final Logger LOG = Logger.getLogger(LogController.class);
 
   @Inject
   public LogController(

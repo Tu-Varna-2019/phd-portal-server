@@ -1,9 +1,6 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.security.jpa.Roles;
-import io.quarkus.security.jpa.UserDefinition;
-import io.quarkus.security.jpa.Username;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,7 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@UserDefinition
+// @UserDefinition
 @Table(name = "doctoralCenter")
 public class DoctoralCenter extends PanacheEntityBase {
 
@@ -39,14 +36,12 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Column(name = "oid", nullable = true, unique = true, updatable = false)
   private String oid;
 
-  @Username
   @Column(nullable = false, unique = false)
   private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
 
-  @Roles
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "DoctoralCenterRole", nullable = false)
   private DoctoralCenterRole role;

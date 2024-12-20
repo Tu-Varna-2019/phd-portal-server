@@ -1,7 +1,6 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.security.jpa.Username;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,9 +32,14 @@ public class Committee extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
   private Long id;
 
-  @Username
+  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  private String oid;
+
   @Column(nullable = false, unique = true)
   private String name;
+
+  @Column(nullable = false, unique = false)
+  private String email;
 
   @Column(nullable = false, unique = false)
   private Double grade;

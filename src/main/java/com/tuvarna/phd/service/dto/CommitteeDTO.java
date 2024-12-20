@@ -4,9 +4,9 @@ import io.smallrye.common.constraint.NotNull;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "DoctoralCenterDTO", description = "Doctoral Center DTO")
+@Schema(name = "CommitteeDTO", description = "Committee DTO")
 @Data
-public class DoctoralCenterDTO {
+public class CommitteeDTO {
 
   @NotNull
   @Schema(title = "oid", required = true)
@@ -19,9 +19,4 @@ public class DoctoralCenterDTO {
   @NotNull
   @Schema(title = "email", required = true)
   private String email;
-
-  @NotNull
-  // TODO: Remove this??
-  @Schema(title = "role", required = false)
-  private String role;
 }
