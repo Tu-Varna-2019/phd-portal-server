@@ -10,6 +10,10 @@ public abstract class BaseController {
     return Response.ok().entity(new ControllerResponse(message, data)).build();
   }
 
+  public Response send(String message, String role, Object data) {
+    return Response.ok().entity(new ControllerResponse(message, role, data)).build();
+  }
+
   public Response send(String message) {
     return Response.ok().entity(new ControllerResponse(message)).build();
   }
