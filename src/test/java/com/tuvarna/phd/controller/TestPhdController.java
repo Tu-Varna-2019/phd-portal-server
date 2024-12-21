@@ -6,10 +6,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.tuvarna.phd.models.ControllerResponse;
+import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.Test;
 public class TestPhdController {
 
   @InjectMock PhdController phdController;
+  @InjectMock PhdService phdService;
+
   static PhdDTO phdDTO;
 
   @BeforeAll
@@ -29,7 +32,7 @@ public class TestPhdController {
 
   @Test
   void testLogin() {
-    when(this.phdController.login(phdDTO))
+    when(phdController.login(phdDTO))
         .thenReturn(Response.ok().entity(new ControllerResponse("Phd user logged in!")).build());
 
     given()
@@ -41,6 +44,6 @@ public class TestPhdController {
         .statusCode(200)
         .body("message", is("Phd user logged in!"));
 
-    verify(this.phdController).login(phdDTO);
+    verify(phdController).login(phdDTO);
   }
 }

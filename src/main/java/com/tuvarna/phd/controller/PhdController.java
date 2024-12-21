@@ -29,7 +29,7 @@ import org.jboss.logging.Logger;
 public class PhdController extends BaseController {
 
   private PhdService phdService;
-  @Inject Logger LOG = Logger.getLogger(DoctoralCenterController.class);
+  @Inject Logger LOG = Logger.getLogger(PhdController.class);
 
   @Inject
   public PhdController(PhdService phdService) {
