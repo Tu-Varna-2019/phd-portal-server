@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.StatusPhd;
-import com.tuvarna.phd.exception.PhdNotFoundException;
+import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,7 +11,6 @@ public class StatusPhdRepository implements PanacheRepositoryBase<StatusPhd, Int
   public StatusPhd getByStatus(String status) {
     return find("status", status)
         .firstResultOptional()
-        .orElseThrow(
-            () -> new PhdNotFoundException("Phd with status: " + status + " doesn't exist!"));
+        .orElseThrow(() -> new PhdException("Phd with status: " + status + " doesn't exist!", 404));
   }
 }

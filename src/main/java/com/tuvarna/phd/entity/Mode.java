@@ -26,6 +26,6 @@ public class Mode extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "modeSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String mode;
 }

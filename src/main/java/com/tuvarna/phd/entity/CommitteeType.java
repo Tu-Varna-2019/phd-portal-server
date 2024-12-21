@@ -29,6 +29,6 @@ public class CommitteeType extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeTypeSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String type;
 }

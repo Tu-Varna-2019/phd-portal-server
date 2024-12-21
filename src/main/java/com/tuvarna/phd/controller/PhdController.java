@@ -1,6 +1,6 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.exception.PhdNotFoundException;
+import com.tuvarna.phd.exception.PhdException;
 import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import jakarta.enterprise.context.RequestScoped;
@@ -28,8 +28,8 @@ import org.jboss.logging.Logger;
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public class PhdController extends BaseController {
 
-  private final PhdService phdService;
-  @Inject private static final Logger LOG = Logger.getLogger(DoctoralCenterController.class);
+  private PhdService phdService;
+  @Inject Logger LOG = Logger.getLogger(PhdController.class);
 
   @Inject
   public PhdController(PhdService phdService) {
@@ -60,7 +60,7 @@ public class PhdController extends BaseController {
                     schema = @Schema(implementation = PhdDTO.class))),
       })
   @Path("/login")
-  public Response login(PhdDTO pDto) throws PhdNotFoundException {
+  public Response login(PhdDTO pDto) throws PhdException {
     LOG.info("Received a request to login from using Phd user creds: " + pDto);
     this.phdService.login(pDto);
 

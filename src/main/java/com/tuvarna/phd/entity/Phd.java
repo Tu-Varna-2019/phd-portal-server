@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.security.jpa.Password;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,7 +31,7 @@ public class Phd extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = false, unique = true, updatable = false)
+  @Column(name = "oid", nullable = true, unique = true, updatable = false)
   private String oid;
 
   @Column(name = "first_name", nullable = false, unique = false)
@@ -43,9 +44,26 @@ public class Phd extends PanacheEntityBase {
   private String lastName;
 
   @Column(nullable = false, unique = false)
+  private String country;
+
+  @Column(nullable = false, unique = false)
+  private String city;
+
+  @Column(nullable = false, unique = false)
+  private String address;
+
+  @Password
+  @Column(nullable = false, unique = true)
+  // TODO: Encrypt this pls
+  // ЕГН
+  private String pin;
+
+  @Column(nullable = false, unique = false)
   private String email;
 
-  // TODO: Can be removed ?
+  @Column(name = "dissertation_topic", nullable = true, unique = false)
+  private String dissertationTopic;
+
   @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 
@@ -56,9 +74,9 @@ public class Phd extends PanacheEntityBase {
   @JoinColumn(name = "StatusPhd", nullable = false)
   private StatusPhd status;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Curriculum", nullable = true)
-  private Curriculum curriculum;
+  // @ManyToOne(fetch = FetchType.LAZY)
+  // @JoinColumn(name = "Curriculum", nullable = true)
+  // private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Supervisor", nullable = true)
@@ -67,4 +85,8 @@ public class Phd extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Department", nullable = true)
   private Department department;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "Report", nullable = true)
+  private Report report;
 }

@@ -1,4 +1,4 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -9,10 +9,9 @@ import com.tuvarna.phd.entity.StatusPhd;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.StatusPhdRepository;
-import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
+import io.quarkus.test.InjectMock;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class TestPhdService {
 
   @BeforeAll
   static void init() {
-    PhdDTO phdDTO = new PhdDTO("1111111", "John", "Johnatan", "Doe", "john.doe@mail.com");
+    phdDTO = new PhdDTO("1111111", "John", "Johnatan", "Doe", "john.doe@mail.com");
   }
 
   @Test

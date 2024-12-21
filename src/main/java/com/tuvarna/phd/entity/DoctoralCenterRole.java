@@ -1,7 +1,6 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.security.jpa.Roles;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +30,5 @@ public class DoctoralCenterRole extends PanacheEntityBase {
   private Long id;
 
   @Column(nullable = false, unique = true)
-  @Roles
   private String role;
 }

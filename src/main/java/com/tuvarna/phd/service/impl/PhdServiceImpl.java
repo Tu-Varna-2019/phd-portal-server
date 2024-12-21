@@ -1,7 +1,7 @@
 package com.tuvarna.phd.service.impl;
 
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.exception.PhdNotFoundException;
+import com.tuvarna.phd.exception.PhdException;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.StatusPhdRepository;
@@ -51,7 +51,7 @@ public class PhdServiceImpl implements PhdService {
               + " with oid: "
               + phd.getOid()
               + " is present in the Phd table.\n No need to add him. Moving on...");
-    } catch (PhdNotFoundException exception) {
+    } catch (PhdException exception) {
       LOG.warn(
           "Phd user: "
               + phd.getEmail()

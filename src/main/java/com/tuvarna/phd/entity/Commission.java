@@ -3,12 +3,9 @@ package com.tuvarna.phd.entity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -32,13 +29,6 @@ public class Commission extends PanacheEntityBase {
       allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commissionSequence")
   private Long id;
-
-  @Column(nullable = false, unique = false)
-  private String name;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Committee", nullable = false)
-  private Committee chairman;
 
   @Column(nullable = false, unique = false)
   private ArrayList<Committee> members;

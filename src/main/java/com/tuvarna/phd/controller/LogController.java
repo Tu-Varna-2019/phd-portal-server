@@ -32,10 +32,10 @@ import org.jboss.logging.Logger;
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public class LogController extends BaseController {
 
-  private final LogService logService;
-  private final LogValidator logValidator;
-  private final DoctoralCenterValidator dValidator;
-  @Inject private static final Logger LOG = Logger.getLogger(LogController.class);
+  private  LogService logService;
+  private LogValidator logValidator;
+  private  DoctoralCenterValidator dValidator;
+  @Inject private  Logger LOG = Logger.getLogger(LogController.class);
 
   @Inject
   public LogController(
