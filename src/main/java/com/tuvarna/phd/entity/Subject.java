@@ -39,7 +39,6 @@ public class Subject extends PanacheEntityBase {
   @JoinColumn(name = "Grade", nullable = true)
   private Grade grade;
 
-  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "examDate", nullable = true)
   private Date examDate;
 
@@ -47,7 +46,6 @@ public class Subject extends PanacheEntityBase {
   private Set<Curriculum> curriculums;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  // TODO: maybe set nullable to false again ?
   @JoinColumn(name = "Committee", nullable = true)
   private Committee teacher;
 }

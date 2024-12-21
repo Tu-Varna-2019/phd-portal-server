@@ -41,7 +41,7 @@ public class Curriculum extends PanacheEntityBase {
   private String description;
 
   @Column(nullable = true, unique = false)
-  private Integer order;
+  private Integer orderNum;
 
   @Column(name = "start_date", nullable = false, unique = false)
   private Date startDate;

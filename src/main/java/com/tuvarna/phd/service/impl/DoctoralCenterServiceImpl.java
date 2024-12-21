@@ -22,7 +22,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final DoctoralCenterMapper doctoralCenterMapper;
 
-  @Inject private final Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
+  @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
   @Inject private ReactiveMailer mailer;
 
   @ConfigProperty(name = "client.base-url")

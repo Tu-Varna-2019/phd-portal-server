@@ -43,5 +43,5 @@ public class Report extends PanacheEntityBase {
   private Date endDate;
 
   @Column(nullable = true, unique = false)
-  private Integer order;
+  private Integer orderNum;
 }

@@ -28,8 +28,8 @@ import org.jboss.logging.Logger;
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public class PhdController extends BaseController {
 
-  private final PhdService phdService;
-  @Inject final Logger LOG = Logger.getLogger(DoctoralCenterController.class);
+  private PhdService phdService;
+  @Inject Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
   @Inject
   public PhdController(PhdService phdService) {
