@@ -3,7 +3,6 @@ package com.tuvarna.phd.controller;
 import static org.mockito.Mockito.when;
 
 import com.tuvarna.phd.models.ControllerResponse;
-import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 public class TestPhdController {
 
   @InjectMock PhdController phdController;
-  @InjectMock PhdService phdService;
 
   static PhdDTO phdDTO;
 
