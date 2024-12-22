@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CommitteeException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.PhdException;
+import com.tuvarna.phd.exception.UserException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
@@ -12,7 +13,6 @@ import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.AuthService;
 import com.tuvarna.phd.service.dto.UserDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
-import io.vertx.ext.web.handler.HttpException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  @Transactional
+  @Transactional(dontRollbackOn = UserException.class)
   public Tuple2<Object, String> login(UserDTO userDTO) {
     LOG.info("Service received a request to login as a user: " + userDTO);
 
@@ -60,24 +60,27 @@ public class AuthServiceImpl implements AuthService {
     // NOTE: Check if user is in phd -> commitee -> doctor center tables sequentially
     Object obj =
         Optional.ofNullable(isUserInPHDTable(oid))
-            .orElse(
-                Optional.ofNullable(isUserInCommitteeTable(oid))
-                    .orElse(Optional.ofNullable(isUserInDoctoralCenterTable(oid))));
+            .or(() -> Optional.ofNullable(isUserInCommitteeTable(oid)))
+            .or(() -> Optional.ofNullable(isUserInDoctoralCenterTable(oid)))
+            .orElse(null);
 
     // NOTE: if user is actually found, then return it
     if (obj != null) return obj;
 
     // NOTE: Else, add it to the unauthorized users repo if it's not already in it
     if (this.usersRepository.getByOid(oid) == null) {
+      LOG.info("User: " + userDTO.getEmail() + " is not present in the table. Adding him now...");
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
       this.usersRepository.save(users);
-    }
+    } else
+      LOG.info(
+          "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
 
-    throw new HttpException(
-        400,
+    throw new UserException(
         "User: "
             + userDTO.getOid()
-            + " is not present in neither phd, committee or doctoral center tables!");
+            + " is not present in neither phd, committee or doctoral center tables!",
+        401);
   }
 
   private Object isUserInPHDTable(String oid) {
@@ -108,8 +111,7 @@ public class AuthServiceImpl implements AuthService {
       this.role = "doctoralCenter";
       return this.doctoralCenterRepository.getByOid(oid);
     } catch (DoctoralCenterException exDoc) {
-      LOG.error(
-          "User not found in any of the tables! Adding him to unauthorized users table now...");
+      LOG.warn("User not found in doctoral center table!");
       return null;
     }
   }

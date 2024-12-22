@@ -42,7 +42,7 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role", nullable = true)
   private DoctoralCenterRole role;
 }

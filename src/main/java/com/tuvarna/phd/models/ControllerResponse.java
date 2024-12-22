@@ -9,6 +9,8 @@ import lombok.Setter;
 public class ControllerResponse {
 
   private String message;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String role;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)

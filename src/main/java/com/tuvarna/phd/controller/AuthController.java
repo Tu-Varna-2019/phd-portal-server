@@ -5,7 +5,6 @@ import com.tuvarna.phd.service.dto.UserDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -37,7 +36,6 @@ public class AuthController extends BaseController {
   }
 
   @POST
-  @Transactional
   @Operation(
       summary = "Verify the user is present in the database",
       description = "Verify the user is present in the database")
@@ -62,7 +60,6 @@ public class AuthController extends BaseController {
   public Response login(UserDTO userDTO) {
     LOG.info("Received a request to login with user creds: " + userDTO);
     Tuple2<Object, String> user = this.authService.login(userDTO);
-    LOG.info("User logged in!");
 
     return send("User logged in!", user.getItem2(), user.getItem1());
   }

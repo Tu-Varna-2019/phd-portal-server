@@ -1,0 +1,26 @@
+---
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.26
+    restart: always
+    depends_on: []
+    # env_file:
+    #   - path: .elastic.env
+    #     required: true
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=123
+    networks:
+      - elnetwork
+    volumes:
+      - elvolume:/var/lib/elastic
+
+networks:
+  elnetwork:
+
+volumes:
+  elvolume:
