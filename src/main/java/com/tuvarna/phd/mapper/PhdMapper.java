@@ -14,6 +14,7 @@ public interface PhdMapper {
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "enrollDate", ignore = true)
   @Mapping(target = "gradDate", ignore = true)
+  @Mapping(target = "curriculum", ignore = true)
   @Mapping(target = "supervisor", ignore = true)
   @Mapping(target = "department", ignore = true)
   @Mapping(target = "report", ignore = true)
