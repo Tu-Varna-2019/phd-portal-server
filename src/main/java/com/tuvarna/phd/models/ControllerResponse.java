@@ -11,10 +11,19 @@ public class ControllerResponse {
   private String message;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String role;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Object data;
 
   public ControllerResponse(String message, Object data) {
     this.message = message;
+    this.data = data;
+  }
+
+  public ControllerResponse(String message, String role, Object data) {
+    this.message = message;
+    this.role = role;
     this.data = data;
   }
 

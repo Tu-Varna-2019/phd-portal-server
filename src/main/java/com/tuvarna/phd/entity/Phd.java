@@ -70,23 +70,23 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "grad_date", nullable = true, unique = false)
   private Date gradDate;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "StatusPhd", nullable = false)
   private StatusPhd status;
 
-  // @ManyToOne(fetch = FetchType.LAZY)
-  // @JoinColumn(name = "Curriculum", nullable = true)
-  // private Curriculum curriculum;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "Curriculum", nullable = true)
+  private Curriculum curriculum;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Supervisor", nullable = true)
   private Supervisor supervisor;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Department", nullable = true)
   private Department department;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
 }

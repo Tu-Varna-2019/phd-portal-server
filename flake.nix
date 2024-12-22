@@ -46,9 +46,6 @@
                 excludes = [ "docker-publish.yaml" ];
               };
             checkmake.enable = true;
-            prettier.enable = true;
-            # Nix
-            statix.enable = true;
           };
 
           devenv.root =
