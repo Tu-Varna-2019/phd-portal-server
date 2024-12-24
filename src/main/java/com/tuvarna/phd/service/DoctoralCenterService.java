@@ -1,12 +1,17 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.entity.DoctoralCenter;
-import com.tuvarna.phd.exception.DoctoralCenterException;
-import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
+import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.service.dto.PhdDTO;
+import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.Uni;
+import java.util.List;
 
 public interface DoctoralCenterService {
-  DoctoralCenter create(DoctoralCenterDTO doctoralCenterDTO) throws DoctoralCenterException;
+  void updatePhdStatus(PhdDTO pDto, String status);
 
-  Uni<Void> sendEmail(String email, String password);
+  void setUnauthorizedUserRole(UnauthorizedUsersDTO usersDTO, String role);
+
+  List<UnauthorizedUsers> getUnauthorizedUsers();
+
+  Uni<Void> sendEmail(String email);
 }

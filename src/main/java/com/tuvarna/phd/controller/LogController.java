@@ -46,7 +46,6 @@ public class LogController extends BaseController {
   }
 
   @POST
-  @Transactional
   @Operation(summary = "Save log", description = "Save a log from user action")
   @APIResponses(
       value = {
@@ -79,7 +78,6 @@ public class LogController extends BaseController {
   }
 
   @GET
-  @Transactional
   @Operation(summary = "fetch logs", description = "Fetch logs, depending on a role")
   @APIResponses(
       value = {
@@ -108,7 +106,6 @@ public class LogController extends BaseController {
   }
 
   @DELETE
-  @Transactional
   @Operation(summary = "delete logs", description = "Delete logs")
   @APIResponses(
       value = {

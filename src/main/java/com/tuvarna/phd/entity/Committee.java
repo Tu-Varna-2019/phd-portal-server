@@ -41,6 +41,9 @@ public class Committee extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
+  @Column(name = "picture", nullable = false, unique = false)
+  private String picture;
+
   @Column(nullable = false, unique = false)
   private Double grade;
 
@@ -49,6 +52,12 @@ public class Committee extends PanacheEntityBase {
   private Department department;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "committeeType", nullable = false)
+  @JoinColumn(name = "committeeType", nullable = true)
   private CommitteeType committeeType;
+
+  public Committee(String oid, String name, String email) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+  }
 }

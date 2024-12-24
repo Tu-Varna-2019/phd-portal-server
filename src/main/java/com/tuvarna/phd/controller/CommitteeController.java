@@ -4,7 +4,6 @@ import com.tuvarna.phd.service.CommitteeService;
 import com.tuvarna.phd.service.dto.CommitteeDTO;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -35,7 +34,6 @@ public class CommitteeController extends BaseController {
   }
 
   @POST
-  @Transactional
   @Operation(summary = "Login to the system", description = "Login as a committee in the system")
   @APIResponses(
       value =

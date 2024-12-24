@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,4 +38,7 @@ public class UnauthorizedUsers extends PanacheEntityBase {
 
   @Column(nullable = false, unique = false)
   private String email;
+
+  @Column(nullable = false, unique = false)
+  private Timestamp timestamp;
 }
