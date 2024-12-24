@@ -118,10 +118,6 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   private void createUserByRole(String oid, String name, String email, String role) {
     switch (role) {
-      case "phd":
-        Phd phd = new Phd(oid, name, email);
-        this.phdRepository.save(phd);
-        break;
       case "committee":
         Committee committee = new Committee(oid, name, email);
         this.committeeRepository.save(committee);

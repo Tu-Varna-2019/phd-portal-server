@@ -1,5 +1,6 @@
 package com.tuvarna.phd.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.smallrye.common.constraint.NotNull;
 import java.sql.Timestamp;
 import lombok.Data;
@@ -22,6 +23,10 @@ public class UnauthorizedUsersDTO {
   private String email;
 
   @NotNull
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd HH:mm:ss.SSS",
+      timezone = "UTC")
   @Schema(title = "timestamp", required = true)
   private Timestamp timestamp;
 }

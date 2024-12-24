@@ -41,7 +41,7 @@ public class Committee extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
-  @Column(name = "picture", nullable = false, unique = false)
+  @Column(nullable = true, unique = false)
   private String picture;
 
   @Column(nullable = false, unique = false)

@@ -33,7 +33,7 @@ public class Phd extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  @Column(name = "oid", nullable = false, unique = true, updatable = false)
   private String oid;
 
   @Column(name = "first_name", nullable = false, unique = false)
@@ -45,7 +45,10 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "last_name", nullable = false, unique = false)
   private String lastName;
 
-  @Column(name = "picture", nullable = false, unique = false)
+  @Column(nullable = false, unique = false)
+  private String email;
+
+  @Column(name = "picture", nullable = true, unique = false)
   private String picture;
 
   @Column(nullable = false, unique = false)
@@ -62,9 +65,6 @@ public class Phd extends PanacheEntityBase {
   // TODO: Encrypt this pls
   // ЕГН
   private String pin;
-
-  @Column(nullable = false, unique = false)
-  private String email;
 
   @Column(name = "dissertation_topic", nullable = true, unique = false)
   private String dissertationTopic;

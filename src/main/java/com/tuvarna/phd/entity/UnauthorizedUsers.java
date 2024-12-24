@@ -33,10 +33,12 @@ public class UnauthorizedUsers extends PanacheEntityBase {
   @Column(name = "oid", nullable = true, unique = true, updatable = false)
   private String oid;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = false)
   private String name;
 
   @Column(nullable = false, unique = false)
+  // BUG: switching unique to true gives a stupid error: duplicate key value violates unique
+  // constraint "unauthorizedusers_email_key"
   private String email;
 
   @Column(nullable = false, unique = false)
