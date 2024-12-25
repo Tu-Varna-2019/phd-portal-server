@@ -16,10 +16,4 @@ steps:
       status: success
     commands:
       - chmod +x ./gradlew
-      - ./gradlew test \
-        -Dquarkus.datasource.devservices.enabled=false \
-        -Dquarkus.datasource.db-kind=h2 \
-        -Dquarkus.datasource.jdbc.url=jdbc:h2:mem:test;DB_CLOSE_DELAY=-1 \
-        -Dquarkus.datasource.username=sa \
-        -Dquarkus.datasource.password=sa \
-        -Dtestcontainers.disabled=true
+      - ./gradlew test -Dtestcontainers.disabled=true -Dquarkus.datasource.devservices.enabled=false -Dquarkus.datasource.db-kind=h2 -Dquarkus.datasource.jdbc.url=jdbc:h2:mem:test;DB_CLOSE_DELAY=-1 -Dquarkus.datasource.username=sa -Dquarkus.datasource.password=sa
