@@ -10,4 +10,4 @@ steps:
       status: success
     commands:
       - chmod +x ./gradlew
-      - ./gradlew test -Dtestcontainers.disabled=true
+      - ./gradlew test -x testcontainersTests
