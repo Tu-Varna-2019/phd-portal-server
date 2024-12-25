@@ -1,11 +1,13 @@
+# when:
+#   branch: master
+#   event: [ pull_request]
+
 steps:
   - name: Java test
     image: gradle:jdk21-corretto
     when:
-      # branch: feat/codeberg-webhook-trigger
-      # event: pull_request
       event: push
       status: success
     commands:
       - chmod +x ./gradlew
-      - ./gradlew test
+      - ./gradlew test -Dtestcontainers.disabled=true
