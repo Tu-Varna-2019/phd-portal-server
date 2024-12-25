@@ -1,13 +1,22 @@
-# when:
-#   branch: master
-#   event: [ pull_request]
+when:
+  # branch: master
+  event: [ push ]
 
 steps:
-  - name: Java test
+  - name: Setup Docker-in-Docker
+    image: docker:20.10.16-dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    commands:
+      - dockerd-entrypoint.sh &
+      - sleep 5
+      - docker info
+
+  - name: Java Test with Docker
     image: gradle:jdk21-corretto
-    when:
-      event: push
-      status: success
+    environment:
+      DOCKER_HOST: tcp://127.0.0.1:2375
     commands:
       - chmod +x ./gradlew
-      - ./gradlew test -Dtestcontainers.disabled=true
+      - ./gradlew test
