@@ -18,7 +18,7 @@ dependencies {
     implementation 'software.amazon.awssdk:aws-crt-client:2.29.35'
 
     // Elastisearch
-    // implementation("io.quarkus:quarkus-elasticsearch-java-client")
+    implementation("io.quarkus:quarkus-elasticsearch-java-client")
 
     // Azure
     implementation("io.quarkus:quarkus-oidc")
