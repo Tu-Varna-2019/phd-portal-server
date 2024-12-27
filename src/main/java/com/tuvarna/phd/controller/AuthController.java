@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.service.AuthService;
-import com.tuvarna.phd.service.dto.UserDTO;
+import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -47,17 +47,17 @@ public class AuthController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
         @APIResponse(
             responseCode = "401",
             description = "User is not present and therefore not allowed!",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
       })
   @Path("/login")
-  public Response login(UserDTO userDTO) {
+  public Response login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Received a request to login with user creds: " + userDTO);
     Tuple2<Object, String> user = this.authService.login(userDTO);
 

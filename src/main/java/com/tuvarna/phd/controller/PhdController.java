@@ -5,7 +5,6 @@ import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -37,7 +36,6 @@ public class PhdController extends BaseController {
   }
 
   @POST
-  @Transactional
   @Operation(
       summary = "Login to the Phd portal",
       description =

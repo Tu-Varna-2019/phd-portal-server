@@ -1,0 +1,19 @@
+# when:
+#   branch: master
+#   event: [ pull_request]
+# clone:
+#    git:
+#      image: woodpeckerci/plugin-git
+#      settings:
+#        partial: false
+
+
+steps:
+  - name: Java test
+    image: gradle:jdk21-corretto
+    when:
+      event: push
+      status: success
+    commands:
+      - chmod +x ./gradlew
+      - ./gradlew test

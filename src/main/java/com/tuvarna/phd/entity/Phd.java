@@ -1,7 +1,9 @@
 package com.tuvarna.phd.entity;
 
+import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.smallrye.mutiny.tuples.Tuple3;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +33,7 @@ public class Phd extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  @Column(name = "oid", nullable = false, unique = true, updatable = false)
   private String oid;
 
   @Column(name = "first_name", nullable = false, unique = false)
@@ -42,6 +44,12 @@ public class Phd extends PanacheEntityBase {
 
   @Column(name = "last_name", nullable = false, unique = false)
   private String lastName;
+
+  @Column(nullable = false, unique = false)
+  private String email;
+
+  @Column(name = "picture", nullable = true, unique = false)
+  private String picture;
 
   @Column(nullable = false, unique = false)
   private String country;
@@ -57,9 +65,6 @@ public class Phd extends PanacheEntityBase {
   // TODO: Encrypt this pls
   // ЕГН
   private String pin;
-
-  @Column(nullable = false, unique = false)
-  private String email;
 
   @Column(name = "dissertation_topic", nullable = true, unique = false)
   private String dissertationTopic;
@@ -89,4 +94,22 @@ public class Phd extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
+
+  public Phd(String oid, String name, String email) {
+    Tuple3<String, String, String> tupleName = this.extractName(name);
+    this.oid = oid;
+    this.firstName = tupleName.getItem1();
+    this.middleName = tupleName.getItem2();
+    this.lastName = tupleName.getItem3();
+    this.email = email;
+  }
+
+  private Tuple3<String, String, String> extractName(String name) {
+    String[] extractedName = name.split(" ");
+
+    if (extractedName.length < 3)
+      throw new PhdException("Cannot extract phd name into: firstName, middleName and lastName!");
+
+    return Tuple3.of(extractedName[0], extractedName[1], extractedName[2]);
+  }
 }

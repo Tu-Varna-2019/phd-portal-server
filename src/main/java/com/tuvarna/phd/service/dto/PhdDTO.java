@@ -27,6 +27,10 @@ public class PhdDTO {
   @Schema(title = "last_name", required = true)
   private String lastName;
 
+  @NotNull
+  @Schema(title = "picture", required = true)
+  private String picture;
+
   @Nullable
   @Schema(title = "country", required = false)
   private String country;

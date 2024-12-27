@@ -10,12 +10,13 @@ INSERT INTO "doctoralcenterrole" ("id", "role")
 SELECT nextval('doctoralCenterRole_id_seq'), 'manager'
 WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'manager');
 
-INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "role")
+INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
 				SELECT
 								nextval('doctoralCenter_id_seq'),
 								'de6b478e-e4e4-422d-88fb-293fe69c6519',
 								'admin',
 								's19621609@onlineedu.tu-varna.bg',
+								'doctoralCenter_image.png',
 								role.id
 				FROM "doctoralcenterrole" role
 				WHERE role.role = 'admin'

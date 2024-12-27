@@ -11,7 +11,7 @@ import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.AuthService;
-import com.tuvarna.phd.service.dto.UserDTO;
+import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -48,13 +48,13 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   @Transactional(dontRollbackOn = UserException.class)
-  public Tuple2<Object, String> login(UserDTO userDTO) {
+  public Tuple2<Object, String> login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Service received a request to login as a user: " + userDTO);
 
     return Tuple2.of(this.verifyUserInDB(userDTO), this.role);
   }
 
-  private Object verifyUserInDB(UserDTO userDTO) {
+  private Object verifyUserInDB(UnauthorizedUsersDTO userDTO) {
     String oid = userDTO.getOid();
 
     // NOTE: Check if user is in phd -> commitee -> doctor center tables sequentially
@@ -70,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
     // NOTE: Else, add it to the unauthorized users repo if it's not already in it
     if (this.usersRepository.getByOid(oid) == null) {
       LOG.info("User: " + userDTO.getEmail() + " is not present in the table. Adding him now...");
+      // LOG.info("Timestamp: "+userDTO.g)
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
       this.usersRepository.save(users);
     } else

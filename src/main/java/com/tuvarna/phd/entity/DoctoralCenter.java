@@ -33,7 +33,7 @@ public class DoctoralCenter extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctoralCenterSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  @Column(nullable = true, unique = true, updatable = false)
   private String oid;
 
   @Column(nullable = false, unique = false)
@@ -42,7 +42,16 @@ public class DoctoralCenter extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String email;
 
+  @Column(nullable = true, unique = false)
+  private String picture;
+
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "role", nullable = true)
+  @JoinColumn(name = "role", nullable = false)
   private DoctoralCenterRole role;
+
+  public DoctoralCenter(String oid, String name, String email) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+  }
 }
