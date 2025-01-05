@@ -25,26 +25,26 @@ INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
 								FROM "doctoralcenter"
 								WHERE "oid" = 'de6b478e-e4e4-422d-88fb-293fe69c6519');
 
-INSERT INTO "statusphd" ("id", "status")
-SELECT nextval('statusPhd_id_seq'), 'enrolled'
-WHERE NOT EXISTS (SELECT 1 FROM "statusphd" WHERE "status" = 'enrolled');
+INSERT INTO "phdstatus" ("id", "status")
+SELECT nextval('PhdStatus_id_seq'), 'enrolled'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'enrolled');
 
-INSERT INTO "statusphd" ("id", "status")
-SELECT nextval('statusPhd_id_seq'), 'graduated'
-WHERE NOT EXISTS (SELECT 1 FROM "statusphd" WHERE "status" = 'graduated');
+INSERT INTO "phdstatus" ("id", "status")
+SELECT nextval('PhdStatus_id_seq'), 'graduated'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'graduated');
 
-INSERT INTO "statusphd" ("id", "status")
-SELECT nextval('statusPhd_id_seq'), 'terminated'
-WHERE NOT EXISTS (SELECT 1 FROM "statusphd" WHERE "status" = 'terminated');
+INSERT INTO "phdstatus" ("id", "status")
+SELECT nextval('PhdStatus_id_seq'), 'terminated'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'terminated');
 
 
-INSERT INTO "committeetype" ("id", "type")
-SELECT nextval('committeeType_id_seq'), 'chairman'
-WHERE NOT EXISTS (SELECT 1 FROM "committeetype" WHERE "type" = 'chairman');
+INSERT INTO "committeerole" ("id", "type")
+SELECT nextval('committeeRole_id_seq'), 'chairman'
+WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'chairman');
 
-INSERT INTO "committeetype" ("id", "type")
-SELECT nextval('committeeType_id_seq'), 'member'
-WHERE NOT EXISTS (SELECT 1 FROM "committeetype" WHERE "type" = 'member');
+INSERT INTO "committeerole" ("id", "type")
+SELECT nextval('committeeRole_id_seq'), 'member'
+WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'member');
 
 
 INSERT INTO "mode" ("id", "mode")

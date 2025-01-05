@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.exception.CommitteeException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public class CommitteeRepository implements PanacheRepositoryBase<Committee, Integer> {
@@ -23,5 +24,13 @@ public class CommitteeRepository implements PanacheRepositoryBase<Committee, Int
 
   public void save(Committee committee) {
     committee.persist();
+  }
+
+  public List<Committee> getAll() {
+    return listAll();
+  }
+
+  public void deleteByOid(String oid) {
+    delete("oid", oid);
   }
 }

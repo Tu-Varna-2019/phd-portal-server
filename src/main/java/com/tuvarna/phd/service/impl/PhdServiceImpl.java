@@ -4,7 +4,7 @@ import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.exception.PhdException;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.repository.PhdRepository;
-import com.tuvarna.phd.repository.StatusPhdRepository;
+import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.service.PhdService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,14 +15,14 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public class PhdServiceImpl implements PhdService {
   private final PhdRepository pRepository;
-  private final StatusPhdRepository sPhdRepository;
+  private final PhdStatusRepository sPhdRepository;
   private final PhdMapper pMapper;
 
   @Inject private Logger LOG = Logger.getLogger(PhdServiceImpl.class);
 
   @Inject
   public PhdServiceImpl(
-      PhdRepository pRepository, StatusPhdRepository sPhdRepository, PhdMapper pMapper) {
+      PhdRepository pRepository, PhdStatusRepository sPhdRepository, PhdMapper pMapper) {
     this.pRepository = pRepository;
     this.pMapper = pMapper;
     this.sPhdRepository = sPhdRepository;

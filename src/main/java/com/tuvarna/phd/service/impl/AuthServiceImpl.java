@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
   private final UnauthorizedUsersRepository usersRepository;
   private final UnauthorizedUsersMapper mapper;
 
-  private String role;
+  private String group;
 
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
 
@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
   public Tuple2<Object, String> login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Service received a request to login as a user: " + userDTO);
 
-    return Tuple2.of(this.verifyUserInDB(userDTO), this.role);
+    return Tuple2.of(this.verifyUserInDB(userDTO), this.group);
   }
 
   private Object verifyUserInDB(UnauthorizedUsersDTO userDTO) {
@@ -70,7 +70,6 @@ public class AuthServiceImpl implements AuthService {
     // NOTE: Else, add it to the unauthorized users repo if it's not already in it
     if (this.usersRepository.getByOid(oid) == null) {
       LOG.info("User: " + userDTO.getEmail() + " is not present in the table. Adding him now...");
-      // LOG.info("Timestamp: "+userDTO.g)
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
       this.usersRepository.save(users);
     } else
@@ -87,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
   private Object isUserInPHDTable(String oid) {
     LOG.info("Checking if user: " + oid + " is in phd table...");
     try {
-      this.role = "phd";
+      this.group = "phd";
       return this.pRepository.getByOid(oid);
     } catch (PhdException exPhd) {
       LOG.warn("User is not in phd table. Now checking if he's present in committee table... ");
@@ -97,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
 
   private Object isUserInCommitteeTable(String oid) {
     try {
-      this.role = "committee";
+      this.group = "committee";
       return this.committeeRepository.getByOid(oid);
     } catch (CommitteeException exComm) {
       LOG.warn(
@@ -109,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
 
   private Object isUserInDoctoralCenterTable(String oid) {
     try {
-      this.role = "doctoralCenter";
+      this.group = "doctoralCenter";
       return this.doctoralCenterRepository.getByOid(oid);
     } catch (DoctoralCenterException exDoc) {
       LOG.warn("User not found in doctoral center table!");

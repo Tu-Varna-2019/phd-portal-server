@@ -1,9 +1,7 @@
 package com.tuvarna.phd.entity;
 
-import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
-import io.smallrye.mutiny.tuples.Tuple3;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -76,8 +74,8 @@ public class Phd extends PanacheEntityBase {
   private Date gradDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "StatusPhd", nullable = false)
-  private StatusPhd status;
+  @JoinColumn(name = "PhdStatus", nullable = false)
+  private PhdStatus status;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Curriculum", nullable = true)
@@ -95,21 +93,7 @@ public class Phd extends PanacheEntityBase {
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
 
-  public Phd(String oid, String name, String email) {
-    Tuple3<String, String, String> tupleName = this.extractName(name);
-    this.oid = oid;
-    this.firstName = tupleName.getItem1();
-    this.middleName = tupleName.getItem2();
-    this.lastName = tupleName.getItem3();
-    this.email = email;
-  }
-
-  private Tuple3<String, String, String> extractName(String name) {
-    String[] extractedName = name.split(" ");
-
-    if (extractedName.length < 3)
-      throw new PhdException("Cannot extract phd name into: firstName, middleName and lastName!");
-
-    return Tuple3.of(extractedName[0], extractedName[1], extractedName[2]);
+  public String getFullName() {
+    return this.getFirstName() + this.getMiddleName() + this.getLastName();
   }
 }

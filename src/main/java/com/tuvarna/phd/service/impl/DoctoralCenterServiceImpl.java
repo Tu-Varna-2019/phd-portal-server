@@ -4,24 +4,27 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.StatusPhd;
+import com.tuvarna.phd.entity.PhdStatus;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.DoctoralCenterException;
+import com.tuvarna.phd.exception.UserException;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
-import com.tuvarna.phd.repository.StatusPhdRepository;
+import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.service.dto.UserDTO;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -32,7 +35,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final PhdRepository phdRepository;
   private final CommitteeRepository committeeRepository;
-  private final StatusPhdRepository sPhdRepository;
+  private final PhdStatusRepository sPhdRepository;
   private final UnauthorizedUsersRepository uRepository;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
@@ -46,7 +49,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
       DoctoralCenterRepository doctoralCenterRepository,
       PhdRepository phdRepository,
       DoctoralCenterRoleRepository doctoralCenterRoleRepository,
-      StatusPhdRepository sPhdRepository,
+      PhdStatusRepository sPhdRepository,
       CommitteeRepository committeeRepository,
       UnauthorizedUsersRepository uRepository) {
     this.doctoralCenterRepository = doctoralCenterRepository;
@@ -63,10 +66,31 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
     LOG.info("Service received a request to update status for  phd user: " + pDto);
 
     Phd phd = this.phdRepository.getByEmail(pDto.getEmail());
-    StatusPhd statusPhd = this.sPhdRepository.getByStatus(status);
+    PhdStatus statusPhd = this.sPhdRepository.getByStatus(status);
 
     LOG.info("Updating phd status to: " + status);
     phd.setStatus(statusPhd);
+  }
+
+  @Override
+  @Transactional
+  public void deleteUser(String oid, String role) {
+    switch (role) {
+      case "phd":
+        this.phdRepository.deleteByOid(oid);
+        break;
+
+      case "committee":
+        this.phdRepository.deleteByOid(oid);
+        break;
+
+      case "doctoralCenter":
+        this.phdRepository.deleteByOid(oid);
+        break;
+
+      default:
+        throw new UserException("Role is incorrect!", 400);
+    }
   }
 
   @Override
@@ -102,18 +126,52 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void setUnauthorizedUserRole(UnauthorizedUsersDTO usersDTO, String role) {
-    LOG.info(
-        "Service received a request to set role for unauthorized user: " + usersDTO.getEmail());
+  public List<UserDTO> getAuthenticatedUsers() {
+    LOG.info("Service received to retrieve all unauthorized users");
+    List<UserDTO> authenticatedUsers = new ArrayList<>();
+    List<Phd> phds = this.phdRepository.getAll();
+    List<Committee> committees = this.committeeRepository.getAll();
+    List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
-    UnauthorizedUsers users = this.uRepository.getByOid(usersDTO.getOid());
-    this.createUserByRole(usersDTO.getOid(), usersDTO.getName(), usersDTO.getEmail(), role);
+    for (Phd phd : phds) {
+      UserDTO user = new UserDTO(phd.getOid(), phd.getFullName(), phd.getEmail(), "phd");
+      authenticatedUsers.add(user);
+    }
+
+    for (Committee commitee : committees) {
+      UserDTO user =
+          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
+      authenticatedUsers.add(user);
+    }
+
+    for (DoctoralCenter dCenter : doctoralCenters) {
+      UserDTO user =
+          new UserDTO(
+              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
+      authenticatedUsers.add(user);
+    }
+
+    return authenticatedUsers;
+  }
+
+  @Override
+  @Transactional
+  public void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role) {
     LOG.info(
-        "User created for a role: "
-            + role
-            + " ! Now deleting him from unauthorized users table...");
-    this.uRepository.delete(users);
-    LOG.info("User deleted from that table!");
+        "Service received a request to set role for unauthorized user: " + usersDTO.toString());
+
+    for (UnauthorizedUsersDTO userDTO : usersDTO) {
+      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
+      this.createUserByRole(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), role);
+
+      LOG.info(
+          "User created for a role: "
+              + role
+              + " ! Now deleting him from unauthorized users table...");
+      this.uRepository.delete(user);
+
+      LOG.info("User" + user.getEmail() + "deleted from that table!");
+    }
   }
 
   private void createUserByRole(String oid, String name, String email, String role) {

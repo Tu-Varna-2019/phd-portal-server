@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
@@ -26,5 +27,13 @@ public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
 
   public void save(Phd phd) {
     phd.persist();
+  }
+
+  public List<Phd> getAll() {
+    return listAll();
+  }
+
+  public void deleteByOid(String oid) {
+    delete("oid", oid);
   }
 }

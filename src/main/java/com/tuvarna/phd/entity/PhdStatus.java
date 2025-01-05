@@ -18,17 +18,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "statusPhd")
-public class StatusPhd extends PanacheEntityBase {
+@Table(name = "phdstatus")
+public class PhdStatus extends PanacheEntityBase {
 
   @Id
   @SequenceGenerator(
-      name = "statusPhdSequence",
-      sequenceName = "statusPhd_id_seq",
+      name = "PhdStatusSequence",
+      sequenceName = "PhdStatus_id_seq",
       allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statusPhdSequence")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PhdStatusSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String status;
 }

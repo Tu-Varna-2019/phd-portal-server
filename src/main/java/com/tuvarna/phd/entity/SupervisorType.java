@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "supervisorType")
+@Table(name = "supervisortype")
 public class SupervisorType extends PanacheEntityBase {
 
   @Id

@@ -5,13 +5,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.StatusPhd;
+import com.tuvarna.phd.entity.PhdStatus;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.repository.PhdRepository;
-import com.tuvarna.phd.repository.StatusPhdRepository;
+import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.service.dto.PhdDTO;
-import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 public class TestPhdService {
   @InjectMock PhdService phdService;
   @InjectMock PhdRepository pRepository;
-  @InjectMock StatusPhdRepository sPhdRepository;
+  @InjectMock PhdStatusRepository sPhdRepository;
   @Inject public PhdMapper pMapper;
   @InjectMock public PhdMapper pMapperMock;
 
@@ -39,7 +39,7 @@ public class TestPhdService {
     Phd phd = this.pMapper.toEntity(phdDTO);
 
     phd.setStatus(this.sPhdRepository.getByStatus(defaultStatus));
-    when(this.sPhdRepository.getByStatus(defaultStatus)).thenReturn(new StatusPhd());
+    when(this.sPhdRepository.getByStatus(defaultStatus)).thenReturn(new PhdStatus());
 
     this.pRepository.getByOid("1111111");
     when(this.pRepository.getByOid("1111111")).thenReturn(phd);

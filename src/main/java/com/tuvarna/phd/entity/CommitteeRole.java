@@ -18,15 +18,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "committeeType")
-public class CommitteeType extends PanacheEntityBase {
+@Table(name = "committeerole")
+public class CommitteeRole extends PanacheEntityBase {
 
   @Id
   @SequenceGenerator(
-      name = "committeeTypeSequence",
-      sequenceName = "committeeType_id_seq",
+      name = "committeeRoleSequence",
+      sequenceName = "committeeRole_id_seq",
       allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeTypeSequence")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeRoleSequence")
   private Long id;
 
   @Column(nullable = false, unique = true)

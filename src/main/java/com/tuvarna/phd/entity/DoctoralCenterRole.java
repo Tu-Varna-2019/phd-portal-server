@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "doctoralCenterRole")
+@Table(name = "doctoralcenterrole")
 public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Id

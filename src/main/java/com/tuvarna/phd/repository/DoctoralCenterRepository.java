@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralCenter, Integer> {
@@ -30,5 +31,13 @@ public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralC
             () ->
                 new DoctoralCenterException(
                     "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
+  }
+
+  public List<DoctoralCenter> getAll() {
+    return listAll();
+  }
+
+  public void deleteByOid(String oid) {
+    delete("oid", oid);
   }
 }
