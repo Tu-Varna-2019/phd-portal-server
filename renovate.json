@@ -1,0 +1,22 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"platform": "gitea",
+	"endpoint": "https://codeberg.org",
+	"repositories": ["Tu-Varna-2019/phd-portal-server"],
+	"dependencyDashboard": true,
+	"enabledManagers": ["gradle"],
+	"ignoreTests": true,
+	"packageRules": [
+		{
+			"description": "use fix scope for renovate updates",
+			"matchPackageNames": ["renovatebot/renovate"],
+			"semanticCommitType": "fix"
+		},
+		{
+			"description": "Automerge renovate updates",
+			"matchPackageNames": ["renovatebot/renovate"],
+			"matchUpdateTypes": ["minor", "patch", "digest"],
+			"automerge": true
+		}
+	]
+}
