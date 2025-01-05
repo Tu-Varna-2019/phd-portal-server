@@ -1,7 +1,6 @@
 when:
-  # branch: master
-  event: [push]
-
+  event: cron
+  cron: "Renovate"
 
 steps:
   - name: scan-pkgs
@@ -10,4 +9,4 @@ steps:
       RENOVATE_TOKEN:
         from_secret: RENOVATE_TOKEN
     commands:
-      - renovate Tu-Varna-2019/phd-portal-server --endpoint=https://codeberg.org --platform=gitea --token=$RENOVATE_TOKEN
+      - renovate $CI_REPO --endpoint=https://codeberg.org --platform=gitea --token=$RENOVATE_TOKEN
