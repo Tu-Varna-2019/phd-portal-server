@@ -5,6 +5,7 @@
 	"repositories": ["Tu-Varna-2019/phd-portal-server"],
 	"dependencyDashboard": true,
 	"enabledManagers": ["gradle"],
+	"assignees": ["iliyan-kostov"],
 	"ignoreTests": true,
 	"packageRules": [
 		{

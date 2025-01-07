@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.service.DoctoralCenterService;
+import com.tuvarna.phd.service.dto.OidDTO;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.service.dto.UserDTO;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
@@ -67,8 +69,8 @@ public class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = PhdDTO.class))),
       })
-  @Path("/candidates/{status}")
-  public Uni<Response> updateStatusCandidate(PhdDTO pDto, String status) {
+  @Path("/candidate")
+  public Uni<Response> updateStatusCandidate(PhdDTO pDto, @QueryParam("status") String status) {
     LOG.info("Received a request to " + status + "a phd user: " + pDto.getEmail());
 
     this.doctoralCenterService.updatePhdStatus(pDto, status);
@@ -120,36 +122,6 @@ public class DoctoralCenterController extends BaseController {
     return send("Unauthorized users retrieved!", unauthorizedUsers);
   }
 
-  @GET
-  @Operation(summary = "User management", description = "Get all authenticated users")
-  @APIResponses(
-      value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "All authenticated users retrieved",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
-        @APIResponse(
-            responseCode = "400",
-            description = "Error when retrieving authtenticated users!",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
-      })
-  @Path("/authenticated/get")
-  public Response getAuthenticatedUsers(
-      @NotBlank @Pattern(regexp = "^doctoralCenter") @CookieParam("group") String group,
-      @NotBlank @Pattern(regexp = "^admin") @CookieParam("role") String role) {
-    LOG.info("Received a request to get all authtenticated users");
-
-    List<UserDTO> authenticatedUsers = this.doctoralCenterService.getAuthenticatedUsers();
-
-    return send("Authenticated users retrieved!", authenticatedUsers);
-  }
-
   @POST
   @Operation(
       summary = "Set role for unauthorized user",
@@ -198,17 +170,47 @@ public class DoctoralCenterController extends BaseController {
             description = "Error when deleting user!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/user/delete/role/{role}")
+  @Path("/authenticated/delete")
   public Response deleteAuthUser(
       @NotBlank @Pattern(regexp = "^doctoralCenter") @CookieParam("group") String group,
       @NotBlank @Pattern(regexp = "^admin") @CookieParam("role") String roleCookie,
-      String oid,
-      String role) {
+        OidDTO oid,
+      @QueryParam("role") String role) {
 
     LOG.info("Received a request to delete a user oid: " + oid + "for role: " + role);
 
     this.doctoralCenterService.deleteUser(oid, role);
 
     return send("User: " + oid + " removed!");
+  }
+
+  @GET
+  @Operation(summary = "User management", description = "Get all authenticated users")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "All authenticated users retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving authtenticated users!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDTO.class))),
+      })
+  @Path("/authenticated/get")
+  public Response getAuthenticatedUsers(
+      @NotBlank @Pattern(regexp = "^doctoralCenter") @CookieParam("group") String group,
+      @NotBlank @Pattern(regexp = "^admin") @CookieParam("role") String role) {
+    LOG.info("Received a request to get all authtenticated users");
+
+    List<UserDTO> authenticatedUsers = this.doctoralCenterService.getAuthenticatedUsers();
+
+    return send("Authenticated users retrieved!", authenticatedUsers);
   }
 }

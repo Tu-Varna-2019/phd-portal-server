@@ -15,6 +15,7 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.DoctoralCenterService;
+import com.tuvarna.phd.service.dto.OidDTO;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.service.dto.UserDTO;
@@ -74,18 +75,18 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void deleteUser(String oid, String role) {
+  public void deleteUser(OidDTO oidDTO, String role) {
     switch (role) {
       case "phd":
-        this.phdRepository.deleteByOid(oid);
+        this.phdRepository.deleteByOid(oidDTO.getOid());
         break;
 
       case "committee":
-        this.phdRepository.deleteByOid(oid);
+        this.committeeRepository.deleteByOid(oidDTO.getOid());
         break;
 
       case "doctoralCenter":
-        this.phdRepository.deleteByOid(oid);
+        this.doctoralCenterRepository.deleteByOid(oidDTO.getOid());
         break;
 
       default:
@@ -134,20 +135,30 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getOid(), phd.getFullName(), phd.getEmail(), "phd");
+      UserDTO user =
+          new UserDTO(phd.getId(), phd.getOid(), phd.getFullName(), phd.getEmail(), "phd");
       authenticatedUsers.add(user);
     }
 
     for (Committee commitee : committees) {
       UserDTO user =
-          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
+          new UserDTO(
+              commitee.getId(),
+              commitee.getOid(),
+              commitee.getName(),
+              commitee.getEmail(),
+              "committee");
       authenticatedUsers.add(user);
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
       UserDTO user =
           new UserDTO(
-              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
+              dCenter.getId(),
+              dCenter.getOid(),
+              dCenter.getName(),
+              dCenter.getEmail(),
+              dCenter.getRole().getRole());
       authenticatedUsers.add(user);
     }
 

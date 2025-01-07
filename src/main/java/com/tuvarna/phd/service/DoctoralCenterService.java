@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.service.dto.OidDTO;
 import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.service.dto.UserDTO;
@@ -16,7 +17,7 @@ public interface DoctoralCenterService {
 
   List<UserDTO> getAuthenticatedUsers();
 
-  void deleteUser(String oid, String role);
+  void deleteUser(OidDTO oidDTO, String role);
 
   Uni<Void> sendEmail(String email);
 }

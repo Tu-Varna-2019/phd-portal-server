@@ -11,6 +11,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class UserDTO {
 
   @NotNull
+  @Schema(title = "id", required = true)
+  private Long id;
+
+  @NotNull
   @Schema(title = "oid", required = true)
   private String oid;
 
