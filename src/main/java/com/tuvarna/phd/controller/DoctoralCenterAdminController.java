@@ -12,6 +12,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -64,15 +65,15 @@ public class DoctoralCenterAdminController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
       })
-  @Path("/unauthorized")
-  public Response getUnauthorized() {
+  @Path("/unauthorized-users")
+  public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users");
     List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
 
     return send("Unauthorized users retrieved!", unauthorizedUsers);
   }
 
-  @PATCH
+  @POST
   @Operation(
       summary = "Set role for unauthorized users",
       description = "Set a role for unauthorized users")
@@ -80,7 +81,7 @@ public class DoctoralCenterAdminController extends BaseController {
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Role set to unauthorizeds user",
+            description = "Role set to unauthorized user",
             content =
                 @Content(
                     mediaType = "application/json",
