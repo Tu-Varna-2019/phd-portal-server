@@ -2,6 +2,7 @@ package com.tuvarna.phd.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.smallrye.common.constraint.NotNull;
+import jakarta.annotation.Nullable;
 import java.sql.Timestamp;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -21,6 +22,10 @@ public class UnauthorizedUsersDTO {
   @NotNull
   @Schema(title = "email", required = true)
   private String email;
+
+  @Nullable
+  @Schema(title = "role", required = true)
+  private String role;
 
   @NotNull
   @JsonFormat(
