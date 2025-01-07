@@ -15,8 +15,9 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.DoctoralCenterService;
-import com.tuvarna.phd.service.dto.OidDTO;
+import com.tuvarna.phd.service.dto.CandidateDTO;
 import com.tuvarna.phd.service.dto.PhdDTO;
+import com.tuvarna.phd.service.dto.RoleDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.service.dto.UserDTO;
 import io.quarkus.mailer.Mail;
@@ -63,30 +64,30 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void updatePhdStatus(PhdDTO pDto, String status) {
-    LOG.info("Service received a request to update status for  phd user: " + pDto);
+  public void updateCandidateStatus(CandidateDTO candidateDTO, String oid) {
+    LOG.info("Service received a request to update status for candidate: " + candidateDTO.toString());
 
-    Phd phd = this.phdRepository.getByEmail(pDto.getEmail());
-    PhdStatus statusPhd = this.sPhdRepository.getByStatus(status);
+    Phd phd = this.phdRepository.getByEmail(candidateDTO.getEmail());
+    PhdStatus statusPhd = this.sPhdRepository.getByStatus(candidateDTO.getStatus());
 
-    LOG.info("Updating phd status to: " + status);
+    LOG.info("Updating candidate status to: " + candidateDTO.getStatus());
     phd.setStatus(statusPhd);
   }
 
   @Override
   @Transactional
-  public void deleteUser(OidDTO oidDTO, String role) {
-    switch (role) {
+  public void deleteAuthorizedUser(String oid, RoleDTO role) {
+    switch (role.getRole()) {
       case "phd":
-        this.phdRepository.deleteByOid(oidDTO.getOid());
+        this.phdRepository.deleteByOid(oid);
         break;
 
       case "committee":
-        this.committeeRepository.deleteByOid(oidDTO.getOid());
+        this.committeeRepository.deleteByOid(oid);
         break;
 
       case "doctoralCenter":
-        this.doctoralCenterRepository.deleteByOid(oidDTO.getOid());
+        this.doctoralCenterRepository.deleteByOid(oid);
         break;
 
       default:
@@ -127,7 +128,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public List<UserDTO> getAuthenticatedUsers() {
+  public List<UserDTO> getAuthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
     List<UserDTO> authenticatedUsers = new ArrayList<>();
     List<Phd> phds = this.phdRepository.getAll();
@@ -169,7 +170,10 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Transactional
   public void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role) {
     LOG.info(
-        "Service received a request to set role for unauthorized user: " + usersDTO.toString());
+        "Service received a request to set a role: "
+            + role
+            + "for unauthorized user: "
+            + usersDTO.toString());
 
     for (UnauthorizedUsersDTO userDTO : usersDTO) {
       UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());

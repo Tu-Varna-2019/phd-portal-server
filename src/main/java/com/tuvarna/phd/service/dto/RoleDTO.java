@@ -4,11 +4,11 @@ import io.smallrye.common.constraint.NotNull;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "OidDTO", description = "Oid DTO")
+@Schema(name = "RoleDTO", description = "Role DTO")
 @Data
-public class OidDTO {
+public class RoleDTO {
 
   @NotNull
-  @Schema(title = "oid", required = true)
-  private String oid;
+  @Schema(title = "role", required = true)
+  private String role;
 }
