@@ -36,7 +36,7 @@ public class LogDTO {
   private LogLevel level;
 
   @NotNull
-  @Schema(title = "userPrincipal", required = true)
-  @JsonProperty("userPrincipal")
+  @Schema(title = "user", required = true)
+  @JsonProperty("user")
   private UserPrincipalDTO userPrincipalDTO;
 }

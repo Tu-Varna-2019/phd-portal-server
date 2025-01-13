@@ -38,12 +38,12 @@ public class LogServiceImpl implements LogService {
 
   @Override
   @Transactional
-  public List<LogDTO> fetch(String role) {
-    LOG.info("Service received a request to fetch logs for role: " + role);
+  public List<LogDTO> get(String group) {
+    LOG.info("Service received a request to fetch logs for group: " + group);
 
-    // NOTE: fetch user logs if the role is manager, fetch user and manager logs for expert
-    List<LogDTO> logs = this.searchByRole("user");
-    if ("expert".equals(role)) logs.addAll(this.searchByRole("manager"));
+    // NOTE: fetch user logs if the role is manager, retrieve user and manager logs for expert
+    List<LogDTO> logs = this.searchByGroup(group);
+    if ("expert".equals(group)) logs.addAll(this.searchByGroup("manager"));
 
     LOG.info("Logs retrieved!");
 
@@ -52,9 +52,9 @@ public class LogServiceImpl implements LogService {
 
   @Override
   @Transactional
-  public void deleteLogs(List<LogDTO> logs) {
+  public void delete(List<LogDTO> logs) {
     LOG.info("Service received a request to delete logs");
-    this.delete(logs);
+    this.deleteLogs(logs);
 
     LOG.info("Logs deleted!");
   }
@@ -66,6 +66,7 @@ public class LogServiceImpl implements LogService {
       LOG.info("Response from creating an index: " + response.id());
 
     } catch (IOException exception) {
+      LOG.error("Error in log indexing: " + exception.getMessage());
       throw new LogException("Error in log indexing!");
     }
   }
@@ -85,8 +86,8 @@ public class LogServiceImpl implements LogService {
     }
   }
 
-  private List<LogDTO> searchByRole(String role) {
-    return search("userPrincipal.role", role);
+  private List<LogDTO> searchByGroup(String group) {
+    return search("user.group", group);
   }
 
   private List<LogDTO> search(String term, String match) {
@@ -110,7 +111,7 @@ public class LogServiceImpl implements LogService {
     }
   }
 
-  private void delete(List<LogDTO> logs) {
+  private void deleteLogs(List<LogDTO> logs) {
 
     try {
       BulkRequest.Builder br = new BulkRequest.Builder();

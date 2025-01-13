@@ -52,3 +52,5 @@ nb-configuration.xml
 logs/*.log*
 .pre-commit-config.yaml
 .elastic.env
+privateKey.pem
+publicKey.pem

@@ -25,4 +25,8 @@ public abstract class BaseController {
   public ResponseBuilder builder(byte[] bytes, String message) {
     return Response.ok(bytes).entity(new ControllerResponse(message));
   }
+
+  public ResponseBuilder builder(String message, String role, Object data) {
+    return Response.ok().entity(new ControllerResponse(message, role, data));
+  }
 }

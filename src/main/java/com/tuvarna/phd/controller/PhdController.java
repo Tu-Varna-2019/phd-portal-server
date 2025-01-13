@@ -24,7 +24,10 @@ import org.jboss.logging.Logger;
 @Path("/phd")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@SecurityScheme(
+    securitySchemeName = "Bearer",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    scheme = "bearer")
 public class PhdController extends BaseController {
 
   private PhdService phdService;

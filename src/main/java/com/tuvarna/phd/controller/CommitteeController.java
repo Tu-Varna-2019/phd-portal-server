@@ -16,17 +16,18 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
-import org.jboss.logging.Logger;
 
 @RequestScoped
 @Path("/teacher")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@SecurityScheme(
+    securitySchemeName = "Bearer",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    scheme = "bearer")
 public class CommitteeController extends BaseController {
 
   private final CommitteeService committeeService;
-  @Inject private Logger LOG;
 
   @Inject
   public CommitteeController(CommitteeService committeeService) {

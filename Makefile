@@ -6,7 +6,11 @@
 all: run build test
 
 run:
+	devenv up -D
 	quarkus dev -Dquarkus.profile=dev
+
+stop:
+	process-compose down
 
 test:
 	quarkus test --verbose

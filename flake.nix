@@ -27,6 +27,10 @@
       systems = nixpkgs.lib.systems.flakeExposed;
 
       perSystem = { config, self', inputs', pkgs, system, ... }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
 
         devenv.shells.default = {
           name = "Quarkus project";
@@ -35,6 +39,13 @@
             enable = true;
             jdk.package = pkgs.jdk;
             gradle.enable = true;
+          };
+
+          # NOTE: use devenv up to run the service
+          services.elasticsearch = {
+            enable = true;
+            cluster_name = "elasicsearch";
+            port = 9200;
           };
 
           git-hooks.hooks = {

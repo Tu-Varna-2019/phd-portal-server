@@ -11,7 +11,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -31,7 +30,10 @@ import org.jboss.logging.Logger;
 @Path("/doctoralcenter/admin")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@SecurityScheme(
+    securitySchemeName = "Bearer",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    scheme = "bearer")
 public class DoctoralCenterAdminController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;

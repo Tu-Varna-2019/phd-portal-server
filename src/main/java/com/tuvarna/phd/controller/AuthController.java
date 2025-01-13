@@ -24,7 +24,10 @@ import org.jboss.logging.Logger;
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@SecurityScheme(
+    securitySchemeName = "Bearer",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    scheme = "bearer")
 public class AuthController extends BaseController {
 
   private AuthService authService;
@@ -60,7 +63,6 @@ public class AuthController extends BaseController {
   public Response login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Received a request to login with user creds: " + userDTO);
     Tuple2<Object, String> user = this.authService.login(userDTO);
-
     return send("User logged in!", user.getItem2(), user.getItem1());
   }
 }

@@ -15,10 +15,6 @@ public class UserPrincipalDTO {
   @Schema(title = "oid", required = false)
   private String oid;
 
-  @NotNull
-  @Schema(title = "role", required = true)
-  private String role;
-
   @Nullable
   @Schema(title = "name", required = false)
   private String name;
@@ -26,4 +22,8 @@ public class UserPrincipalDTO {
   @NotNull
   @Schema(title = "email", required = true)
   private String email;
+
+  @NotNull
+  @Schema(title = "group", required = true)
+  private String group;
 }

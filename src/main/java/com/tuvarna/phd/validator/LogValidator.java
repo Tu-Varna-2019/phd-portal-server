@@ -7,13 +7,21 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class LogValidator {
 
-  public void validateRoleExists(LogDTO logDTO) throws LogException {
-    String role = logDTO.getUserPrincipalDTO().getRole();
+  protected enum VALID_GROUPS {
+    phd,
+    committee,
+    // doctoralCenter;
+    manager,
+    expert
+  }
+
+  public void validateGroupExists(LogDTO logDTO) throws LogException {
+    String group = logDTO.getUserPrincipalDTO().getGroup();
 
     try {
-      if (!"user".equals(role)) DoctoralCenterValidator.VALID_ROLES.valueOf(role);
+      if (!"user".equals(group)) VALID_GROUPS.valueOf(group);
     } catch (IllegalArgumentException e) {
-      throw new LogException("Role " + role + " doesn't exist!");
+      throw new LogException("Group " + group + " doesn't exist!");
     }
     ;
   }

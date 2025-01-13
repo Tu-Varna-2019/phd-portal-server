@@ -2,11 +2,9 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.service.dto.LogDTO;
-import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -29,20 +27,20 @@ import org.jboss.logging.Logger;
 @Path("/logs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@SecurityScheme(
+    securitySchemeName = "Bearer",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    scheme = "bearer")
 public class LogController extends BaseController {
 
-  private  LogService logService;
+  private LogService logService;
   private LogValidator logValidator;
-  private  DoctoralCenterValidator dValidator;
-  @Inject private  Logger LOG = Logger.getLogger(LogController.class);
+  @Inject private Logger LOG = Logger.getLogger(LogController.class);
 
   @Inject
-  public LogController(
-      LogService logService, LogValidator logValidator, DoctoralCenterValidator dValidator) {
+  public LogController(LogService logService, LogValidator logValidator) {
     this.logService = logService;
     this.logValidator = logValidator;
-    this.dValidator = dValidator;
   }
 
   @POST
@@ -64,45 +62,39 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  @Path("/save")
   public Response save(LogDTO logDTO) {
-    LOG.info(
-        "Received a request to save log from user role: " + logDTO.getUserPrincipalDTO().getRole());
-    this.logValidator.validateRoleExists(logDTO);
-
+    this.logValidator.validateGroupExists(logDTO);
     this.logService.save(logDTO);
-
     LOG.info("Log saved!");
 
     return send("Log saved!");
   }
 
   @GET
-  @Operation(summary = "fetch logs", description = "Fetch logs, depending on a role")
+  @Operation(summary = "Get logs", description = "Get logs, depending on a role")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Log fetched!",
+            description = "Log retrived!",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
         @APIResponse(
             responseCode = "400",
-            description = "Error when fetching log",
+            description = "Error when retriving log",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  @Path("/fetch/{role}")
-  public Response fetch(String role) {
-    LOG.info("Received a request to fetch log from user role: " + role);
-    this.dValidator.validateRole(role);
-    List<LogDTO> logs = this.logService.fetch(role);
+  @Path("/{group}")
+  public Response get(String group) {
+    LOG.info("Received a request to retrieve log from user group: " + group);
+    List<LogDTO> logs = this.logService.get(group);
 
-    return send("Logs fetched", logs);
+    return send("Logs retrieved", logs);
   }
 
   @DELETE
@@ -124,10 +116,9 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  @Path("/delete")
   public Response delete(List<LogDTO> logs) {
     LOG.info("Received a request to delete logs");
-    this.logService.deleteLogs(logs);
+    this.logService.delete(logs);
 
     return send("Logs deleted");
   }
