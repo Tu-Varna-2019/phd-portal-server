@@ -17,6 +17,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
@@ -39,12 +41,16 @@ public class LogServiceImpl implements LogService {
   @Override
   @Transactional
   public List<LogDTO> get(String group) {
+    List<String> roles = new ArrayList<String>(Arrays.asList("phd", "committee"));
+    List<LogDTO> logs = this.searchByGroup(group);
     LOG.info("Service received a request to fetch logs for group: " + group);
 
-    // NOTE: fetch user logs if the role is manager, retrieve user and manager logs for expert
-    List<LogDTO> logs = this.searchByGroup(group);
-    if ("expert".equals(group)) logs.addAll(this.searchByGroup("manager"));
+    if (group.equals("admin")) {
+      roles.add("manager");
+      roles.add("expert");
+    }
 
+    for (String role : roles) logs.addAll(this.searchByGroup(role));
     LOG.info("Logs retrieved!");
 
     return logs;

@@ -12,6 +12,9 @@ repositories {
 
 dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    // JWT
+    implementation("io.quarkus:quarkus-smallrye-jwt")
+    implementation("io.quarkus:quarkus-smallrye-jwt-build")
 
     // AWS
     implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.2.0'

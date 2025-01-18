@@ -40,4 +40,13 @@ public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralC
   public void deleteByOid(String oid) {
     delete("oid", oid);
   }
+
+  public DoctoralCenter getByEmail(String email) {
+    return find("email", email)
+        .firstResultOptional()
+        .orElseThrow(
+            () ->
+                new DoctoralCenterException(
+                    "DoctoralCenter user with email: " + email + " doesn't exist!", 404));
+  }
 }

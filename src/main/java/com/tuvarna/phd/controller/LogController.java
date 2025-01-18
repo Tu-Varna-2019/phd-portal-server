@@ -1,5 +1,6 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.service.dto.LogDTO;
 import com.tuvarna.phd.validator.LogValidator;
@@ -14,6 +15,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -24,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.jboss.logging.Logger;
 
 @RequestScoped
+// TODO: restrict the endpoint usage only to the admin ??
 @Path("/logs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,12 +38,18 @@ public class LogController extends BaseController {
 
   private LogService logService;
   private LogValidator logValidator;
+  private DoctoralCenterRepository doctoralCenterRepository;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
+  @Inject JsonWebToken jwt;
 
   @Inject
-  public LogController(LogService logService, LogValidator logValidator) {
+  public LogController(
+      LogService logService,
+      LogValidator logValidator,
+      DoctoralCenterRepository doctoralCenterRepository) {
     this.logService = logService;
     this.logValidator = logValidator;
+    this.doctoralCenterRepository = doctoralCenterRepository;
   }
 
   @POST
@@ -89,9 +98,11 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  @Path("/{group}")
-  public Response get(String group) {
+  public Response get() {
+    String email = jwt.getName();
+    String group = (this.doctoralCenterRepository.getByEmail(email)).getRole().getRole();
     LOG.info("Received a request to retrieve log from user group: " + group);
+
     List<LogDTO> logs = this.logService.get(group);
 
     return send("Logs retrieved", logs);
