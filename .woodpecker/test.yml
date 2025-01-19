@@ -1,8 +1,8 @@
-when:
-  event: manual
 # when:
-#   branch: master
-#   event: [ pull_request]
+#   event: manual
+when:
+  branch: master
+  event: [ pull_request]
 # clone:
 #    git:
 #      image: woodpeckerci/plugin-git
@@ -16,19 +16,19 @@ steps:
       DOCKER_HOST: "tcp://docker:2376"
       DOCKER_CERT_PATH: "/dind-certs/client27.4-cli"
       DOCKER_TLS_VERIFY: "1"
-    # volumes:
-      # - /opt/woodpeckerci/dind-certs:/dind-certs
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/dind-certs
     commands:
       - docker version
 
 services:
   - name: docker
     image: docker:27.4-dind
-    # privileged: true
+    privileged: true
     environment:
       DOCKER_TLS_CERTDIR: /dind-certs
-    # volumes:
-      # - /opt/woodpeckerci/dind-certs:/dind-certs
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/dind-certs
     ports:
       - 2376
 

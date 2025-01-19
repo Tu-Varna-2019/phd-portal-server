@@ -69,7 +69,10 @@ public class AuthServiceImpl implements AuthService {
 
     // NOTE: Else, add it to the unauthorized users repo if it's not already in it
     if (this.usersRepository.getByOid(oid) == null) {
-      LOG.info("User: " + userDTO.getEmail() + " is not present in the table. Adding him now...");
+      LOG.info(
+          "User: "
+              + userDTO.getEmail()
+              + " is not present in any of the tables. Adding him now...");
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
       this.usersRepository.save(users);
     } else

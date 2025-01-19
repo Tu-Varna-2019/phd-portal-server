@@ -2,7 +2,7 @@
 # TARGETS
 ###############
 
-.PHONY: all clean build run test
+.PHONY: all clean build run test install
 all: run build test
 
 run:
@@ -20,6 +20,9 @@ build:
 
 clean:
 	echo "clean"
+
+install:
+	gradle build
 
 .PHONY: help
 help:

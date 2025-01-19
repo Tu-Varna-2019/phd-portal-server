@@ -40,7 +40,10 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm'
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 
+    // SQL
+    // implementation("io.quarkus:quarkus-reactive-pg-client:3.17.7")
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
+
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-rest'
     implementation 'io.quarkus:quarkus-rest-jackson'

@@ -9,6 +9,7 @@ import java.util.List;
 @ApplicationScoped
 public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
 
+
   public Phd getById(Integer id) throws PhdException {
     return findByIdOptional(id).orElseThrow(() -> new PhdException("Phd doesn't exist!"));
   }
