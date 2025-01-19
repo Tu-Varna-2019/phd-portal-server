@@ -7,7 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class LogValidator {
 
-  protected enum VALID_GROUPS {
+  private enum VALID_GROUPS {
     phd,
     committee,
     // doctoralCenter;
@@ -15,14 +15,29 @@ public class LogValidator {
     expert
   }
 
+  private enum VALID_LEVEL {
+    INFO,
+    SUCCESS,
+    ERROR,
+    WARN
+  }
+
   public void validateGroupExists(LogDTO logDTO) throws LogException {
     String group = logDTO.getUserPrincipalDTO().getGroup();
-
     try {
       if (!"user".equals(group)) VALID_GROUPS.valueOf(group);
     } catch (IllegalArgumentException e) {
       throw new LogException("Group " + group + " doesn't exist!");
     }
     ;
+  }
+
+  public void validateLevel(LogDTO logDTO) throws LogException {
+    String level = logDTO.getLevel();
+    try {
+      VALID_LEVEL.valueOf(level);
+    } catch (IllegalArgumentException e) {
+      throw new LogException("Level " + level + " is invalid");
+    }
   }
 }

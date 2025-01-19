@@ -12,13 +12,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class LogDTO {
 
-  private enum LogLevel {
-    INFO,
-    SUCCESS,
-    ERROR,
-    WARN
-  }
-
   @NotNull
   @Schema(title = "description", required = true)
   private String description;
@@ -33,7 +26,7 @@ public class LogDTO {
 
   @NotNull
   @Schema(title = "level", required = true)
-  private LogLevel level;
+  private String level;
 
   @NotNull
   @Schema(title = "user", required = true)

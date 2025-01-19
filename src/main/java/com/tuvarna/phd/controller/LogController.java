@@ -73,6 +73,8 @@ public class LogController extends BaseController {
       })
   public Response save(LogDTO logDTO) {
     this.logValidator.validateGroupExists(logDTO);
+    this.logValidator.validateLevel(logDTO);
+
     this.logService.save(logDTO);
     LOG.info("Log saved!");
 
