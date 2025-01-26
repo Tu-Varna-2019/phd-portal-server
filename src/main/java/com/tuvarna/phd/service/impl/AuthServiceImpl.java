@@ -46,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     this.mapper = mapper;
   }
 
+  // TODO: Improve this
   @Override
   @Transactional(dontRollbackOn = UserException.class)
   public Tuple2<Object, String> login(UnauthorizedUsersDTO userDTO) {

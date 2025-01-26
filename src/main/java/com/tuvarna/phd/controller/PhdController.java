@@ -62,8 +62,8 @@ public class PhdController extends BaseController {
       })
   @Path("/login")
   public Response login(PhdDTO pDto) throws PhdException {
-    LOG.info("Received a request to login from using Phd user creds: " + pDto);
-    this.phdService.login(pDto);
+    // LOG.info("Received a request to login from using Phd user creds: " + pDto);
+    // this.phdService.login(pDto);
 
     LOG.info("Phd user logged on!");
 

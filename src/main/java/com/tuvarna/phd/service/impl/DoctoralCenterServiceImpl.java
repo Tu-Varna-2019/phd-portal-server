@@ -16,7 +16,6 @@ import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.CandidateDTO;
-import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.service.dto.RoleDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.service.dto.UserDTO;
@@ -65,7 +64,8 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Override
   @Transactional
   public void updateCandidateStatus(CandidateDTO candidateDTO, String oid) {
-    LOG.info("Service received a request to update status for candidate: " + candidateDTO.toString());
+    LOG.info(
+        "Service received a request to update status for candidate: " + candidateDTO.toString());
 
     Phd phd = this.phdRepository.getByEmail(candidateDTO.getEmail());
     PhdStatus statusPhd = this.sPhdRepository.getByStatus(candidateDTO.getStatus());
@@ -191,11 +191,12 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   private void createUserByRole(String oid, String name, String email, String role) {
     switch (role) {
-      case "committee":
-        Committee committee = new Committee(oid, name, email);
-        this.committeeRepository.save(committee);
-        break;
-      case "expert", "manager":
+      // TODO: Not sure if the admin should add users as committees
+      // case "committee":
+      //   Committee committee = new Committee(oid, name, email);
+      //   this.committeeRepository.save(committee);
+      //   break;
+      case "expert", "manager","admin":
         DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
         DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);
         dCenter.setRole(doctoralCenterRole);

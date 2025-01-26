@@ -1,12 +1,16 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.mapper.LogMapper;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.service.dto.LogDTO;
+import com.tuvarna.phd.service.dto.UserPrincipalDTO;
+import com.tuvarna.phd.service.dto.sendLogDTO;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -39,6 +43,7 @@ public class LogController extends BaseController {
   private LogService logService;
   private LogValidator logValidator;
   private DoctoralCenterRepository doctoralCenterRepository;
+  private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
 
@@ -46,10 +51,12 @@ public class LogController extends BaseController {
   public LogController(
       LogService logService,
       LogValidator logValidator,
+      LogMapper logMapper,
       DoctoralCenterRepository doctoralCenterRepository) {
     this.logService = logService;
     this.logValidator = logValidator;
     this.doctoralCenterRepository = doctoralCenterRepository;
+    this.logMapper = logMapper;
   }
 
   @POST
@@ -71,8 +78,20 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  public Response save(LogDTO logDTO) {
-    this.logValidator.validateGroupExists(logDTO);
+  public Response save(
+      sendLogDTO sendLogDTO, @CookieParam("group") String group, @CookieParam("role") String role) {
+    String userGroup = group.equals("doctoralCenter") ? role : group;
+
+    this.logValidator.validateGroupExists(userGroup);
+    this.logValidator.validateLevel(sendLogDTO.getLevel());
+
+    String oid = jwt.getClaim("oid");
+    String name = jwt.getClaim("name");
+    String email = jwt.getName();
+
+    LogDTO logDTO = this.logMapper.toDto(sendLogDTO);
+    logDTO.setUserPrincipalDTO(new UserPrincipalDTO(oid, name, email, userGroup));
+
     this.logService.save(logDTO);
     LOG.info("Log saved!");
 

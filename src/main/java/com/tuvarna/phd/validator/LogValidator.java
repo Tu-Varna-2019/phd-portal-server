@@ -1,28 +1,40 @@
 package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.exception.LogException;
-import com.tuvarna.phd.service.dto.LogDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class LogValidator {
 
-  protected enum VALID_GROUPS {
+  private enum VALID_GROUPS {
     phd,
     committee,
-    // doctoralCenter;
+    admin,
     manager,
     expert
   }
 
-  public void validateGroupExists(LogDTO logDTO) throws LogException {
-    String group = logDTO.getUserPrincipalDTO().getGroup();
+  private enum VALID_LEVEL {
+    INFO,
+    SUCCESS,
+    ERROR,
+    WARN
+  }
 
+  public void validateGroupExists(String group) throws LogException {
     try {
       if (!"user".equals(group)) VALID_GROUPS.valueOf(group);
     } catch (IllegalArgumentException e) {
       throw new LogException("Group " + group + " doesn't exist!");
     }
     ;
+  }
+
+  public void validateLevel(String level) throws LogException {
+    try {
+      VALID_LEVEL.valueOf(level);
+    } catch (IllegalArgumentException e) {
+      throw new LogException("Level " + level + " is invalid");
+    }
   }
 }
