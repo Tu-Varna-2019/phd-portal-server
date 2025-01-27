@@ -1,87 +1,87 @@
 INSERT INTO "doctoralcenterrole" ("id", "role")
-SELECT nextval('doctoralCenterRole_id_seq'), 'администратор'
-WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'администратор');
+SELECT nextval('doctoralCenterRole_id_seq'), 'admin'
+WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'admin');
 
 INSERT INTO "doctoralcenterrole" ("id", "role")
-SELECT nextval('doctoralCenterRole_id_seq'), 'експерт'
-WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'експерт');
+SELECT nextval('doctoralCenterRole_id_seq'), 'expert'
+WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'expert');
 
 INSERT INTO "doctoralcenterrole" ("id", "role")
-SELECT nextval('doctoralCenterRole_id_seq'), 'ръководител'
-WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'ръководител');
+SELECT nextval('doctoralCenterRole_id_seq'), 'manager'
+WHERE NOT EXISTS (SELECT 1 FROM "doctoralcenterrole" WHERE "role" = 'manager');
 
 INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
 				SELECT
 								nextval('doctoralCenter_id_seq'),
 								'de6b478e-e4e4-422d-88fb-293fe69c6519',
-								'администратор',
+								'admin',
 								's19621609@onlineedu.tu-varna.bg',
 								'doctoralCenter_image.png',
 								role.id
 				FROM "doctoralcenterrole" role
-				WHERE role.role = 'администратор'
+				WHERE role.role = 'admin'
 				AND NOT EXISTS (
 								SELECT 1
 								FROM "doctoralcenter"
 								WHERE "oid" = 'de6b478e-e4e4-422d-88fb-293fe69c6519');
 
 INSERT INTO "phdstatus" ("id", "status")
-SELECT nextval('PhdStatus_id_seq'), 'записан'
-WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'записан');
+SELECT nextval('PhdStatus_id_seq'), 'enrolled'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'enrolled');
 
 INSERT INTO "phdstatus" ("id", "status")
-SELECT nextval('PhdStatus_id_seq'), 'дипломиран'
-WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'дипломиран');
+SELECT nextval('PhdStatus_id_seq'), 'graduated'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'graduated');
 
 INSERT INTO "phdstatus" ("id", "status")
-SELECT nextval('PhdStatus_id_seq'), 'терминиран'
-WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'терминиран');
+SELECT nextval('PhdStatus_id_seq'), 'terminated'
+WHERE NOT EXISTS (SELECT 1 FROM "phdstatus" WHERE "status" = 'terminated');
 
 
 INSERT INTO "committeerole" ("id", "type")
-SELECT nextval('committeeRole_id_seq'), 'прецедател'
-WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'прецедател');
+SELECT nextval('committeeRole_id_seq'), 'chairman'
+WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'chairman');
 
 INSERT INTO "committeerole" ("id", "type")
-SELECT nextval('committeeRole_id_seq'), 'член'
-WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'член');
+SELECT nextval('committeeRole_id_seq'), 'member'
+WHERE NOT EXISTS (SELECT 1 FROM "committeerole" WHERE "type" = 'member');
 
 
 INSERT INTO "mode" ("id", "mode")
-SELECT nextval('mode_id_seq'), 'редовно'
-WHERE NOT EXISTS (SELECT 1 FROM "mode" WHERE "mode" = 'редовно');
+SELECT nextval('mode_id_seq'), 'regular'
+WHERE NOT EXISTS (SELECT 1 FROM "mode" WHERE "mode" = 'regular');
 
 INSERT INTO "mode" ("id", "mode")
-SELECT nextval('mode_id_seq'), 'задочно'
-WHERE NOT EXISTS (SELECT 1 FROM "mode" WHERE "mode" = 'задочно');
+SELECT nextval('mode_id_seq'), 'part_time'
+WHERE NOT EXISTS (SELECT 1 FROM "mode" WHERE "mode" = 'part_time');
 
 
 INSERT INTO "department" ("id", "name")
-SELECT nextval('department_id_seq'), 'Софтуерно инженерство'
-WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Софтуерно инженерство');
+SELECT nextval('department_id_seq'), 'Software engineering'
+WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Software engineering');
 
 INSERT INTO "department" ("id", "name")
-SELECT nextval('department_id_seq'), 'Изкуствен интелект'
-WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Изкуствен интелект');
+SELECT nextval('department_id_seq'), 'Artificial inteligence'
+WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Artificial inteligence');
 
 INSERT INTO "department" ("id", "name")
-SELECT nextval('department_id_seq'), 'Киберсигурност'
-WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Киберсигурност');
+SELECT nextval('department_id_seq'), 'Cybersecurity'
+WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Cybersecurity');
 
 -- Mandatory
 INSERT INTO "subject" ("id", "name")
-SELECT nextval('subject_id_seq'), 'Англииски език'
-WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Англииски език');
+SELECT nextval('subject_id_seq'), 'English'
+WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'English');
 
 INSERT INTO "subject" ("id", "name")
-SELECT nextval('subject_id_seq'), 'Методи за изследване и развитие на дисертация'
-WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Методи за изследване и развитие на дисертация');
+SELECT nextval('subject_id_seq'), 'Methods of Research and Development of dissertation'
+WHERE NOT EXISTS (SELECT 1 FROM "department" WHERE "name" = 'Methods of Research and Development of dissertation');
 
 
 INSERT INTO "supervisortype" ("id", "title")
-SELECT nextval('supervisorType_id_seq'), 'доцент'
-WHERE NOT EXISTS (SELECT 1 FROM "supervisortype" WHERE "title" = 'доцент');
+SELECT nextval('supervisorType_id_seq'), 'professor'
+WHERE NOT EXISTS (SELECT 1 FROM "supervisortype" WHERE "title" = 'professor');
 
 INSERT INTO "supervisortype" ("id", "title")
-SELECT nextval('supervisorType_id_seq'), 'асистент'
-WHERE NOT EXISTS (SELECT 1 FROM "supervisortype" WHERE "title" = 'асистент');
+SELECT nextval('supervisorType_id_seq'), 'assistant'
+WHERE NOT EXISTS (SELECT 1 FROM "supervisortype" WHERE "title" = 'assistant');
