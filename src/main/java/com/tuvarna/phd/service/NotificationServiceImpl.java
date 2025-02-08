@@ -1,10 +1,9 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.entity.Notification;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.NotificationRepository;
-import com.tuvarna.phd.service.NotificationService;
 import com.tuvarna.phd.service.dto.IdDTO;
 import com.tuvarna.phd.service.dto.NotificationClientDTO;
 import com.tuvarna.phd.service.dto.NotificationDTO;
@@ -21,7 +20,7 @@ import java.util.List;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class NotificationServiceImpl implements NotificationService {
+public final class NotificationServiceImpl implements NotificationService {
 
   @Inject private Logger LOG = Logger.getLogger(NotificationServiceImpl.class);
   private final NotificationRepository notificationRepository;

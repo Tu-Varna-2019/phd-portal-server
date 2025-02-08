@@ -10,7 +10,6 @@ import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -28,6 +27,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestCookie;
 
 @RequestScoped
 // TODO: restrict the endpoint usage only to the admin ??
@@ -38,7 +38,7 @@ import org.jboss.logging.Logger;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class LogController extends BaseController {
+public final class LogController extends BaseController {
 
   private LogService logService;
   private LogValidator logValidator;
@@ -78,8 +78,13 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  public Response save(
-      sendLogDTO sendLogDTO, @CookieParam("group") String group, @CookieParam("role") String role) {
+  public Response save(sendLogDTO sendLogDTO, @RestCookie String group, @RestCookie String role) {
+    LOG.info(
+        "Receved a controller request to save log from user group: "
+            + group
+            + " and role: "
+            + role);
+
     String userGroup = group.equals("doctoralCenter") ? role : group;
 
     this.logValidator.validateGroupExists(userGroup);
@@ -117,12 +122,9 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  public Response get() {
-    String email = jwt.getName();
-    String group = (this.doctoralCenterRepository.getByEmail(email)).getRole().getRole();
-    LOG.info("Received a request to retrieve log from user group: " + group);
-
-    List<LogDTO> logs = this.logService.get(group);
+  public Response get(@RestCookie String role) {
+    this.logValidator.isRoleAdmin(role);
+    List<LogDTO> logs = this.logService.get();
 
     return send("Logs retrieved", logs);
   }

@@ -1,8 +1,9 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.exception.PhdException;
-import com.tuvarna.phd.service.PhdService;
+import com.tuvarna.phd.service.CandidateService;
+import com.tuvarna.phd.service.dto.CandidateDTO;
 import com.tuvarna.phd.service.dto.PhdDTO;
+import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -21,52 +22,46 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.jboss.logging.Logger;
 
 @RequestScoped
-@Path("/phd")
+@Path("/candidate")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public final class PhdController extends BaseController {
+public final class CandidateController extends BaseController {
 
-  private PhdService phdService;
-  @Inject Logger LOG = Logger.getLogger(PhdController.class);
+  private final CandidateService candidateService;
+  @Inject private Logger LOG = Logger.getLogger(CandidateController.class);
 
   @Inject
-  public PhdController(PhdService phdService) {
-    this.phdService = phdService;
+  public CandidateController(CandidateService candidateService) {
+    this.candidateService = candidateService;
   }
 
   @POST
-  @Operation(
-      summary = "Login to the Phd portal",
-      description =
-          "Login to the PHD portal and synchronize the AAD (Entra ID) user with Postgre's")
+  @PermitAll
+  @Operation(summary = "Phd's candidate", description = "Approve or reject phd's candidate")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Phd user logged in!",
+            description = "Phd approved",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = PhdDTO.class))),
         @APIResponse(
             responseCode = "400",
-            description = "Error when logging in via Phd user",
+            description = "Error when approving/rejecting phd's candidate",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = PhdDTO.class))),
       })
-  @Path("/login")
-  public Response login(PhdDTO pDto) throws PhdException {
-    // LOG.info("Received a request to login from using Phd user creds: " + pDto);
-    // this.phdService.login(pDto);
-
-    LOG.info("Phd user logged on!");
-
-    return send("Phd user logged in!");
+  @Path("/register")
+  public Response register(CandidateDTO candidateDTO) {
+    this.candidateService.register(candidateDTO);
+    return send("Registration done!");
   }
 }

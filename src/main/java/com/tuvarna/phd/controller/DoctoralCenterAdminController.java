@@ -34,7 +34,7 @@ import org.jboss.logging.Logger;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class DoctoralCenterAdminController extends BaseController {
+public final class DoctoralCenterAdminController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterAdminController.class);

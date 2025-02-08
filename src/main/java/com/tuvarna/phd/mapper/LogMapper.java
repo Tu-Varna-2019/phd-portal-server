@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 public interface LogMapper {
   LogMapper mapperInstance = Mappers.getMapper(LogMapper.class);
 
-
+  @Mapping(target = "id", ignore = true)
   @Mapping(target = "userPrincipalDTO", ignore = true)
   LogDTO toDto(sendLogDTO sendLogDTO);
 }

@@ -1,4 +1,4 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
@@ -14,7 +14,6 @@ import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.service.dto.CandidateDTO;
 import com.tuvarna.phd.service.dto.RoleDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
@@ -31,7 +30,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class DoctoralCenterServiceImpl implements DoctoralCenterService {
+public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private final DoctoralCenterRepository doctoralCenterRepository;
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final PhdRepository phdRepository;
@@ -196,7 +195,7 @@ public class DoctoralCenterServiceImpl implements DoctoralCenterService {
       //   Committee committee = new Committee(oid, name, email);
       //   this.committeeRepository.save(committee);
       //   break;
-      case "expert", "manager","admin":
+      case "expert", "manager", "admin":
         DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
         DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);
         dCenter.setRole(doctoralCenterRole);

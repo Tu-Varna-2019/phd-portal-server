@@ -2,7 +2,7 @@ package com.tuvarna.phd.service;
 
 import java.util.List;
 
-public interface PhdService {
+public sealed interface PhdService permits PhdServiceImpl {
   List<String> getCurriculum();
 
   void deleteCurriculum();

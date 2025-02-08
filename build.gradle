@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     // JWT
     implementation 'io.quarkus:quarkus-smallrye-jwt'
     implementation 'io.quarkus:quarkus-smallrye-jwt-build'
@@ -55,7 +56,7 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.mockito:mockito-core:5.14.2'
-    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.18.1'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.17.5'
 }
 
 group 'com.tuvarna'

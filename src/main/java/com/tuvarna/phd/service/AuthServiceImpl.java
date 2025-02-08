@@ -1,4 +1,4 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CommitteeException;
@@ -10,7 +10,6 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.service.AuthService;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -20,7 +19,7 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class AuthServiceImpl implements AuthService {
+public final class AuthServiceImpl implements AuthService {
 
   private final PhdRepository pRepository;
   private final DoctoralCenterRepository doctoralCenterRepository;

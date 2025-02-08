@@ -2,6 +2,7 @@ package com.tuvarna.phd.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.smallrye.common.constraint.NotNull;
+import io.smallrye.common.constraint.Nullable;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 public class LogDTO {
+
+  @Nullable
+  @Schema(title = "id", required = true)
+  private String id;
 
   @NotNull
   @Schema(title = "description", required = true)

@@ -1,9 +1,8 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
-import com.tuvarna.phd.service.PhdService;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,7 +12,7 @@ import java.util.List;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class PhdServiceImpl implements PhdService {
+public final class PhdServiceImpl implements PhdService {
   private final PhdRepository pRepository;
   private final PhdStatusRepository sPhdRepository;
   private final PhdMapper pMapper;

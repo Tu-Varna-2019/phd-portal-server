@@ -1,6 +1,6 @@
 package com.tuvarna.phd.exception;
 
-public class NotificationException extends HttpException {
+public final class NotificationException extends HttpException {
 
   public NotificationException(String message) {
     super(message, 404);

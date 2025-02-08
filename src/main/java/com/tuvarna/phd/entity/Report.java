@@ -15,10 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// NOTE: Once created, it cannot be modified
 @Entity
 @Getter
 @Setter
-@Cacheable // TODO: Not sure if it should be cachable
+@Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "report")

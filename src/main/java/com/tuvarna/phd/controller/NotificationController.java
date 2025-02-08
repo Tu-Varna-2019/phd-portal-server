@@ -34,7 +34,7 @@ import org.jboss.logging.Logger;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class NotificationController extends BaseController {
+public final class NotificationController extends BaseController {
 
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;

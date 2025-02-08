@@ -5,7 +5,7 @@ import com.tuvarna.phd.service.dto.NotificationClientDTO;
 import com.tuvarna.phd.service.dto.NotificationDTO;
 import java.util.List;
 
-public interface NotificationService {
+public sealed interface NotificationService permits NotificationServiceImpl {
   void save(NotificationDTO notificationDTO);
 
   List<NotificationClientDTO> get(String oid);

@@ -15,10 +15,10 @@ public class LogValidator {
   }
 
   private enum VALID_LEVEL {
-    INFO,
-    SUCCESS,
-    ERROR,
-    WARN
+    info,
+    success,
+    error,
+    warn
   }
 
   public void validateGroupExists(String group) throws LogException {
@@ -28,6 +28,12 @@ public class LogValidator {
       throw new LogException("Group " + group + " doesn't exist!");
     }
     ;
+  }
+
+  public void isRoleAdmin(String role) throws LogException {
+    if (!role.equals("admin"))
+      throw new LogException(
+          "Fetching logs for role: " + role + " is not permitted! Only admin is allowed.");
   }
 
   public void validateLevel(String level) throws LogException {
