@@ -158,6 +158,6 @@ public final class FileController extends BaseController {
 
     this.s3ClientService.delete(oid, group, type, file.getFilename());
 
-    return send("File deleted!");
+        return send("File deleted!");
   }
 }
