@@ -1,0 +1,24 @@
+when:
+  - branch: [master]
+    event: tag
+
+steps:
+  - name: Publish docker image to codeberg
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      repo: codeberg.org/${CI_REPO_OWNER,,}/phd-portal-server
+      # dry-run: true
+      registry: codeberg.org
+      username: docker
+      tags:
+        - ${CI_COMMIT_TAG}
+      password:
+        from_secret: DOCKER_PASS
+      dockerfile: Dockerfile
+      platforms: linux/arm64/v8
+      # auto_tag: true
+      labels:
+        - version: ${CI_COMMIT_TAG}
+        - description: "Masters thesis for developing REST API backend server"
+        - author: "Iliyan Kostov"
+        - env: "prod"
