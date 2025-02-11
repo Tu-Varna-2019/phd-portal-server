@@ -4,15 +4,11 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
 public final class DoctoralCenterRepository extends SharedUserRepository
     implements PanacheRepositoryBase<DoctoralCenter, Integer> {
-
-  @Inject EntityManager entityManager;
 
   public void save(DoctoralCenter doctoralCenter) {
     doctoralCenter.persist();
@@ -40,9 +36,7 @@ public final class DoctoralCenterRepository extends SharedUserRepository
 
   public DoctoralCenter getFullByOid(String oid) {
     DoctoralCenter doctoralCenter = this.getByOid(oid);
-    this.entityManager.detach(doctoralCenter);
-
-    doctoralCenter.setPicture(super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
+    doctoralCenter.setPictureBlob(super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
 
     return doctoralCenter;
   }
