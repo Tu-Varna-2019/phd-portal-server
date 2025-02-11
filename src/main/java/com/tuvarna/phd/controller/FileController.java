@@ -107,14 +107,13 @@ public final class FileController extends BaseController {
   public Response download(@RestQuery String type, @RestQuery String filename) {
     LOG.info("Received a request to download file from type: " + type);
     String oid = jwt.getClaim("oid");
+    String email = jwt.getClaim("name");
 
     String objectKey = oid + "/" + type + "/" + filename;
-    String test = "test";
-
     FileBlobDTO fileBlobDTO = this.s3ClientService.download(objectKey);
 
     ResponseBuilder response = builder(fileBlobDTO.getData());
-    response.header("Content-Disposition", "attachment;filename=" + test);
+    response.header("Content-Disposition", "attachment;filename=" + email);
     response.header("Content-Type", fileBlobDTO.getMimetype());
 
     LOG.info(

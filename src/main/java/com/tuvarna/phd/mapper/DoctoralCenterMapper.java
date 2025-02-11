@@ -13,4 +13,7 @@ public interface DoctoralCenterMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "role", ignore = true)
   DoctoralCenter toEntity(DoctoralCenterDTO doctoralCenterDTO);
+
+  @Mapping(target = "role", ignore = true)
+  DoctoralCenterDTO toDto(DoctoralCenter doctoralCenter);
 }
