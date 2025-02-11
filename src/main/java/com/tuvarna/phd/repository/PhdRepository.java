@@ -4,11 +4,15 @@ import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
-public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
+public final class PhdRepository extends SharedUserRepository
+    implements PanacheRepositoryBase<Phd, Integer> {
 
+  @Inject EntityManager entityManager;
 
   public Phd getById(Integer id) throws PhdException {
     return findByIdOptional(id).orElseThrow(() -> new PhdException("Phd doesn't exist!"));
@@ -18,6 +22,15 @@ public class PhdRepository implements PanacheRepositoryBase<Phd, Integer> {
     return find("oid", oid)
         .firstResultOptional()
         .orElseThrow(() -> new PhdException("Phd user with oid: " + oid + " doesn't exist!"));
+  }
+
+  public Phd getFullByOid(String oid) {
+    Phd phd = this.getByOid(oid);
+    this.entityManager.detach(phd);
+
+    phd.setPicture(super.getDataUrlPicture(oid, phd.getPicture()));
+
+    return phd;
   }
 
   public Phd getByEmail(String email) {

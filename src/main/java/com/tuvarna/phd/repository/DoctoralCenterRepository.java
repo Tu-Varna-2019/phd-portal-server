@@ -4,10 +4,15 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
-public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralCenter, Integer> {
+public final class DoctoralCenterRepository extends SharedUserRepository
+    implements PanacheRepositoryBase<DoctoralCenter, Integer> {
+
+  @Inject EntityManager entityManager;
 
   public void save(DoctoralCenter doctoralCenter) {
     doctoralCenter.persist();
@@ -31,6 +36,15 @@ public class DoctoralCenterRepository implements PanacheRepositoryBase<DoctoralC
             () ->
                 new DoctoralCenterException(
                     "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
+  }
+
+  public DoctoralCenter getFullByOid(String oid) {
+    DoctoralCenter doctoralCenter = this.getByOid(oid);
+    this.entityManager.detach(doctoralCenter);
+
+    doctoralCenter.setPicture(super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
+
+    return doctoralCenter;
   }
 
   public List<DoctoralCenter> getAll() {

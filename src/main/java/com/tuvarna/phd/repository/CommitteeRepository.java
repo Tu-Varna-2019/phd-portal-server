@@ -4,10 +4,15 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.exception.CommitteeException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
-public class CommitteeRepository implements PanacheRepositoryBase<Committee, Integer> {
+public final class CommitteeRepository extends SharedUserRepository
+    implements PanacheRepositoryBase<Committee, Integer> {
+
+  @Inject EntityManager entityManager;
 
   public Committee getCommitteeById(Integer id) throws CommitteeException {
     return findByIdOptional(id)
@@ -20,6 +25,15 @@ public class CommitteeRepository implements PanacheRepositoryBase<Committee, Int
         .orElseThrow(
             () ->
                 new CommitteeException("Committee user with oid: " + oid + " doesn't exist!", 404));
+  }
+
+  public Committee getFullByOid(String oid) {
+    Committee committee = this.getByOid(oid);
+    this.entityManager.detach(committee);
+
+    committee.setPicture(super.getDataUrlPicture(oid, committee.getPicture()));
+
+    return committee;
   }
 
   public void save(Committee committee) {

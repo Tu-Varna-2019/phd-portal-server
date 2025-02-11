@@ -1,60 +1,46 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
+import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CommitteeException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.PhdException;
 import com.tuvarna.phd.exception.UserException;
-import com.tuvarna.phd.mapper.DoctoralCenterMapper;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.Base64;
 import java.util.Optional;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @ApplicationScoped
 public final class AuthServiceImpl implements AuthService {
-
-  @Inject S3Client client;
-
-  @ConfigProperty(name = "bucket.name")
-  String bucketName;
 
   private final PhdRepository pRepository;
   private final DoctoralCenterRepository doctoralCenterRepository;
   private final CommitteeRepository committeeRepository;
   private final UnauthorizedUsersRepository usersRepository;
   private final UnauthorizedUsersMapper mapper;
-  private final DoctoralCenterMapper doctoralCenterMapper;
 
   private String group;
 
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
 
   public AuthServiceImpl(
-      DoctoralCenterMapper doctoralCenterMapper,
       PhdRepository pRepository,
       DoctoralCenterRepository doctoralCenterRepository,
       CommitteeRepository committeeRepository,
       UnauthorizedUsersRepository usersRepository,
       UnauthorizedUsersMapper mapper) {
 
-    this.doctoralCenterMapper = doctoralCenterMapper;
     this.pRepository = pRepository;
     this.doctoralCenterRepository = doctoralCenterRepository;
     this.committeeRepository = committeeRepository;
@@ -107,7 +93,9 @@ public final class AuthServiceImpl implements AuthService {
     LOG.info("Checking if user: " + oid + " is in phd table...");
     try {
       this.group = "phd";
-      return this.pRepository.getByOid(oid);
+      Phd phd = this.pRepository.getFullByOid(oid);
+
+      return phd;
     } catch (PhdException exPhd) {
       LOG.warn("User is not in phd table. Now checking if he's present in committee table... ");
       return null;
@@ -117,7 +105,9 @@ public final class AuthServiceImpl implements AuthService {
   private Object isUserInCommitteeTable(String oid) {
     try {
       this.group = "committee";
-      return this.committeeRepository.getByOid(oid);
+      Committee committee = this.committeeRepository.getFullByOid(oid);
+
+      return committee;
     } catch (CommitteeException exComm) {
       LOG.warn(
           "User is not in committee table. Now checking if he's present in doctoral center"
@@ -129,27 +119,12 @@ public final class AuthServiceImpl implements AuthService {
   private Object isUserInDoctoralCenterTable(String oid) {
     try {
       this.group = "doctoralCenter";
-      DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
+      DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getFullByOid(oid);
 
-      ResponseBytes<GetObjectResponse> oBytes =
-          this.client.getObjectAsBytes(
-              this.buildGetRequest(
-                  doctoralCenter.getOid() + "/avatar/" + doctoralCenter.getPicture()));
-
-      String pictureBase64 = Base64.getEncoder().encodeToString(oBytes.asByteArray());
-      DoctoralCenterDTO dto = this.doctoralCenterMapper.toDto(doctoralCenter);
-      dto.setPicture(pictureBase64);
-      LOG.info("The mime type is: " + oBytes.response().contentType());
-      dto.setRole(doctoralCenter.getRole().getRole());
-
-      return dto;
+      return doctoralCenter;
     } catch (DoctoralCenterException exDoc) {
       LOG.warn("User not found in doctoral center table!");
       return null;
     }
-  }
-
-  private GetObjectRequest buildGetRequest(String objectKey) {
-    return GetObjectRequest.builder().bucket(bucketName).key(objectKey).build();
   }
 }
