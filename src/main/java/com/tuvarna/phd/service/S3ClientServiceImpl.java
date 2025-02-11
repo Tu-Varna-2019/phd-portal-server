@@ -9,8 +9,6 @@ import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.Collections;
-import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -32,20 +30,13 @@ public final class S3ClientServiceImpl implements S3ClientService {
   @ConfigProperty(name = "bucket.name")
   String bucketName;
 
-  private Map<String, String> DEFAULT_IMAGE_NAMES =
-      Collections.unmodifiableMap(
-          Map.of(
-              "phd", "phd_image.png",
-              "committee", "committee_image.png",
-              "doctoralCenter", "doctoralCenter_image.png"));
-
   public S3ClientServiceImpl(PgPool pgPool) {
     this.pgClient = pgPool;
   }
 
   @Override
-  public void setPictureByOid(String imageName, String group, String oid) {
-    LOG.info("Now updating the user image with this name: " + imageName);
+  public void setPictureByOid(String picture, String group, String oid) {
+    LOG.info("Now updating the user picture with name: " + picture);
     StringBuilder statement = new StringBuilder();
 
     switch (group) {
@@ -58,10 +49,25 @@ public final class S3ClientServiceImpl implements S3ClientService {
 
     this.pgClient
         .preparedQuery(statement.toString())
-        .execute(Tuple.of(imageName, oid))
+        .execute(Tuple.of(picture, oid))
         .await()
         .indefinitely();
-    LOG.info("Image updated with picture: " + imageName);
+    LOG.info("Picture updated with picture: " + picture);
+  }
+
+  // TODO: Move this to shared user service
+  @Override
+  public String getPictureByOid(String group, String oid) {
+    LOG.info("Retrieveing picture name for user oid: " + oid);
+    String statement = "SELECT picture FROM" + group.toLowerCase() + " WHERE oid = $1";
+
+    return this.pgClient
+        .preparedQuery(statement.toString())
+        .execute(Tuple.of(oid))
+        .onItem()
+        .transform(rowSet -> rowSet.iterator().next().getString("picture"))
+        .await()
+        .indefinitely();
   }
 
   @Override
@@ -113,10 +119,6 @@ public final class S3ClientServiceImpl implements S3ClientService {
     LOG.info("Received a service request to delete a file: " + filename);
     try {
       this.client.deleteObject(this.buildDeleteRequest(oid + "/" + type + "/" + filename));
-
-      if (type.equals("avatar")) {
-        this.setPictureByOid(this.DEFAULT_IMAGE_NAMES.get(group), group, oid);
-      }
 
       LOG.info("Succeess! File: " + filename + " deleted!");
     } catch (S3Exception exception) {

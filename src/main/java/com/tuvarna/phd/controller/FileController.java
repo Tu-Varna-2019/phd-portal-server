@@ -17,6 +17,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
+import java.util.Collections;
+import java.util.Map;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
@@ -38,6 +40,13 @@ public final class FileController extends BaseController {
   private final S3ClientValidator s3ClientValidator;
   @Inject private Logger LOG;
   @Inject JsonWebToken jwt;
+
+  private Map<String, String> DEFAULT_IMAGE_NAMES =
+      Collections.unmodifiableMap(
+          Map.of(
+              "phd", "phd_image.png",
+              "committee", "committee_image.png",
+              "doctoralCenter", "doctoralCenter_image.png"));
 
   @Inject
   public FileController(S3ClientService s3ClientService, S3ClientValidator s3ClientValidator) {
@@ -69,14 +78,19 @@ public final class FileController extends BaseController {
   @Path("/upload")
   public Response upload(BlobDataDTO file, @RestQuery String type, @RestCookie String group) {
     this.s3ClientValidator.validateType(type);
-    LOG.info("Received a controller request to upload a file " + group);
     String oid = jwt.getClaim("oid");
 
+    LOG.info(
+        "Received a controller request to upload a file "
+            + group
+            + " with filename: "
+            + file.getFilename());
+
     file.generateUniqueFilename();
-
     this.s3ClientService.upload(file, oid, type);
-
     if (type.equals("avatar")) {
+      String oldPicture = this.s3ClientService.getPictureByOid(group, oid);
+      this.s3ClientService.delete(oid, group, type, oldPicture);
       this.s3ClientService.setPictureByOid(file.getUniqueFilename(), group, oid);
     }
 
@@ -157,6 +171,10 @@ public final class FileController extends BaseController {
 
     this.s3ClientService.delete(oid, group, type, file.getFilename());
 
-        return send("File deleted!");
+    if (type.equals("avatar")) {
+      this.s3ClientService.setPictureByOid(this.DEFAULT_IMAGE_NAMES.get(group), group, oid);
+    }
+
+    return send("File deleted!");
   }
 }
