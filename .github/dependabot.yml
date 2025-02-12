@@ -19,7 +19,7 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       timezone: "Europe/Sofia"
     commit-message:
       prefix: "[gradle] "

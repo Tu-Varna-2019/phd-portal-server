@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,10 +20,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Getter
 @Setter
+@Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "curriculum")
@@ -54,6 +58,7 @@ public class Curriculum extends PanacheEntityBase {
   private Mode mode;
 
   @ManyToMany
+  @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
   @JoinTable(
       name = "curriculum_subject",
       joinColumns = @JoinColumn(name = "curriculum_id"),

@@ -1,4 +1,4 @@
-package com.tuvarna.phd.service.impl;
+package com.tuvarna.phd.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
@@ -11,7 +11,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import com.tuvarna.phd.exception.LogException;
-import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.service.dto.LogDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,40 +19,43 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class LogServiceImpl implements LogService {
+public final class LogServiceImpl implements LogService {
 
   @Inject private Logger LOG = Logger.getLogger(LogServiceImpl.class);
   @Inject private ElasticsearchClient client;
   private final String INDEX = "logs";
 
   @Override
+  // @CacheInvalidate(cacheName = "logs-cache")
   @Transactional
   public void save(LogDTO logDTO) {
-    LOG.info("Service received a request to save a log with timestamp" + logDTO.getTimestamp());
+    LOG.info("Service received a request to save a log: " + logDTO.toString());
+    logDTO.setId(UUID.randomUUID().toString());
+
     this.index(logDTO);
+
     LOG.info("Log: " + logDTO.getTimestamp() + " saved to ElastiSearch!");
   }
 
   @Override
+  // @CacheResult(cacheName = "logs-cache")
   @Transactional
-  public List<LogDTO> get(String group) {
-    List<String> roles = new ArrayList<String>(Arrays.asList("phd", "committee"));
-    List<LogDTO> logs = this.searchByGroup(group);
-    LOG.info("Service received a request to fetch logs for group: " + group);
+  public List<LogDTO> get() {
+    LOG.info("Service received a request to fetch logs for admin role");
 
-    if (group.equals("admin")) {
-      roles.add("manager");
-      roles.add("expert");
-    }
+    List<String> userCollection =
+        new ArrayList<String>(Arrays.asList("phd", "committee", "manager", "expert", "admin"));
 
-    for (String role : roles) logs.addAll(this.searchByGroup(role));
+    List<LogDTO> userTraceLogs = new ArrayList<LogDTO>();
+    for (String user : userCollection) userTraceLogs.addAll(this.searchByGroup(user));
+
     LOG.info("Logs retrieved!");
-
-    return logs;
+    return userTraceLogs;
   }
 
   @Override
@@ -66,28 +68,15 @@ public class LogServiceImpl implements LogService {
   }
 
   public void index(LogDTO logDTO) {
+
     try {
-      IndexRequest<LogDTO> request = IndexRequest.of(b -> b.index(INDEX).document(logDTO));
+      IndexRequest<LogDTO> request =
+          IndexRequest.of(b -> b.index(INDEX).document(logDTO).id(logDTO.getId()));
       IndexResponse response = this.client.index(request);
       LOG.info("Response from creating an index: " + response.id());
 
     } catch (IOException exception) {
       LOG.error("Error in log indexing: " + exception.getMessage());
-      throw new LogException("Error in log indexing!");
-    }
-  }
-
-  private void index(List<LogDTO> logs) {
-    try {
-      BulkRequest.Builder br = new BulkRequest.Builder();
-
-      for (var log : logs) br.operations(op -> op.index(idx -> idx.index(INDEX).document(log)));
-
-      BulkResponse result = client.bulk(br.build());
-
-      if (result.errors()) throw new LogException("The indexing operation encountered errors.");
-
-    } catch (IOException exception) {
       throw new LogException("Error in log indexing!");
     }
   }
@@ -118,7 +107,6 @@ public class LogServiceImpl implements LogService {
   }
 
   private void deleteLogs(List<LogDTO> logs) {
-
     try {
       BulkRequest.Builder br = new BulkRequest.Builder();
 
