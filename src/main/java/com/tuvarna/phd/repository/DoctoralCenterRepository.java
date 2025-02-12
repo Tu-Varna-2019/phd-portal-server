@@ -4,27 +4,18 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.List;
 
 @ApplicationScoped
 public final class DoctoralCenterRepository extends SharedUserRepository
-    implements PanacheRepositoryBase<DoctoralCenter, Integer> {
+    implements PanacheRepositoryBase<DoctoralCenter, Integer>,
+        UserRepositoryStrategy<DoctoralCenter> {
 
+  @Override
   public void save(DoctoralCenter doctoralCenter) {
     doctoralCenter.persist();
   }
 
-  public DoctoralCenter getDoctoralCenterByEmail(String email) {
-    return find("email", email)
-        .firstResultOptional()
-        .orElseThrow(
-            () -> new DoctoralCenterException("User with email: " + email + " doesn't exists!"));
-  }
-
-  public boolean existsByEmail(String email) {
-    return count("email = ?1", email) > 0;
-  }
-
+  @Override
   public DoctoralCenter getByOid(String oid) {
     return find("oid", oid)
         .firstResultOptional()
@@ -34,6 +25,7 @@ public final class DoctoralCenterRepository extends SharedUserRepository
                     "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
   }
 
+  @Override
   public DoctoralCenter getFullByOid(String oid) {
     DoctoralCenter doctoralCenter = this.getByOid(oid);
     doctoralCenter.setPictureBlob(
@@ -44,14 +36,12 @@ public final class DoctoralCenterRepository extends SharedUserRepository
     return doctoralCenter;
   }
 
-  public List<DoctoralCenter> getAll() {
-    return listAll();
-  }
-
+  @Override
   public void deleteByOid(String oid) {
     delete("oid", oid);
   }
 
+  @Override
   public DoctoralCenter getByEmail(String email) {
     return find("email", email)
         .firstResultOptional()

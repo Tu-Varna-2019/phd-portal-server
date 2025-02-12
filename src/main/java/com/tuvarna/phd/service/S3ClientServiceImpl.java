@@ -30,22 +30,23 @@ public final class S3ClientServiceImpl implements S3ClientService {
   @ConfigProperty(name = "bucket.name")
   String bucketName;
 
-  public S3ClientServiceImpl(PgPool pgPool) {
-    this.pgClient = pgPool;
+  public S3ClientServiceImpl(PgPool pgClient) {
+    this.pgClient = pgClient;
   }
 
   @Override
   public void setPictureByOid(String picture, String group, String oid) {
     LOG.info("Now updating the user picture with name: " + picture);
-    StringBuilder statement = new StringBuilder();
-
-    switch (group) {
-      case "phd", "committee", "doctoralCenter" ->
-          statement.append("UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2");
-      default ->
-          throw new S3ClientException(
-              "Unable to change user picture. The group is incorrect: " + group);
-    }
+    String statement =
+        switch (group) {
+          case "phd", "committee", "doctoralCenter" -> {
+            yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
+          }
+          default -> {
+            throw new S3ClientException(
+                "Unable to change user picture. The group is incorrect: " + group);
+          }
+        };
 
     this.pgClient
         .preparedQuery(statement.toString())

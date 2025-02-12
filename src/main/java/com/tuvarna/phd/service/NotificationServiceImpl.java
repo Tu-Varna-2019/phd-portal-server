@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.entity.Notification;
+import com.tuvarna.phd.exception.NotificationException;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.NotificationRepository;
@@ -59,14 +60,19 @@ public final class NotificationServiceImpl implements NotificationService {
   }
 
   private Uni<List<String>> getOidsByGroup(String group) {
-    String statement = "";
-
-    switch (group) {
-      case "admin" ->
-          statement =
-              "select d.oid from doctoralcenter d join doctoralcenterrole role on d.id=role.id "
-                  + " where role.role=$1";
-    }
+    String statement =
+        switch (group) {
+          case "admin" -> {
+            yield "select d.oid from doctoralcenter d join doctoralcenterrole role on d.id=role.id "
+                + " where role.role=$1";
+          }
+          default -> {
+            throw new NotificationException(
+                "Notification error: cannot retrieve oids for unknown group: "
+                    + group
+                    + " Valid groups are: admin");
+          }
+        };
 
     return this.client
         .preparedQuery(statement)

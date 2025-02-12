@@ -25,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "phd")
-public class Phd extends PanacheEntityBase {
+public final class Phd extends PanacheEntityBase implements UserEntity {
 
   @Id
   @SequenceGenerator(name = "phdSequence", sequenceName = "phd_id_seq", allocationSize = 1)

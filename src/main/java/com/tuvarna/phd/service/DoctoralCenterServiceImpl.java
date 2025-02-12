@@ -77,20 +77,11 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Transactional
   public void deleteAuthorizedUser(String oid, RoleDTO role) {
     switch (role.getRole()) {
-      case "phd":
-        this.phdRepository.deleteByOid(oid);
-        break;
+      case "phd" -> this.phdRepository.deleteByOid(oid);
+      case "committee" -> this.committeeRepository.deleteByOid(oid);
+      case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
 
-      case "committee":
-        this.committeeRepository.deleteByOid(oid);
-        break;
-
-      case "doctoralCenter":
-        this.doctoralCenterRepository.deleteByOid(oid);
-        break;
-
-      default:
-        throw new UserException("Role is incorrect!", 400);
+      default -> throw new UserException("Role is incorrect!", 400);
     }
   }
 
