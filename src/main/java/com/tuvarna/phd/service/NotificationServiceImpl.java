@@ -25,7 +25,6 @@ public final class NotificationServiceImpl implements NotificationService {
   @Inject private Logger LOG = Logger.getLogger(NotificationServiceImpl.class);
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
-  private final DoctoralCenterRepository doctoralCenterRepository;
   private final PgPool client;
 
   public NotificationServiceImpl(
@@ -34,7 +33,6 @@ public final class NotificationServiceImpl implements NotificationService {
       NotificationMapper notificationMapper,
       PgPool client) {
     this.notificationRepository = notificationRepository;
-    this.doctoralCenterRepository = doctoralCenterRepository;
     this.client = client;
     this.notificationMapper = notificationMapper;
   }
@@ -48,7 +46,7 @@ public final class NotificationServiceImpl implements NotificationService {
       notificationDTO.addRecipients(
           this.getOidsByGroup(notificationDTO.getGroup()).await().indefinitely());
 
-    LOG.info("Recipient oids to save : " + notificationDTO.getRecipients());
+    LOG.info("Recipient oids to save: " + notificationDTO.getRecipients());
 
     for (String recipientOid : notificationDTO.getRecipients())
       this.notificationRepository.save(

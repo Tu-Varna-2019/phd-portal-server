@@ -69,14 +69,19 @@ public final class FileController extends BaseController {
   @Path("/upload")
   public Response upload(BlobDataDTO file, @RestQuery String type, @RestCookie String group) {
     this.s3ClientValidator.validateType(type);
-    LOG.info("Received a controller request to upload a file " + group);
     String oid = jwt.getClaim("oid");
 
+    LOG.info(
+        "Received a controller request to upload a file "
+            + group
+            + " with filename: "
+            + file.getFilename());
+
     file.generateUniqueFilename();
-
     this.s3ClientService.upload(file, oid, type);
-
     if (type.equals("avatar")) {
+      String oldPicture = this.s3ClientService.getPictureByOid(group, oid);
+      if (!oldPicture.isEmpty()) this.s3ClientService.delete(oid, group, type, oldPicture);
       this.s3ClientService.setPictureByOid(file.getUniqueFilename(), group, oid);
     }
 
@@ -107,14 +112,13 @@ public final class FileController extends BaseController {
   public Response download(@RestQuery String type, @RestQuery String filename) {
     LOG.info("Received a request to download file from type: " + type);
     String oid = jwt.getClaim("oid");
+    String email = jwt.getClaim("name");
 
     String objectKey = oid + "/" + type + "/" + filename;
-    String test = "test";
-
     FileBlobDTO fileBlobDTO = this.s3ClientService.download(objectKey);
 
     ResponseBuilder response = builder(fileBlobDTO.getData());
-    response.header("Content-Disposition", "attachment;filename=" + test);
+    response.header("Content-Disposition", "attachment;filename=" + email);
     response.header("Content-Type", fileBlobDTO.getMimetype());
 
     LOG.info(
@@ -137,14 +141,14 @@ public final class FileController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = String.class))),
+                    schema = @Schema(implementation = FilenameDTO.class))),
         @APIResponse(
             responseCode = "404",
             description = "file not found",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = FilenameDTO.class)))
       })
   public Response delete(
       FilenameDTO file, @RestCookie String group, @NotNull @RestQuery String type) {
@@ -157,6 +161,10 @@ public final class FileController extends BaseController {
             + group);
 
     this.s3ClientService.delete(oid, group, type, file.getFilename());
+
+    if (type.equals("avatar")) {
+      this.s3ClientService.setPictureByOid("", group, oid);
+    }
 
     return send("File deleted!");
   }

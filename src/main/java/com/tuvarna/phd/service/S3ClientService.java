@@ -11,5 +11,7 @@ public sealed interface S3ClientService permits S3ClientServiceImpl {
 
   void setPictureByOid(String uniqueFilename, String group, String oid);
 
+  String getPictureByOid(String group, String oid);
+
   FileBlobDTO download(String objectKey);
 }

@@ -1,5 +1,8 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.DoctoralCenter;
+import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CommitteeException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
@@ -90,7 +93,9 @@ public final class AuthServiceImpl implements AuthService {
     LOG.info("Checking if user: " + oid + " is in phd table...");
     try {
       this.group = "phd";
-      return this.pRepository.getByOid(oid);
+      Phd phd = this.pRepository.getFullByOid(oid);
+
+      return phd;
     } catch (PhdException exPhd) {
       LOG.warn("User is not in phd table. Now checking if he's present in committee table... ");
       return null;
@@ -100,7 +105,9 @@ public final class AuthServiceImpl implements AuthService {
   private Object isUserInCommitteeTable(String oid) {
     try {
       this.group = "committee";
-      return this.committeeRepository.getByOid(oid);
+      Committee committee = this.committeeRepository.getFullByOid(oid);
+
+      return committee;
     } catch (CommitteeException exComm) {
       LOG.warn(
           "User is not in committee table. Now checking if he's present in doctoral center"
@@ -112,7 +119,9 @@ public final class AuthServiceImpl implements AuthService {
   private Object isUserInDoctoralCenterTable(String oid) {
     try {
       this.group = "doctoralCenter";
-      return this.doctoralCenterRepository.getByOid(oid);
+      DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getFullByOid(oid);
+
+      return doctoralCenter;
     } catch (DoctoralCenterException exDoc) {
       LOG.warn("User not found in doctoral center table!");
       return null;
