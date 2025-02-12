@@ -25,6 +25,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/doctoralcenter/admin")
@@ -34,7 +35,7 @@ import org.jboss.logging.Logger;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class DoctoralCenterAdminController extends BaseController {
+public final class DoctoralCenterAdminController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterAdminController.class);
@@ -72,6 +73,7 @@ public class DoctoralCenterAdminController extends BaseController {
     LOG.info("Received a request to get all unauthorized users");
     List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
 
+    LOG.info("Unauthorized users received! Now sending to client...");
     return send("Unauthorized users retrieved!", unauthorizedUsers);
   }
 
@@ -96,8 +98,9 @@ public class DoctoralCenterAdminController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
       })
-  @Path("/unauthorized-users/role/{role}")
-  public Response setRoleForUnauthorizedUsers(List<UnauthorizedUsersDTO> usersDTO, String role) {
+  @Path("/unauthorized-users/role")
+  public Response setRoleForUnauthorizedUsers(
+      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String role) {
     LOG.info("Received a request to set a role for unauthorized users: " + usersDTO.toString());
     this.doctoralCenterService.setUnauthorizedUserRole(usersDTO, role);
 
@@ -117,8 +120,8 @@ public class DoctoralCenterAdminController extends BaseController {
             description = "Error when deleting user!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/authorized-users/{oid}")
-  public Response deleteAuthorizedUser(String oid, RoleDTO role) {
+  @Path("/authorized-users")
+  public Response deleteAuthorizedUser(@RestQuery String oid, RoleDTO role) {
     LOG.info("Received a request to delete an auth user oid: " + oid + "for role: " + role);
     this.doctoralCenterService.deleteAuthorizedUser(oid, role);
 

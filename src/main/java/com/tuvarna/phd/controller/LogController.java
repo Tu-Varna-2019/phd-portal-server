@@ -1,8 +1,11 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.mapper.LogMapper;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.service.dto.LogDTO;
+import com.tuvarna.phd.service.dto.UserPrincipalDTO;
+import com.tuvarna.phd.service.dto.sendLogDTO;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -24,6 +27,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestCookie;
 
 @RequestScoped
 // TODO: restrict the endpoint usage only to the admin ??
@@ -34,11 +38,12 @@ import org.jboss.logging.Logger;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class LogController extends BaseController {
+public final class LogController extends BaseController {
 
   private LogService logService;
   private LogValidator logValidator;
   private DoctoralCenterRepository doctoralCenterRepository;
+  private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
 
@@ -46,10 +51,12 @@ public class LogController extends BaseController {
   public LogController(
       LogService logService,
       LogValidator logValidator,
+      LogMapper logMapper,
       DoctoralCenterRepository doctoralCenterRepository) {
     this.logService = logService;
     this.logValidator = logValidator;
     this.doctoralCenterRepository = doctoralCenterRepository;
+    this.logMapper = logMapper;
   }
 
   @POST
@@ -71,8 +78,25 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  public Response save(LogDTO logDTO) {
-    this.logValidator.validateGroupExists(logDTO);
+  public Response save(sendLogDTO sendLogDTO, @RestCookie String group, @RestCookie String role) {
+    LOG.info(
+        "Receved a controller request to save log from user group: "
+            + group
+            + " and role: "
+            + role);
+
+    String userGroup = group.equals("doctoralCenter") ? role : group;
+
+    this.logValidator.validateGroupExists(userGroup);
+    this.logValidator.validateLevel(sendLogDTO.getLevel());
+
+    String oid = jwt.getClaim("oid");
+    String name = jwt.getClaim("name");
+    String email = jwt.getName();
+
+    LogDTO logDTO = this.logMapper.toDto(sendLogDTO);
+    logDTO.setUserPrincipalDTO(new UserPrincipalDTO(oid, name, email, userGroup));
+
     this.logService.save(logDTO);
     LOG.info("Log saved!");
 
@@ -98,12 +122,9 @@ public class LogController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = LogDTO.class))),
       })
-  public Response get() {
-    String email = jwt.getName();
-    String group = (this.doctoralCenterRepository.getByEmail(email)).getRole().getRole();
-    LOG.info("Received a request to retrieve log from user group: " + group);
-
-    List<LogDTO> logs = this.logService.get(group);
+  public Response get(@RestCookie String role) {
+    this.logValidator.isRoleAdmin(role);
+    List<LogDTO> logs = this.logService.get();
 
     return send("Logs retrieved", logs);
   }

@@ -33,23 +33,26 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
   }
 
   private Response mapExceptionToResponse(Exception exception) {
-    ControllerResponse controllerResponse = new ControllerResponse(exception.getMessage());
     return switch (exception) {
-      case HttpException e -> Response.status(e.getStatus()).entity(controllerResponse).build();
+      case HttpException e ->
+          Response.status(e.getStatus())
+              .entity(new ControllerResponse(exception.getMessage()))
+              .build();
 
       case ForbiddenException e -> {
-        controllerResponse.setMessage("You are not permitted to do this operation");
-        yield Response.status(403).entity(controllerResponse).build();
+        yield Response.status(403)
+            .entity(new ControllerResponse("You are not permitted to do this operation"))
+            .build();
       }
 
       case UnauthorizedException e -> {
-        controllerResponse.setMessage("Unauthorized!");
-        yield Response.status(401).entity(controllerResponse).build();
+        yield Response.status(401).entity(new ControllerResponse("Unauthorized!")).build();
       }
 
       default -> {
-        controllerResponse.setMessage("Unexpected error occured. Try again at later time!");
-        yield Response.status(500).entity(controllerResponse).build();
+        yield Response.status(500)
+            .entity(new ControllerResponse("Unexpected error occured. Try again at later time!"))
+            .build();
       }
     };
   }

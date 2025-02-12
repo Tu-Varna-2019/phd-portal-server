@@ -1,6 +1,6 @@
 package com.tuvarna.phd.exception;
 
-public class UserException extends HttpException {
+public final class UserException extends HttpException {
 
   public UserException(String message) {
     super(message, 400);

@@ -1,9 +1,8 @@
 package com.tuvarna.phd.exception;
 
-
-public class DoctoralCenterRoleException extends HttpException {
+public final class DoctoralCenterRoleException extends HttpException {
 
   public DoctoralCenterRoleException(String message) {
-    super(message,404);
+    super(message, 404);
   }
 }

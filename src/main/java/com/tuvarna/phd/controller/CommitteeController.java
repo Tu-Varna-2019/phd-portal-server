@@ -25,7 +25,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
     securitySchemeName = "Bearer",
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
-public class CommitteeController extends BaseController {
+public final class CommitteeController extends BaseController {
 
   private final CommitteeService committeeService;
 

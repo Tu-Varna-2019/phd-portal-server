@@ -8,8 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.sql.Date;
-import java.util.List;
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,8 +37,20 @@ public class Notification extends PanacheEntityBase {
   private String description;
 
   @Column(nullable = false, unique = false)
-  private Date creation;
+  private Timestamp creation;
 
   @Column(nullable = false, unique = false)
-  private List<String> oidRecipients;
+  private String severity;
+
+  @Column(nullable = true, unique = false)
+  private String recipient;
+
+  public Notification(
+      String title, String description, Timestamp creation, String severity, String recipient) {
+    this.title = title;
+    this.description = description;
+    this.creation = creation;
+    this.severity = severity;
+    this.recipient = recipient;
+  }
 }

@@ -2,8 +2,8 @@ package com.tuvarna.phd.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.smallrye.common.constraint.NotNull;
-import jakarta.annotation.Nullable;
 import java.sql.Timestamp;
+import javax.annotation.Nullable;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
