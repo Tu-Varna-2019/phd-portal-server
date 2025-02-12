@@ -181,11 +181,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   private void createUserByRole(String oid, String name, String email, String role) {
     switch (role) {
-      // TODO: Not sure if the admin should add users as committees
-      // case "committee":
-      //   Committee committee = new Committee(oid, name, email);
-      //   this.committeeRepository.save(committee);
-      //   break;
       case "expert", "manager", "admin":
         DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
         DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);

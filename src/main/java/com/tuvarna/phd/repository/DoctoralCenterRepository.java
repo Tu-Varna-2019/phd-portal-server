@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public final class DoctoralCenterRepository extends SharedUserRepository
@@ -49,5 +50,10 @@ public final class DoctoralCenterRepository extends SharedUserRepository
             () ->
                 new DoctoralCenterException(
                     "DoctoralCenter user with email: " + email + " doesn't exist!", 404));
+  }
+
+  @Override
+  public List<DoctoralCenter> getAll() {
+    return listAll();
   }
 }

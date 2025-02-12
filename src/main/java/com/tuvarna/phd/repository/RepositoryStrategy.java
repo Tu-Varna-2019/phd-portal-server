@@ -1,9 +1,12 @@
 package com.tuvarna.phd.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public interface RepositoryStrategy<T> {
 
-  public void save(T repository);
+  void save(T repository);
+
+  List<T> getAll();
 }

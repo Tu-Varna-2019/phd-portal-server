@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public final class PhdRepository extends SharedUserRepository
@@ -40,5 +41,10 @@ public final class PhdRepository extends SharedUserRepository
   @Override
   public void deleteByOid(String oid) {
     delete("oid", oid);
+  }
+
+  @Override
+  public List<Phd> getAll() {
+    return listAll();
   }
 }

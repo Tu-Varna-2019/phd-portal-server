@@ -4,6 +4,7 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
 public class UnauthorizedUsersRepository
@@ -36,5 +37,10 @@ public class UnauthorizedUsersRepository
   @Override
   public void deleteByOid(String oid) {
     delete("oid", oid);
+  }
+
+  @Override
+  public List<UnauthorizedUsers> getAll() {
+    return listAll();
   }
 }
