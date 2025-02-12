@@ -7,7 +7,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class CommitteeRepository implements PanacheRepositoryBase<Committee, Integer> {
+public final class CommitteeRepository extends SharedUserRepository
+    implements PanacheRepositoryBase<Committee, Integer> {
 
   public Committee getCommitteeById(Integer id) throws CommitteeException {
     return findByIdOptional(id)
@@ -20,6 +21,16 @@ public class CommitteeRepository implements PanacheRepositoryBase<Committee, Int
         .orElseThrow(
             () ->
                 new CommitteeException("Committee user with oid: " + oid + " doesn't exist!", 404));
+  }
+
+  public Committee getFullByOid(String oid) {
+    Committee committee = this.getByOid(oid);
+    committee.setPictureBlob(
+        committee.getPicture().isEmpty()
+            ? ""
+            : super.getDataUrlPicture(oid, committee.getPicture()));
+
+    return committee;
   }
 
   public void save(Committee committee) {

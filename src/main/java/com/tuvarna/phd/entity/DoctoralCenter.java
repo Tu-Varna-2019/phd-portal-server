@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +45,8 @@ public class DoctoralCenter extends PanacheEntityBase {
 
   @Column(nullable = true, unique = false)
   private String picture;
+
+  @Transient private String pictureBlob;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role", nullable = false)
