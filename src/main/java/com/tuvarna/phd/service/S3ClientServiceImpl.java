@@ -59,7 +59,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
   @Override
   public String getPictureByOid(String group, String oid) {
     LOG.info("Retrieveing picture name for user oid: " + oid);
-    String statement = "SELECT picture FROM" + group.toLowerCase() + " WHERE oid = $1";
+    String statement = "SELECT picture FROM " + group.toLowerCase() + " WHERE oid = $1";
 
     return this.pgClient
         .preparedQuery(statement.toString())

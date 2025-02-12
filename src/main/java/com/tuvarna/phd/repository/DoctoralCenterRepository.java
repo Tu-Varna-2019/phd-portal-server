@@ -36,7 +36,10 @@ public final class DoctoralCenterRepository extends SharedUserRepository
 
   public DoctoralCenter getFullByOid(String oid) {
     DoctoralCenter doctoralCenter = this.getByOid(oid);
-    doctoralCenter.setPictureBlob(super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
+    doctoralCenter.setPictureBlob(
+        doctoralCenter.getPicture().isEmpty()
+            ? ""
+            : super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
 
     return doctoralCenter;
   }

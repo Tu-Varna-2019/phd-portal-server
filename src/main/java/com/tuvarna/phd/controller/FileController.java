@@ -17,8 +17,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
-import java.util.Collections;
-import java.util.Map;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
@@ -40,13 +38,6 @@ public final class FileController extends BaseController {
   private final S3ClientValidator s3ClientValidator;
   @Inject private Logger LOG;
   @Inject JsonWebToken jwt;
-
-  private Map<String, String> DEFAULT_IMAGE_NAMES =
-      Collections.unmodifiableMap(
-          Map.of(
-              "phd", "phd_image.png",
-              "committee", "committee_image.png",
-              "doctoralCenter", "doctoralCenter_image.png"));
 
   @Inject
   public FileController(S3ClientService s3ClientService, S3ClientValidator s3ClientValidator) {
@@ -90,7 +81,7 @@ public final class FileController extends BaseController {
     this.s3ClientService.upload(file, oid, type);
     if (type.equals("avatar")) {
       String oldPicture = this.s3ClientService.getPictureByOid(group, oid);
-      this.s3ClientService.delete(oid, group, type, oldPicture);
+      if (!oldPicture.isEmpty()) this.s3ClientService.delete(oid, group, type, oldPicture);
       this.s3ClientService.setPictureByOid(file.getUniqueFilename(), group, oid);
     }
 
@@ -150,14 +141,14 @@ public final class FileController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = String.class))),
+                    schema = @Schema(implementation = FilenameDTO.class))),
         @APIResponse(
             responseCode = "404",
             description = "file not found",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = String.class)))
+                    schema = @Schema(implementation = FilenameDTO.class)))
       })
   public Response delete(
       FilenameDTO file, @RestCookie String group, @NotNull @RestQuery String type) {
@@ -172,7 +163,7 @@ public final class FileController extends BaseController {
     this.s3ClientService.delete(oid, group, type, file.getFilename());
 
     if (type.equals("avatar")) {
-      this.s3ClientService.setPictureByOid(this.DEFAULT_IMAGE_NAMES.get(group), group, oid);
+      this.s3ClientService.setPictureByOid("", group, oid);
     }
 
     return send("File deleted!");

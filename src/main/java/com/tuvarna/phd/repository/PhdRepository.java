@@ -22,7 +22,8 @@ public final class PhdRepository extends SharedUserRepository
 
   public Phd getFullByOid(String oid) {
     Phd phd = this.getByOid(oid);
-    phd.setPictureBlob(super.getDataUrlPicture(oid, phd.getPicture()));
+    phd.setPictureBlob(
+        phd.getPicture().isEmpty() ? "" : super.getDataUrlPicture(oid, phd.getPicture()));
 
     return phd;
   }

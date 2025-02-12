@@ -25,7 +25,10 @@ public final class CommitteeRepository extends SharedUserRepository
 
   public Committee getFullByOid(String oid) {
     Committee committee = this.getByOid(oid);
-    committee.setPictureBlob(super.getDataUrlPicture(oid, committee.getPicture()));
+    committee.setPictureBlob(
+        committee.getPicture().isEmpty()
+            ? ""
+            : super.getDataUrlPicture(oid, committee.getPicture()));
 
     return committee;
   }
