@@ -1,7 +1,9 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.service.dto.PhdDTO;
+import java.util.List;
 
-public interface PhdService {
-  void login(PhdDTO pDto);
+public sealed interface PhdService permits PhdServiceImpl {
+  List<String> getCurriculum();
+
+  void deleteCurriculum();
 }
