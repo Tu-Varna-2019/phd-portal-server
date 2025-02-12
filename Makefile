@@ -19,7 +19,9 @@ build:
 	quarkus build
 
 clean:
-	echo "clean"
+	./gradlew --stop
+	./gradlew clean
+	./gradlew build --refresh-dependencies
 
 install:
 	gradle build

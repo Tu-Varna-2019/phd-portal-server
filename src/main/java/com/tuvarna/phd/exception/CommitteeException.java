@@ -1,6 +1,6 @@
 package com.tuvarna.phd.exception;
 
-public class CommitteeException extends HttpException {
+public final class CommitteeException extends HttpException {
 
   public CommitteeException(String message) {
     super(message, 404);

@@ -16,7 +16,7 @@ INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
 								'de6b478e-e4e4-422d-88fb-293fe69c6519',
 								'admin',
 								's19621609@onlineedu.tu-varna.bg',
-								'doctoralCenter_image.png',
+								'',
 								role.id
 				FROM "doctoralcenterrole" role
 				WHERE role.role = 'admin'

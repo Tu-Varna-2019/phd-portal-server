@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.sql.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,6 +50,8 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "picture", nullable = true, unique = false)
   private String picture;
 
+  @Transient private String pictureBlob;
+
   @Column(nullable = false, unique = false)
   private String country;
 
@@ -59,7 +62,7 @@ public class Phd extends PanacheEntityBase {
   private String address;
 
   @Password
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 10)
   // TODO: Encrypt this pls
   // ЕГН
   private String pin;

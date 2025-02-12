@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,9 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// NOTE: Once created, it cannot be modified
 @Entity
 @Getter
 @Setter
+@Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "report")

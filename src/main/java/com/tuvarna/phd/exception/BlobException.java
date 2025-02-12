@@ -1,6 +1,6 @@
 package com.tuvarna.phd.exception;
 
-public class BlobException extends HttpException {
+public final class BlobException extends HttpException {
 
   public BlobException(String message) {
     super(message, 400);

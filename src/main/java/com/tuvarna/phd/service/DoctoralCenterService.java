@@ -8,7 +8,7 @@ import com.tuvarna.phd.service.dto.UserDTO;
 import io.smallrye.mutiny.Uni;
 import java.util.List;
 
-public interface DoctoralCenterService {
+public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
   void updateCandidateStatus(CandidateDTO candidateDTO, String oid);
 
   void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role);
