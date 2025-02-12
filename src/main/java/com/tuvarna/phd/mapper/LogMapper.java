@@ -1,7 +1,7 @@
 package com.tuvarna.phd.mapper;
 
-import com.tuvarna.phd.service.dto.LogDTO;
-import com.tuvarna.phd.service.dto.sendLogDTO;
+import com.tuvarna.phd.dto.LogDTO;
+import com.tuvarna.phd.dto.sendLogDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

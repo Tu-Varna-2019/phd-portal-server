@@ -1,7 +1,7 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.service.dto.BlobDataDTO;
-import com.tuvarna.phd.service.dto.FileBlobDTO;
+import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.FileBlobDTO;
 
 public sealed interface S3ClientService permits S3ClientServiceImpl {
 

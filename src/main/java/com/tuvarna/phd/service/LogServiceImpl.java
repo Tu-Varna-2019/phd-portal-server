@@ -11,7 +11,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import com.tuvarna.phd.exception.LogException;
-import com.tuvarna.phd.service.dto.LogDTO;
+import com.tuvarna.phd.dto.LogDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

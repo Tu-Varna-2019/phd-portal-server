@@ -2,8 +2,8 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.exception.BlobException;
 import com.tuvarna.phd.exception.S3ClientException;
-import com.tuvarna.phd.service.dto.BlobDataDTO;
-import com.tuvarna.phd.service.dto.FileBlobDTO;
+import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.FileBlobDTO;
 import io.vertx.ext.auth.NoSuchKeyIdException;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;

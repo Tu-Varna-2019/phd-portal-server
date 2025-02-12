@@ -1,7 +1,7 @@
 package com.tuvarna.phd.mapper;
 
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

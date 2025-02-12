@@ -1,7 +1,7 @@
 package com.tuvarna.phd.mapper;
 
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.entity.Candidate;
-import com.tuvarna.phd.service.dto.CandidateDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

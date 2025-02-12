@@ -1,7 +1,7 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UserEntity;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 
 public sealed interface AuthService permits AuthServiceImpl {

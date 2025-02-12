@@ -1,8 +1,8 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.PhdDTO;
 import com.tuvarna.phd.service.DoctoralCenterService;
-import com.tuvarna.phd.service.dto.CandidateDTO;
-import com.tuvarna.phd.service.dto.PhdDTO;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;

@@ -2,9 +2,9 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.service.DoctoralCenterService;
-import com.tuvarna.phd.service.dto.RoleDTO;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.service.dto.UserDTO;
+import com.tuvarna.phd.dto.RoleDTO;
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

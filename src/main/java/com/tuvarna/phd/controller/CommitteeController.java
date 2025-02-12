@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.service.CommitteeService;
-import com.tuvarna.phd.service.dto.CommitteeDTO;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;

@@ -1,8 +1,8 @@
 package com.tuvarna.phd.mapper;
 
+import com.tuvarna.phd.dto.NotificationClientDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.entity.Notification;
-import com.tuvarna.phd.service.dto.NotificationClientDTO;
-import com.tuvarna.phd.service.dto.NotificationDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

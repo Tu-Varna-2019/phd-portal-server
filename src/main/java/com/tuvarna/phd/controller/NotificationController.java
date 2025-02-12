@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.IdDTO;
+import com.tuvarna.phd.dto.NotificationClientDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.service.NotificationService;
-import com.tuvarna.phd.service.dto.IdDTO;
-import com.tuvarna.phd.service.dto.NotificationClientDTO;
-import com.tuvarna.phd.service.dto.NotificationDTO;
 import com.tuvarna.phd.validator.NotificationValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

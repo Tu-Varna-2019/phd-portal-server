@@ -2,7 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.entity.UserEntity;
 import com.tuvarna.phd.service.AuthService;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -65,6 +65,7 @@ public final class AuthController extends BaseController {
   @Path("/login")
   public Response login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Received a request to login with user creds: " + userDTO);
+
     Tuple2<UserEntity, String> user = this.authService.login(userDTO);
     return send("User logged in!", user.getItem1(), user.getItem2());
   }

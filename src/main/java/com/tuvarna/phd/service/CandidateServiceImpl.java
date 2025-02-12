@@ -5,7 +5,7 @@ import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.IPBlockException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.repository.CandidateRepository;
-import com.tuvarna.phd.service.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;

@@ -1,7 +1,7 @@
 package com.tuvarna.phd.mapper;
 
+import com.tuvarna.phd.dto.PhdDTO;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.service.dto.PhdDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.service.S3ClientService;
-import com.tuvarna.phd.service.dto.BlobDataDTO;
-import com.tuvarna.phd.service.dto.FileBlobDTO;
-import com.tuvarna.phd.service.dto.FilenameDTO;
+import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.FileBlobDTO;
+import com.tuvarna.phd.dto.FilenameDTO;
 import com.tuvarna.phd.validator.S3ClientValidator;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.RequestScoped;

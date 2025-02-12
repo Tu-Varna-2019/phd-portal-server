@@ -1,8 +1,8 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.PhdDTO;
 import com.tuvarna.phd.service.CandidateService;
-import com.tuvarna.phd.service.dto.CandidateDTO;
-import com.tuvarna.phd.service.dto.PhdDTO;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -24,7 +24,7 @@ import org.jboss.logging.Logger;
 
 @RequestScoped
 @Path("/candidate")
-@Tag(name="Candidate endpoint", description = "Endpoint for serving candidate services")
+@Tag(name = "Candidate endpoint", description = "Endpoint for serving candidate services")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(

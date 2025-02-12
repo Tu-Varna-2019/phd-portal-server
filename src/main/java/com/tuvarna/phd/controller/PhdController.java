@@ -1,8 +1,8 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.PhdDTO;
 import com.tuvarna.phd.exception.PhdException;
 import com.tuvarna.phd.service.PhdService;
-import com.tuvarna.phd.service.dto.PhdDTO;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;

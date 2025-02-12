@@ -1,12 +1,12 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.entity.UserEntity;
 import com.tuvarna.phd.exception.UserException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import com.tuvarna.phd.repository.UserRepositoryStrategy;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;

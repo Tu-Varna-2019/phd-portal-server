@@ -1,7 +1,7 @@
 package com.tuvarna.phd.validator;
 
+import com.tuvarna.phd.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.exception.DoctoralCenterRoleException;
-import com.tuvarna.phd.service.dto.DoctoralCenterDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
