@@ -5,11 +5,11 @@ import com.tuvarna.phd.entity.UserEntity;
 import io.smallrye.mutiny.tuples.Tuple2;
 
 public sealed interface AuthService permits AuthServiceImpl {
-  Tuple2<UserEntity, String> login(UnauthorizedUsersDTO uDto);
+  Tuple2<UserEntity<?>, String> login(UnauthorizedUsersDTO uDto);
 
-  UserEntity authenticate(UnauthorizedUsersDTO uDto);
+  UserEntity<?> getUser(String oid, String group);
 
   String getGroupByOid(String oid);
 
-  void addToUnauthorized(UnauthorizedUsersDTO unauthorizedUsersDTO);
+  void addToUnauthorized(UnauthorizedUsersDTO unauthorizedUsersDTO, String group);
 }

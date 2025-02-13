@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "committee")
-public final class Committee extends PanacheEntityBase implements UserEntity {
+public non-sealed class Committee extends PanacheEntityBase implements UserEntity<Committee> {
 
   @Id
   @SequenceGenerator(
@@ -62,5 +63,10 @@ public final class Committee extends PanacheEntityBase implements UserEntity {
     this.oid = oid;
     this.name = name;
     this.email = email;
+  }
+
+  @Override
+  public Committee toEntity(Row row) {
+    return new Committee();
   }
 }

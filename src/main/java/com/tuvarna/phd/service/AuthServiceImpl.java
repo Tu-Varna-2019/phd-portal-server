@@ -1,6 +1,9 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.DoctoralCenter;
+import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.entity.UserEntity;
 import com.tuvarna.phd.exception.UserException;
@@ -13,6 +16,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -20,8 +24,6 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class AuthServiceImpl implements AuthService {
 
-  private final UserRepositoryStrategy userRepositoryStrategy;
-  private final UnauthorizedUsersRepository usersRepository;
   private final UnauthorizedUsersMapper mapper;
   private final PgPool pgClient;
 
@@ -30,31 +32,24 @@ public final class AuthServiceImpl implements AuthService {
 
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
 
-  public AuthServiceImpl(
-      PgPool pgClient,
-      UserRepositoryStrategy userRepositoryStrategy,
-      UnauthorizedUsersRepository usersRepository,
-      UnauthorizedUsersMapper mapper) {
-
-    this.userRepositoryStrategy = userRepositoryStrategy;
+  public AuthServiceImpl(PgPool pgClient, UnauthorizedUsersMapper mapper) {
     this.pgClient = pgClient;
-    this.usersRepository = usersRepository;
     this.mapper = mapper;
   }
 
   @Override
   public String getGroupByOid(String oid) {
-    StringBuffer statement = new StringBuffer();
+    String statement;
 
-    for (String group : groups) {
-      statement.append("SELECT COUNT(1) FROM " + group + " WHERE oid = $1");
+    for (String group : this.groups) {
+      statement = ("SELECT EXISTS (SELECT 1 FROM " + group + " WHERE oid = $1)");
 
       Boolean isUserFound =
           this.pgClient
-              .preparedQuery(statement.toString())
+              .preparedQuery(statement)
               .execute(Tuple.of(oid))
               .onItem()
-              .transform(rowSet -> rowSet.iterator().hasNext())
+              .transform(rowSet -> rowSet.iterator().next().getBoolean(0))
               .await()
               .indefinitely();
 
@@ -67,15 +62,18 @@ public final class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void addToUnauthorized(UnauthorizedUsersDTO userDTO) {
-    if (this.userRepositoryStrategy.getByOid(userDTO.getOid()) == null) {
+  public void addToUnauthorized(UnauthorizedUsersDTO userDTO, String group) {
+    UserRepositoryStrategy<UnauthorizedUsers> unauthorizedRepository =
+        new UnauthorizedUsersRepository();
+
+    if (unauthorizedRepository.getByOid(userDTO.getOid()) == null) {
       LOG.info(
           "User: "
               + userDTO.getEmail()
               + " is not present in any of the tables. Adding him now...");
 
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
-      this.usersRepository.save(users);
+      unauthorizedRepository.save(users);
     } else {
       LOG.info(
           "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
@@ -90,21 +88,57 @@ public final class AuthServiceImpl implements AuthService {
 
   @Override
   @Transactional(dontRollbackOn = UserException.class)
-  public Tuple2<UserEntity, String> login(UnauthorizedUsersDTO userDTO) {
+  public Tuple2<UserEntity<?>, String> login(UnauthorizedUsersDTO userDTO) {
     String group;
     LOG.info("Service received a request to login as a user: " + userDTO);
 
     if (!(group = this.getGroupByOid(userDTO.getOid())).isEmpty()) {
-      return Tuple2.of(this.authenticate(userDTO), group);
+      return Tuple2.of(this.getUser(userDTO.getOid(), group), group);
     } else {
-      this.addToUnauthorized(userDTO);
+      this.addToUnauthorized(userDTO, group);
     }
     return null;
   }
 
   @Override
-  public UserEntity authenticate(UnauthorizedUsersDTO uDto) {
+  public UserEntity<?> getUser(String oid, String group) {
+    String statement = "SELECT * FROM " + group + " WHERE oid = $1";
+    UserEntity<?> userEntity = this.getEntityByGroup(group);
 
-    return null;
+    List<UserEntity<?>> result =
+        this.pgClient
+            .preparedQuery(statement.toString())
+            .execute(Tuple.of(oid))
+            .map(
+                rowSet -> {
+                  List<UserEntity<?>> userEntities = new ArrayList<UserEntity<?>>(1);
+                  rowSet.forEach(row -> userEntities.add(userEntity.toEntity(row)));
+                  return userEntities;
+                })
+            .await()
+            .indefinitely();
+
+    return result.get(0);
+  }
+
+
+  private UserEntity<?> getEntityByGroup(String group) {
+    return switch (group) {
+      case "phd" -> {
+        yield new Phd();
+      }
+      case "committee" -> {
+        yield new Committee();
+      }
+      case "doctoralCenter" -> {
+        yield new DoctoralCenter();
+      }
+      case "unauthorizedUsers" -> {
+        yield new UnauthorizedUsers();
+      }
+      default -> {
+        throw new UserException("Error. strategy group doesn't exist: " + group);
+      }
+    };
   }
 }

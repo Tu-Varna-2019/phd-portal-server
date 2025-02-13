@@ -4,9 +4,12 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.exception.CommitteeException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
 import java.util.List;
 
 @ApplicationScoped
+@Named("committee")
 public final class CommitteeRepository extends SharedUserRepository
     implements PanacheRepositoryBase<Committee, Integer>, UserRepositoryStrategy<Committee> {
 

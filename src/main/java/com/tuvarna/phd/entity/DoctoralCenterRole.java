@@ -33,4 +33,8 @@ public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Column(nullable = false, unique = true)
   private String role;
+
+  public DoctoralCenterRole(Long id) {
+    this.id = id;
+  }
 }

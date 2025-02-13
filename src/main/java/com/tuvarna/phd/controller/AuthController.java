@@ -66,7 +66,7 @@ public final class AuthController extends BaseController {
   public Response login(UnauthorizedUsersDTO userDTO) {
     LOG.info("Received a request to login with user creds: " + userDTO);
 
-    Tuple2<UserEntity, String> user = this.authService.login(userDTO);
+    Tuple2<UserEntity<?>, String> user = this.authService.login(userDTO);
     return send("User logged in!", user.getItem1(), user.getItem2());
   }
 }

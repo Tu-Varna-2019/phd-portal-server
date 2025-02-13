@@ -1,3 +1,8 @@
 package com.tuvarna.phd.entity;
 
-public sealed interface UserEntity permits Phd, Committee, DoctoralCenter, UnauthorizedUsers {}
+import io.vertx.mutiny.sqlclient.Row;
+
+public sealed interface UserEntity<T extends UserEntity<T>>
+    permits Phd, Committee, DoctoralCenter, UnauthorizedUsers {
+  T toEntity(Row row);
+}

@@ -4,9 +4,11 @@ import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.exception.PhdException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 import java.util.List;
 
 @ApplicationScoped
+@Named("phd")
 public final class PhdRepository extends SharedUserRepository
     implements PanacheRepositoryBase<Phd, Integer>, UserRepositoryStrategy<Phd> {
 

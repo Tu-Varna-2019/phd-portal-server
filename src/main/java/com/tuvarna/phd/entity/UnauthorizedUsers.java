@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "unauthorizedusers")
-public final class UnauthorizedUsers extends PanacheEntityBase implements UserEntity {
+public non-sealed class UnauthorizedUsers extends PanacheEntityBase
+    implements UserEntity<UnauthorizedUsers> {
 
   @Id
   @SequenceGenerator(
@@ -43,4 +45,9 @@ public final class UnauthorizedUsers extends PanacheEntityBase implements UserEn
 
   @Column(nullable = false, unique = false)
   private Timestamp timestamp;
+
+  @Override
+  public UnauthorizedUsers toEntity(Row row) {
+    return new UnauthorizedUsers();
+  }
 }

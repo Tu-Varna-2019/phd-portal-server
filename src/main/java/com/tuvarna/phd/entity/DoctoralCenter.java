@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,7 +25,8 @@ import lombok.Setter;
 @AllArgsConstructor
 // @UserDefinition
 @Table(name = "doctoralcenter")
-public final class DoctoralCenter extends PanacheEntityBase implements UserEntity {
+public non-sealed class DoctoralCenter extends PanacheEntityBase
+    implements UserEntity<DoctoralCenter> {
 
   @Id
   @SequenceGenerator(
@@ -56,5 +58,24 @@ public final class DoctoralCenter extends PanacheEntityBase implements UserEntit
     this.oid = oid;
     this.name = name;
     this.email = email;
+  }
+
+  public DoctoralCenter(
+      String oid, String name, String email, String picture, DoctoralCenterRole role) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.picture = picture;
+    this.role = role;
+  }
+
+  @Override
+  public DoctoralCenter toEntity(Row row) {
+    return new DoctoralCenter(
+        row.getString("oid"),
+        row.getString("name"),
+        row.getString("email"),
+        row.getString("picture"),
+        new DoctoralCenterRole(row.getLong("id")));
   }
 }

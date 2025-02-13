@@ -7,7 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class UnauthorizedUsersRepository
+public final class UnauthorizedUsersRepository
     implements PanacheRepositoryBase<UnauthorizedUsers, Integer>,
         UserRepositoryStrategy<UnauthorizedUsers> {
 
