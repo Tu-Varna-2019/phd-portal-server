@@ -1,4 +1,4 @@
-package com.tuvarna.phd.models;
+package com.tuvarna.phd.model;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

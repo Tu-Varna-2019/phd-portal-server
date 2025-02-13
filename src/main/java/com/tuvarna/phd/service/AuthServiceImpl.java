@@ -8,13 +8,13 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.entity.UserEntity;
 import com.tuvarna.phd.exception.UserException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
-import com.tuvarna.phd.models.S3Model;
+import com.tuvarna.phd.model.DatabaseModel;
+import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import io.smallrye.mutiny.tuples.Tuple2;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -27,7 +27,7 @@ import org.jboss.logging.Logger;
 public final class AuthServiceImpl implements AuthService {
 
   private final UnauthorizedUsersMapper mapper;
-  private final PgPool pgClient;
+  private final DatabaseModel databaseModel;
   private final S3Model s3Model;
   private DoctoralCenterRepository doctoralCenterRepository;
   private CommitteeRepository committeeRepository;
@@ -40,19 +40,19 @@ public final class AuthServiceImpl implements AuthService {
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
 
   public AuthServiceImpl(
+      DatabaseModel databaseModel,
       PhdRepository phdRepository,
       CommitteeRepository committeeRepository,
       DoctoralCenterRepository doctoralCenterRepository,
       UnauthorizedUsersRepository unauthorizedUsersRepository,
       S3Model s3Model,
-      PgPool pgClient,
       UnauthorizedUsersMapper mapper) {
+    this.databaseModel = databaseModel;
     this.unauthorizedUsersRepository = unauthorizedUsersRepository;
     this.phdRepository = phdRepository;
     this.committeeRepository = committeeRepository;
     this.doctoralCenterRepository = doctoralCenterRepository;
     this.s3Model = s3Model;
-    this.pgClient = pgClient;
     this.mapper = mapper;
   }
 
@@ -62,15 +62,7 @@ public final class AuthServiceImpl implements AuthService {
 
     for (String group : this.groups) {
       statement = ("SELECT EXISTS (SELECT 1 FROM " + group + " WHERE oid = $1)");
-
-      Boolean isUserFound =
-          this.pgClient
-              .preparedQuery(statement)
-              .execute(Tuple.of(oid))
-              .onItem()
-              .transform(rowSet -> rowSet.iterator().next().getBoolean(0))
-              .await()
-              .indefinitely();
+      Boolean isUserFound = this.databaseModel.selectIfExists(statement, Tuple.of(oid));
 
       if (isUserFound) {
         return group;
