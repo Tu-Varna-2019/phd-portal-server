@@ -8,8 +8,11 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.entity.UserEntity;
 import com.tuvarna.phd.exception.UserException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
+import com.tuvarna.phd.models.S3Model;
+import com.tuvarna.phd.repository.CommitteeRepository;
+import com.tuvarna.phd.repository.DoctoralCenterRepository;
+import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.repository.UserRepositoryStrategy;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -25,13 +28,30 @@ public final class AuthServiceImpl implements AuthService {
 
   private final UnauthorizedUsersMapper mapper;
   private final PgPool pgClient;
+  private final S3Model s3Model;
+  private DoctoralCenterRepository doctoralCenterRepository;
+  private CommitteeRepository committeeRepository;
+  private PhdRepository phdRepository;
+  private UnauthorizedUsersRepository unauthorizedUsersRepository;
 
   @ConfigProperty(name = "user.groups")
   List<String> groups;
 
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
 
-  public AuthServiceImpl(PgPool pgClient, UnauthorizedUsersMapper mapper) {
+  public AuthServiceImpl(
+      PhdRepository phdRepository,
+      CommitteeRepository committeeRepository,
+      DoctoralCenterRepository doctoralCenterRepository,
+      UnauthorizedUsersRepository unauthorizedUsersRepository,
+      S3Model s3Model,
+      PgPool pgClient,
+      UnauthorizedUsersMapper mapper) {
+    this.unauthorizedUsersRepository = unauthorizedUsersRepository;
+    this.phdRepository = phdRepository;
+    this.committeeRepository = committeeRepository;
+    this.doctoralCenterRepository = doctoralCenterRepository;
+    this.s3Model = s3Model;
     this.pgClient = pgClient;
     this.mapper = mapper;
   }
@@ -62,17 +82,14 @@ public final class AuthServiceImpl implements AuthService {
 
   @Override
   public void addToUnauthorized(UnauthorizedUsersDTO userDTO, String group) {
-    UserRepositoryStrategy<UnauthorizedUsers> unauthorizedRepository =
-        new UnauthorizedUsersRepository();
-
-    if (unauthorizedRepository.getByOid(userDTO.getOid()) == null) {
+    if (this.unauthorizedUsersRepository.getByOid(userDTO.getOid()) == null) {
       LOG.info(
           "User: "
               + userDTO.getEmail()
               + " is not present in any of the tables. Adding him now...");
 
       UnauthorizedUsers users = this.mapper.toEntity(userDTO);
-      unauthorizedRepository.save(users);
+      this.unauthorizedUsersRepository.save(users);
     } else {
       LOG.info(
           "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
@@ -101,38 +118,25 @@ public final class AuthServiceImpl implements AuthService {
 
   @Override
   public UserEntity<?> getUser(String oid, String group) {
-    String statement = "SELECT * FROM " + group + " WHERE oid = $1";
-    UserEntity<?> userEntity = this.getEntityByGroup(group);
-
-    UserEntity<?> result =
-        this.pgClient
-            .preparedQuery(statement.toString())
-            .execute(Tuple.of(oid))
-            .onItem()
-            .transform(rowSet -> userEntity.toEntity(rowSet.iterator().next()))
-            .await()
-            .indefinitely();
-
-    return result;
+    if (group.equals(this.groups.get(0))) {
+      Phd phd = this.phdRepository.getByOid(oid);
+      phd.setPictureBlob(this.setPictureBlobBase64(oid, phd.getPicture()));
+      return phd;
+    } else if (group.equals(this.groups.get(1))) {
+      Committee committee = this.committeeRepository.getByOid(oid);
+      committee.setPictureBlob(this.setPictureBlobBase64(oid, committee.getPicture()));
+      return committee;
+    } else if (group.equals(this.groups.get(2))) {
+      DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
+      doctoralCenter.setPictureBlob(this.setPictureBlobBase64(oid, doctoralCenter.getPicture()));
+      return doctoralCenter;
+    }
+    throw new UserException("Error: Cannot getUser because of non existing group!");
   }
 
-  private UserEntity<?> getEntityByGroup(String group) {
-    return switch (group) {
-      case "phd" -> {
-        yield new Phd();
-      }
-      case "committee" -> {
-        yield new Committee();
-      }
-      case "doctoralCenter" -> {
-        yield new DoctoralCenter();
-      }
-      case "unauthorizedUsers" -> {
-        yield new UnauthorizedUsers();
-      }
-      default -> {
-        throw new UserException("Error. strategy group doesn't exist: " + group);
-      }
-    };
+  private String setPictureBlobBase64(String oid, String picture) {
+    if (picture.isEmpty()) return "";
+
+    return this.s3Model.getDataUrlPicture(oid, picture);
   }
 }

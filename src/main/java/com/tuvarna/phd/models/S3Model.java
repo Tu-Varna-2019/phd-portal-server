@@ -1,4 +1,4 @@
-package com.tuvarna.phd.repository;
+package com.tuvarna.phd.models;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -10,15 +10,13 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @ApplicationScoped
-public abstract sealed class SharedUserRepository
-    permits DoctoralCenterRepository, PhdRepository, CommitteeRepository {
-
+public class S3Model {
   @Inject S3Client client;
 
   @ConfigProperty(name = "bucket.name")
   String bucketName;
 
-  protected String getDataUrlPicture(String oid, String picture) {
+  public String getDataUrlPicture(String oid, String picture) {
 
     ResponseBytes<GetObjectResponse> oBytes =
         this.client.getObjectAsBytes(this.buildGetRequest(oid + "/avatar/" + picture));

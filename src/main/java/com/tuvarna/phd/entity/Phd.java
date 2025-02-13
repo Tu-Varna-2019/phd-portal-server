@@ -105,4 +105,6 @@ public non-sealed class Phd extends PanacheEntityBase implements UserEntity<Phd>
   public Phd toEntity(Row row) {
     return new Phd();
   }
+
+
 }

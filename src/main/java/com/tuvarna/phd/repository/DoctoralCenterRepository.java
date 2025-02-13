@@ -4,14 +4,11 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 import java.util.List;
 
 @ApplicationScoped
-@Named("doctoralCenter")
-public final class DoctoralCenterRepository extends SharedUserRepository
-    implements PanacheRepositoryBase<DoctoralCenter, Integer>,
-        UserRepositoryStrategy<DoctoralCenter> {
+public final class DoctoralCenterRepository
+    implements PanacheRepositoryBase<DoctoralCenter, Integer>, IUserRepository<DoctoralCenter> {
 
   @Override
   public void save(DoctoralCenter doctoralCenter) {
@@ -26,17 +23,6 @@ public final class DoctoralCenterRepository extends SharedUserRepository
             () ->
                 new DoctoralCenterException(
                     "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
-  }
-
-  @Override
-  public DoctoralCenter getFullByOid(String oid) {
-    DoctoralCenter doctoralCenter = this.getByOid(oid);
-    doctoralCenter.setPictureBlob(
-        doctoralCenter.getPicture().isEmpty()
-            ? ""
-            : super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
-
-    return doctoralCenter;
   }
 
   @Override

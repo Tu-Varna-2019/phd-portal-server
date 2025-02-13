@@ -9,7 +9,7 @@ import java.util.List;
 @ApplicationScoped
 public final class UnauthorizedUsersRepository
     implements PanacheRepositoryBase<UnauthorizedUsers, Integer>,
-        UserRepositoryStrategy<UnauthorizedUsers> {
+        IUserRepository<UnauthorizedUsers> {
 
   @Override
   public UnauthorizedUsers getByOid(String oid) {
@@ -27,11 +27,6 @@ public final class UnauthorizedUsersRepository
   @Override
   public void save(UnauthorizedUsers users) {
     users.persist();
-  }
-
-  @Override
-  public UnauthorizedUsers getFullByOid(String oid) {
-    throw new UnauthorizedException("Error: not implemented yet!");
   }
 
   @Override
