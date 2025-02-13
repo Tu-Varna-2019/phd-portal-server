@@ -16,7 +16,6 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -105,22 +104,17 @@ public final class AuthServiceImpl implements AuthService {
     String statement = "SELECT * FROM " + group + " WHERE oid = $1";
     UserEntity<?> userEntity = this.getEntityByGroup(group);
 
-    List<UserEntity<?>> result =
+    UserEntity<?> result =
         this.pgClient
             .preparedQuery(statement.toString())
             .execute(Tuple.of(oid))
-            .map(
-                rowSet -> {
-                  List<UserEntity<?>> userEntities = new ArrayList<UserEntity<?>>(1);
-                  rowSet.forEach(row -> userEntities.add(userEntity.toEntity(row)));
-                  return userEntities;
-                })
+            .onItem()
+            .transform(rowSet -> userEntity.toEntity(rowSet.iterator().next()))
             .await()
             .indefinitely();
 
-    return result.get(0);
+    return result;
   }
-
 
   private UserEntity<?> getEntityByGroup(String group) {
     return switch (group) {
