@@ -1,9 +1,11 @@
 package com.tuvarna.phd.mapper;
 
 import com.tuvarna.phd.dto.PhdDTO;
+import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Phd;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "cdi")
@@ -20,4 +22,9 @@ public interface PhdMapper {
   @Mapping(target = "report", ignore = true)
   @Mapping(target = "pictureBlob", ignore = true)
   Phd toEntity(PhdDTO pDto);
+
+  @Named("candidateToEntity")
+  public static Phd toEntity(Candidate candidate) {
+    return new Phd();
+  }
 }

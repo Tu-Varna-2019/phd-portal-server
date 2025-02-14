@@ -1,7 +1,6 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -67,15 +66,5 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
     this.email = email;
     this.picture = picture;
     this.role = role;
-  }
-
-  @Override
-  public DoctoralCenter toEntity(Row row) {
-    return new DoctoralCenter(
-        row.getString("oid"),
-        row.getString("name"),
-        row.getString("email"),
-        row.getString("picture"),
-        new DoctoralCenterRole(row.getLong("id")));
   }
 }

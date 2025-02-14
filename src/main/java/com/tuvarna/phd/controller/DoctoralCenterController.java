@@ -1,7 +1,6 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.PhdDTO;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import io.smallrye.mutiny.Uni;
@@ -22,6 +21,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/doctoralcenter")
@@ -56,32 +56,25 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = PhdDTO.class))),
+                    schema = @Schema(implementation = CandidateDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when approving/rejecting phd's candidate",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = PhdDTO.class))),
+                    schema = @Schema(implementation = CandidateDTO.class))),
       })
-  @Path("/candidate/{oid}/status")
-  public Uni<Response> updateCandidateStatus(CandidateDTO candidateDTO, String oid) {
+  @Path("/candidate/status")
+  public Uni<Response> updateCandidateStatus(CandidateDTO candidateDTO, @RestQuery Long id) {
     LOG.info(
-        "Received a request to change candidate's"
-            + oid
-            + "status to: "
+        "Received a request to change candidate's id: "
+            + id
+            + " status to: "
             + candidateDTO.getStatus());
 
-    this.doctoralCenterService.updateCandidateStatus(candidateDTO, oid);
-
-    if (candidateDTO.getStatus().equals("approved")) {
-
-      LOG.info("Email is being sent for the candidate: " + candidateDTO.getEmail());
-      this.doctoralCenterService.sendEmail(candidateDTO.getEmail());
-    }
-
+    this.doctoralCenterService.review(candidateDTO, id);
     // NOTE: Should be removed ?
-    return Uni.createFrom().item(send("Canidatestatus changed to: " + candidateDTO.getStatus()));
+    return Uni.createFrom().item(send("Candidate status changed to: " + candidateDTO.getStatus()));
   }
 }

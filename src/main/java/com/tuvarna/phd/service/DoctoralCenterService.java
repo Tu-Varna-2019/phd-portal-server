@@ -5,10 +5,11 @@ import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import java.util.List;
 
 public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
-  void updateCandidateStatus(CandidateDTO candidateDTO, String oid);
+  void review(CandidateDTO candidateDTO, Long id);
 
   void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role);
 
@@ -18,5 +19,5 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   void deleteAuthorizedUser(String oid, RoleDTO role);
 
-  void sendEmail(String email);
+  void sendEmail(String title, TEMPLATES template, String email);
 }

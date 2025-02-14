@@ -11,6 +11,16 @@ public final class DoctoralCenterRepository
     implements PanacheRepositoryBase<DoctoralCenter, Integer>, IUserRepository<DoctoralCenter> {
 
   @Override
+  public DoctoralCenter getById(Long id) {
+    return find("id", id)
+        .firstResultOptional()
+        .orElseThrow(
+            () ->
+                new DoctoralCenterException(
+                    "DoctoralCenter user with id: " + id + " doesn't exist!"));
+  }
+
+  @Override
   public void save(DoctoralCenter doctoralCenter) {
     doctoralCenter.persist();
   }
@@ -43,5 +53,10 @@ public final class DoctoralCenterRepository
   @Override
   public List<DoctoralCenter> getAll() {
     return listAll();
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    delete("id", id);
   }
 }

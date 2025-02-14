@@ -12,6 +12,15 @@ public final class UnauthorizedUsersRepository
         IUserRepository<UnauthorizedUsers> {
 
   @Override
+  public UnauthorizedUsers getById(Long id) {
+    return find("id", id)
+        .firstResultOptional()
+        .orElseThrow(
+            () ->
+                new UnauthorizedException("Unauthorived user with id: " + id + " doesn't exist!"));
+  }
+
+  @Override
   public UnauthorizedUsers getByOid(String oid) {
     return find("oid", oid).firstResultOptional().orElse(null);
   }
@@ -37,5 +46,10 @@ public final class UnauthorizedUsersRepository
   @Override
   public List<UnauthorizedUsers> getAll() {
     return listAll();
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    delete("id", id);
   }
 }

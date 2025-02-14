@@ -10,9 +10,12 @@ import java.util.List;
 public final class CommitteeRepository
     implements PanacheRepositoryBase<Committee, Integer>, IUserRepository<Committee> {
 
-  public Committee getCommitteeById(Integer id) throws CommitteeException {
-    return findByIdOptional(id)
-        .orElseThrow(() -> new CommitteeException("Committee doesn't exist!", 404));
+  @Override
+  public Committee getById(Long id) {
+    return find("id", id)
+        .firstResultOptional()
+        .orElseThrow(
+            () -> new CommitteeException("Committee user with id: " + id + " doesn't exist!"));
   }
 
   @Override
@@ -46,5 +49,10 @@ public final class CommitteeRepository
   @Override
   public void deleteByOid(String oid) {
     delete("oid", oid);
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    delete("id", id);
   }
 }

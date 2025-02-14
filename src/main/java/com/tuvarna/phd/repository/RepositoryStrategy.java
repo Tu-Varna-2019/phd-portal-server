@@ -1,11 +1,12 @@
 package com.tuvarna.phd.repository;
 
-import com.tuvarna.phd.entity.UserEntity;
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
-@ApplicationScoped
-public interface RepositoryStrategy<T extends UserEntity<T>> {
+public interface RepositoryStrategy<T> {
+
+  T getById(Long id);
+
+  void deleteById(Long id);
 
   void save(T repository);
 

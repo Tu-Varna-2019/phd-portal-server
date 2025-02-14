@@ -2,7 +2,6 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
-import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,14 +35,8 @@ public non-sealed class Phd extends PanacheEntityBase implements UserEntity<Phd>
   @Column(name = "oid", nullable = false, unique = true, updatable = false)
   private String oid;
 
-  @Column(name = "first_name", nullable = false, unique = false)
-  private String firstName;
-
-  @Column(name = "middle_name", nullable = false, unique = false)
-  private String middleName;
-
-  @Column(name = "last_name", nullable = false, unique = false)
-  private String lastName;
+  @Column(name = "name", nullable = false, unique = false)
+  private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
@@ -96,15 +89,4 @@ public non-sealed class Phd extends PanacheEntityBase implements UserEntity<Phd>
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
-
-  public String getFullName() {
-    return this.getFirstName() + this.getMiddleName() + this.getLastName();
-  }
-
-  @Override
-  public Phd toEntity(Row row) {
-    return new Phd();
-  }
-
-
 }

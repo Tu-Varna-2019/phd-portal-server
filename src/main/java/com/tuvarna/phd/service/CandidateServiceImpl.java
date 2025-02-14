@@ -33,7 +33,7 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
     Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
 
-    if (this.candidateRepository.getByEmail(candidate) != null) {
+    if (this.candidateRepository.getByEmail(candidate.getEmail()) != null) {
       LOG.error("Candidate email: " + candidate.getEmail() + " aleady exists!");
       throw new CandidateException("Error, email already exists!");
     }

@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
 import jakarta.persistence.Column;
@@ -58,8 +59,7 @@ public class Candidate extends PanacheEntityBase {
   private String biography;
 
   @Column(nullable = false, unique = false)
-  // NOTE: Default true
-  private Boolean isBlocked;
+  private Boolean isBlocked = false;
 
   @Password
   @Column(nullable = false, unique = true, length = 10)
