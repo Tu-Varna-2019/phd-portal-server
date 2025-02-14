@@ -5,7 +5,6 @@ import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import io.smallrye.mutiny.Uni;
 import java.util.List;
 
 public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
@@ -19,5 +18,5 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   void deleteAuthorizedUser(String oid, RoleDTO role);
 
-  Uni<Void> sendEmail(String email);
+  void sendEmail(String email);
 }

@@ -1,5 +1,9 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.RoleDTO;
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
@@ -8,19 +12,14 @@ import com.tuvarna.phd.entity.PhdStatus;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.model.MailModel;
+import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.RoleDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.dto.UserDTO;
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.reactive.ReactiveMailer;
-import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -40,19 +39,21 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private final UnauthorizedUsersRepository uRepository;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
-  @Inject private ReactiveMailer mailer;
+  MailModel mailModel;
 
   @ConfigProperty(name = "client.base-url")
   private String clientBaseURL;
 
   @Inject
   public DoctoralCenterServiceImpl(
+      MailModel mailModel,
       DoctoralCenterRepository doctoralCenterRepository,
       PhdRepository phdRepository,
       DoctoralCenterRoleRepository doctoralCenterRoleRepository,
       PhdStatusRepository sPhdRepository,
       CommitteeRepository committeeRepository,
       UnauthorizedUsersRepository uRepository) {
+    this.mailModel = mailModel;
     this.doctoralCenterRepository = doctoralCenterRepository;
     this.phdRepository = phdRepository;
     this.doctoralCenterRoleRepository = doctoralCenterRoleRepository;
@@ -87,25 +88,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
-  public Uni<Void> sendEmail(String email) {
-    String body =
-        String.format(
-            """
-            <html>
-            <body>
-                <h3> Добре дошли в докторската платформа за Технически университет Варна!</h3>
-                <p>Вие сте одобрен във вашата кандидатура</p>
-                <p>Създаден ви е профил в Azure Active Directory и в докторантската платформа</p>
-                <p><strong>Линк:</strong> %s </p>
-                <p>С най-добри пожелания,</p>
-                <p> Екипът на Технически университет Варна</p>
-            </body>
-            </html>
-            """,
-            this.clientBaseURL);
-
-    return this.mailer.send(
-        Mail.withHtml(email, "Добре дошли в Технически университет Варна!", body));
+  public void sendEmail(String email) {
+    this.mailModel.send("Добре дошли в Технически университет Варна!", TEMPLATES.GREETINGS, "");
   }
 
   @Override
@@ -176,7 +160,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               + " ! Now deleting him from unauthorized users table...");
       this.uRepository.delete(user);
 
-      LOG.info("User" + user.getEmail() + "deleted from that table!");
+      LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
   }
 

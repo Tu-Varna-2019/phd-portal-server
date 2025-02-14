@@ -78,15 +78,10 @@ public final class DoctoralCenterController extends BaseController {
     if (candidateDTO.getStatus().equals("approved")) {
 
       LOG.info("Email is being sent for the candidate: " + candidateDTO.getEmail());
-      Uni<Void> emailSent = this.doctoralCenterService.sendEmail(candidateDTO.getEmail());
-
-      return emailSent
-          .onItem()
-          .transform(
-              v -> {
-                return send("Candidate email sent!");
-              });
+      this.doctoralCenterService.sendEmail(candidateDTO.getEmail());
     }
+
+    // NOTE: Should be removed ?
     return Uni.createFrom().item(send("Canidatestatus changed to: " + candidateDTO.getStatus()));
   }
 }
