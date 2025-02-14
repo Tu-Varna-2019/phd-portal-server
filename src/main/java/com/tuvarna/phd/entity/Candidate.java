@@ -1,6 +1,5 @@
 package com.tuvarna.phd.entity;
 
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
 import jakarta.persistence.Column;
@@ -34,14 +33,8 @@ public class Candidate extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidateSequence")
   private Long id;
 
-  @Column(name = "first_name", nullable = false, unique = false)
-  private String firstName;
-
-  @Column(name = "middle_name", nullable = false, unique = false)
-  private String middleName;
-
-  @Column(name = "last_name", nullable = false, unique = false)
-  private String lastName;
+  @Column(name = "name", nullable = false, unique = false)
+  private String name;
 
   @Column(nullable = false, unique = false)
   private String email;

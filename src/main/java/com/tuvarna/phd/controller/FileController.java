@@ -69,6 +69,7 @@ public final class FileController extends BaseController {
                     schema = @Schema(implementation = BlobDataDTO.class)))
       })
   @Path("/upload")
+
   public Response upload(BlobDataDTO file, @RestQuery String type, @RestCookie String group) {
     this.s3ClientValidator.validateType(type);
     String oid = jwt.getClaim("oid");

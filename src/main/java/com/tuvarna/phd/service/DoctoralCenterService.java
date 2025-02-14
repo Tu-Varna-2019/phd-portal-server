@@ -9,7 +9,8 @@ import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import java.util.List;
 
 public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
-  void review(CandidateDTO candidateDTO, Long id);
+
+  void review(CandidateDTO candidateDTO);
 
   void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role);
 

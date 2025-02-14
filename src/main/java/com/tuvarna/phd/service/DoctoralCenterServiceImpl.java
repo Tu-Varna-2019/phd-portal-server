@@ -13,7 +13,6 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.UserException;
-import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
@@ -76,16 +75,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void review(CandidateDTO candidateDTO, Long id) {
+  public void review(CandidateDTO candidateDTO) {
     LOG.info(
         "Service received a request to update status for candidate: " + candidateDTO.toString());
     Candidate candidate = this.candidateRepository.getByEmail(candidateDTO.getEmail());
 
     switch (candidateDTO.getStatus()) {
       case "approved" -> {
-        this.candidateRepository.deleteByEmail(candidateDTO.getEmail());
-        Phd phd = PhdMapper.toEntity(candidate);
-        this.phdRepository.save(phd);
+        // this.candidateRepository.deleteByEmail(candidateDTO.getEmail());
+
+        // Phd phd = PhdMapper.toEntity(candidate);
+        // this.phdRepository.save(phd);
         LOG.info("Phd user created! Now sending email to the candidate personal email about it...");
 
         this.sendEmail(
@@ -166,8 +166,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user =
-          new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
+      UserDTO user = new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
       authenticatedUsers.add(user);
     }
 

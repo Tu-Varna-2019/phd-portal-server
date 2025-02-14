@@ -2,12 +2,11 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.service.DoctoralCenterService;
-import com.tuvarna.phd.validator.DoctoralCenterValidator;
-import io.smallrye.mutiny.Uni;
+import com.tuvarna.phd.validator.CandidateValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -21,7 +20,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/doctoralcenter")
@@ -37,16 +35,17 @@ import org.jboss.resteasy.reactive.RestQuery;
 public final class DoctoralCenterController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;
+  private final CandidateValidator candidateValidator;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
   @Inject
   public DoctoralCenterController(
-      DoctoralCenterService doctoralCenterService,
-      DoctoralCenterValidator doctoralCenterValidator) {
+      DoctoralCenterService doctoralCenterService, CandidateValidator candidateValidator) {
     this.doctoralCenterService = doctoralCenterService;
+    this.candidateValidator = candidateValidator;
   }
 
-  @PATCH
+  @POST
   @Operation(summary = "Phd's candidate", description = "Approve or reject phd's candidate")
   @APIResponses(
       value = {
@@ -66,15 +65,18 @@ public final class DoctoralCenterController extends BaseController {
                     schema = @Schema(implementation = CandidateDTO.class))),
       })
   @Path("/candidate/status")
-  public Uni<Response> updateCandidateStatus(CandidateDTO candidateDTO, @RestQuery Long id) {
+  public Response updateCandidateStatus(CandidateDTO candidateDTO) {
+    this.candidateValidator.validateStatusExists(candidateDTO.getStatus());
     LOG.info(
-        "Received a request to change candidate's id: "
-            + id
+        "Received a request to change candidate's email: "
+            + candidateDTO.getEmail()
             + " status to: "
             + candidateDTO.getStatus());
 
-    this.doctoralCenterService.review(candidateDTO, id);
+    this.doctoralCenterService.review(candidateDTO);
     // NOTE: Should be removed ?
-    return Uni.createFrom().item(send("Candidate status changed to: " + candidateDTO.getStatus()));
+    // return Uni.createFrom().item(send("Candidate status changed to: " +
+    // candidateDTO.getStatus()));
+    return send("Candidate status changed to: " + candidateDTO.getStatus());
   }
 }

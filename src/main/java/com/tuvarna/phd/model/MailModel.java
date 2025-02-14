@@ -4,6 +4,7 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,15 +30,18 @@ public class MailModel {
   }
 
   public void send(String title, TEMPLATES template, String email) throws IOException {
-    String body = Files.readString(Path.of("./templates/", template.getPath()));
+    String absolutePath = new File(template.getPath()).getCanonicalPath();
+    String body = Files.readString(Path.of(absolutePath));
 
     this.mailer
-        .send(Mail.withHtml(email, "Добре дошли в Технически университет Варна!", body))
+        .send(Mail.withHtml(email, title, body))
         .onItem()
         .transform(
             v -> {
               // NOTE: Not sure if I need that
               return ("Candidate email sent!");
-            });
+            })
+        .await()
+        .indefinitely();
   }
 }
