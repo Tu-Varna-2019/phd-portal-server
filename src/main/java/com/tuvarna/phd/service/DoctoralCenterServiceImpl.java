@@ -40,7 +40,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final PhdRepository phdRepository;
   private final CommitteeRepository committeeRepository;
-  private final PhdStatusRepository sPhdRepository;
   private final CandidateRepository candidateRepository;
   private final UnauthorizedUsersRepository uRepository;
   private final DatabaseModel databaseModel;
@@ -68,7 +67,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     this.doctoralCenterRepository = doctoralCenterRepository;
     this.phdRepository = phdRepository;
     this.doctoralCenterRoleRepository = doctoralCenterRoleRepository;
-    this.sPhdRepository = sPhdRepository;
     this.uRepository = uRepository;
     this.committeeRepository = committeeRepository;
   }
@@ -82,11 +80,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
     switch (candidateDTO.getStatus()) {
       case "approved" -> {
-        // this.candidateRepository.deleteByEmail(candidateDTO.getEmail());
-
-        // Phd phd = PhdMapper.toEntity(candidate);
-        // this.phdRepository.save(phd);
-        LOG.info("Phd user created! Now sending email to the candidate personal email about it...");
+        candidate.setStatus("approved");
+        LOG.info(
+            "Candidate arroved! Now sending email to the candidate personal email about it...");
 
         this.sendEmail(
             "Добре дошли в Технически университет Варна!",
@@ -111,7 +107,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
             });
       }
 
-      case "declined" -> {
+      case "rejected" -> {
+        candidate.setStatus("rejected");
         this.sendEmail(
             "Вие не бяхте одобрен за вашата кандидатура в Ту-Варна",
             TEMPLATES.REJECTED,

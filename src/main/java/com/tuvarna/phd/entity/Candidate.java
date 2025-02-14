@@ -52,7 +52,7 @@ public class Candidate extends PanacheEntityBase {
   private String biography;
 
   @Column(nullable = false, unique = false)
-  private Boolean isBlocked = false;
+  private String status = "waiting";
 
   @Password
   @Column(nullable = false, unique = true, length = 10)
