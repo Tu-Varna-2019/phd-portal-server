@@ -30,6 +30,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -73,7 +74,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void review(CandidateDTO candidateDTO) {
+  public void review(CandidateDTO candidateDTO) throws IOException {
     LOG.info(
         "Service received a request to update status for candidate: " + candidateDTO.toString());
     Candidate candidate = this.candidateRepository.getByEmail(candidateDTO.getEmail());
@@ -84,32 +85,35 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         LOG.info(
             "Candidate arroved! Now sending email to the candidate personal email about it...");
 
-        this.sendEmail(
+        this.mailModel.send(
             "Добре дошли в Технически университет Варна!",
             TEMPLATES.ACCEPTED,
-            candidateDTO.getEmail());
+            candidateDTO.getEmail(),
+            Map.of("", ""));
 
         LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
 
         List<String> adminEmails =
             this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoralcenter d JOIN doctoralcenterrole dc ON(d.role = dc.id)"
-                    + " WHERE dc.role = $1",
+                "SELECT d.email FROM doctoralcenter d JOIN doctoralcenterrole dc ON(d.role ="
+                    + " dc.id) WHERE dc.role = $1",
                 Tuple.of("admin"),
                 "email");
 
         adminEmails.forEach(
             email -> {
-              this.sendEmail(
+              this.mailModel.send(
                   "Създаване на нов докторант: " + candidateDTO.getEmail(),
                   TEMPLATES.CREATE_USER,
-                  email);
+                  candidateDTO.getEmail(),
+                  Map.of("", ""));
             });
       }
 
       case "rejected" -> {
         candidate.setStatus("rejected");
-        this.sendEmail(
+
+        this.mailModel.send(
             "Вие не бяхте одобрен за вашата кандидатура в Ту-Варна",
             TEMPLATES.REJECTED,
             candidateDTO.getEmail());
@@ -131,16 +135,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
 
       default -> throw new UserException("Role is incorrect!", 400);
-    }
-  }
-
-  @Override
-  public void sendEmail(String title, TEMPLATES template, String email) {
-    try {
-      this.mailModel.send("Добре дошли в Технически университет Варна!", template, email);
-    } catch (IOException exception) {
-      LOG.error("Error in reading mail template: " + exception);
-      throw new CandidateException("Error in sending email. Please try again later!");
     }
   }
 

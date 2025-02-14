@@ -1,6 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
 import jakarta.enterprise.context.RequestScoped;
@@ -11,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.IOException;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -73,10 +75,13 @@ public final class DoctoralCenterController extends BaseController {
             + " status to: "
             + candidateDTO.getStatus());
 
-    this.doctoralCenterService.review(candidateDTO);
-    // NOTE: Should be removed ?
-    // return Uni.createFrom().item(send("Candidate status changed to: " +
-    // candidateDTO.getStatus()));
+    try {
+      this.doctoralCenterService.review(candidateDTO);
+    } catch (IOException exception) {
+      LOG.error("Error in reading mail template: " + exception);
+      throw new CandidateException("Error in sending email. Please try again later!");
+    }
+
     return send("Candidate status changed to: " + candidateDTO.getStatus());
   }
 }
