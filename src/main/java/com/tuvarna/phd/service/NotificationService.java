@@ -10,5 +10,7 @@ public sealed interface NotificationService permits NotificationServiceImpl {
 
   List<NotificationClientDTO> get(String oid);
 
+  List<String> getOidsByGroup(String group);
+
   void delete(List<IdDTO> notificationDTOs);
 }

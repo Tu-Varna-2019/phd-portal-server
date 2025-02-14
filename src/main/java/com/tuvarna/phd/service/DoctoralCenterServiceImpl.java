@@ -31,6 +31,7 @@ import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
+
   private final DoctoralCenterRepository doctoralCenterRepository;
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final PhdRepository phdRepository;

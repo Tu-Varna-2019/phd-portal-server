@@ -47,7 +47,6 @@ public final class LogServiceImpl implements LogService {
 
   @Override
   // @CacheResult(cacheName = "logs-cache")
-  @Transactional
   public List<LogDTO> get() {
     LOG.info("Service received a request to fetch logs for admin role");
 
