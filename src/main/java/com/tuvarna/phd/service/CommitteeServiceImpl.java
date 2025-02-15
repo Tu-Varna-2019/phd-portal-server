@@ -9,14 +9,9 @@ import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class CommitteeServiceImpl implements CommitteeService {
-  private final CommitteeRepository committeeRepository;
+  @Inject CommitteeRepository committeeRepository;
 
   @Inject private Logger LOG;
-
-  @Inject
-  public CommitteeServiceImpl(CommitteeRepository committeeRepository) {
-    this.committeeRepository = committeeRepository;
-  }
 
   @Override
   @Transactional

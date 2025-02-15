@@ -13,17 +13,12 @@ import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class S3ClientServiceImpl implements S3ClientService {
-  DatabaseModel databaseModel;
-  S3Model s3Model;
+  @Inject DatabaseModel databaseModel;
+  @Inject S3Model s3Model;
   @Inject private Logger LOG;
 
   @ConfigProperty(name = "bucket.name")
   String bucketName;
-
-  public S3ClientServiceImpl(DatabaseModel databaseModel, S3Model s3Model) {
-    this.databaseModel = databaseModel;
-    this.s3Model = s3Model;
-  }
 
   @Override
   public void setPictureByOid(String picture, String group, String oid) {

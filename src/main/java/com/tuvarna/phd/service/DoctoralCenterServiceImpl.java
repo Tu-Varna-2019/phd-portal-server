@@ -21,7 +21,6 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
-import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,41 +35,19 @@ import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
-
-  private final DoctoralCenterRepository doctoralCenterRepository;
-  private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
-  private final PhdRepository phdRepository;
-  private final CommitteeRepository committeeRepository;
-  private final CandidateRepository candidateRepository;
-  private final UnauthorizedUsersRepository uRepository;
-  private final DatabaseModel databaseModel;
+  @Inject DoctoralCenterRepository doctoralCenterRepository;
+  @Inject DoctoralCenterRoleRepository doctoralCenterRoleRepository;
+  @Inject PhdRepository phdRepository;
+  @Inject CommitteeRepository committeeRepository;
+  @Inject CandidateRepository candidateRepository;
+  @Inject UnauthorizedUsersRepository uRepository;
+  @Inject DatabaseModel databaseModel;
+  @Inject MailModel mailModel;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
-  MailModel mailModel;
 
   @ConfigProperty(name = "client.base-url")
   private String clientBaseURL;
-
-  @Inject
-  public DoctoralCenterServiceImpl(
-      DatabaseModel databaseModel,
-      MailModel mailModel,
-      CandidateRepository candidateRepository,
-      DoctoralCenterRepository doctoralCenterRepository,
-      PhdRepository phdRepository,
-      DoctoralCenterRoleRepository doctoralCenterRoleRepository,
-      PhdStatusRepository sPhdRepository,
-      CommitteeRepository committeeRepository,
-      UnauthorizedUsersRepository uRepository) {
-    this.databaseModel = databaseModel;
-    this.mailModel = mailModel;
-    this.candidateRepository = candidateRepository;
-    this.doctoralCenterRepository = doctoralCenterRepository;
-    this.phdRepository = phdRepository;
-    this.doctoralCenterRoleRepository = doctoralCenterRoleRepository;
-    this.uRepository = uRepository;
-    this.committeeRepository = committeeRepository;
-  }
 
   @Override
   @Transactional

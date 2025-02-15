@@ -26,35 +26,24 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class AuthServiceImpl implements AuthService {
 
-  private final UnauthorizedUsersMapper mapper;
-  private final DatabaseModel databaseModel;
-  private final S3Model s3Model;
-  private DoctoralCenterRepository doctoralCenterRepository;
-  private CommitteeRepository committeeRepository;
-  private PhdRepository phdRepository;
-  private UnauthorizedUsersRepository unauthorizedUsersRepository;
+  @Inject UnauthorizedUsersMapper mapper;
+
+  @Inject DatabaseModel databaseModel;
+
+  @Inject S3Model s3Model;
+
+  @Inject DoctoralCenterRepository doctoralCenterRepository;
+
+  @Inject CommitteeRepository committeeRepository;
+
+  @Inject PhdRepository phdRepository;
+
+  @Inject UnauthorizedUsersRepository unauthorizedUsersRepository;
 
   @ConfigProperty(name = "user.groups")
   List<String> groups;
 
   @Inject private Logger LOG = Logger.getLogger(AuthServiceImpl.class);
-
-  public AuthServiceImpl(
-      DatabaseModel databaseModel,
-      PhdRepository phdRepository,
-      CommitteeRepository committeeRepository,
-      DoctoralCenterRepository doctoralCenterRepository,
-      UnauthorizedUsersRepository unauthorizedUsersRepository,
-      S3Model s3Model,
-      UnauthorizedUsersMapper mapper) {
-    this.databaseModel = databaseModel;
-    this.unauthorizedUsersRepository = unauthorizedUsersRepository;
-    this.phdRepository = phdRepository;
-    this.committeeRepository = committeeRepository;
-    this.doctoralCenterRepository = doctoralCenterRepository;
-    this.s3Model = s3Model;
-    this.mapper = mapper;
-  }
 
   @Override
   public String getGroupByOid(String oid) {

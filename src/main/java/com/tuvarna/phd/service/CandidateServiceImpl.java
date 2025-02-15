@@ -1,32 +1,22 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.IPBlockException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.repository.CandidateRepository;
-import com.tuvarna.phd.dto.CandidateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class CandidateServiceImpl implements CandidateService {
-  private final CandidateRepository candidateRepository;
-  private final CandidateMapper candidateMapper;
-  private final IPBlockService ipBlockService;
+  @Inject CandidateRepository candidateRepository;
+  @Inject CandidateMapper candidateMapper;
+  @Inject IPBlockService ipBlockService;
 
   @Inject private Logger LOG;
-
-  @Inject
-  public CandidateServiceImpl(
-      IPBlockService ipBlockService,
-      CandidateRepository candidateRepository,
-      CandidateMapper candidateMapper) {
-    this.candidateRepository = candidateRepository;
-    this.candidateMapper = candidateMapper;
-    this.ipBlockService = ipBlockService;
-  }
 
   @Override
   public void register(CandidateDTO candidateDTO) {
