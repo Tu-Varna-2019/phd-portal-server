@@ -1,21 +1,15 @@
-package com.tuvarna.phd.service.dto;
+package com.tuvarna.phd.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.smallrye.common.constraint.NotNull;
-import io.smallrye.common.constraint.Nullable;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "LogDTO", description = "Log DTO")
+@Schema(name = "sendLogDTO", description = "Log DTO")
 @Data
 @AllArgsConstructor
-public class LogDTO {
-
-  @Nullable
-  @Schema(title = "id", required = true)
-  private String id;
+public class sendLogDTO {
 
   @NotNull
   @Schema(title = "description", required = true)
@@ -32,8 +26,4 @@ public class LogDTO {
   @NotNull
   @Schema(title = "level", required = true)
   private String level;
-
-  @Schema(title = "user", required = true)
-  @JsonProperty("user")
-  private UserPrincipalDTO userPrincipalDTO;
 }

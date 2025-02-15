@@ -1,7 +1,7 @@
 package com.tuvarna.phd.validator;
 
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.exception.NotificationException;
-import com.tuvarna.phd.service.dto.NotificationDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped

@@ -20,7 +20,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "unauthorizedusers")
-public class UnauthorizedUsers extends PanacheEntityBase {
+public non-sealed class UnauthorizedUsers extends PanacheEntityBase
+    implements UserEntity<UnauthorizedUsers> {
 
   @Id
   @SequenceGenerator(

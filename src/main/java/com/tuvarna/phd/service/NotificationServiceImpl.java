@@ -1,14 +1,14 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.IdDTO;
+import com.tuvarna.phd.dto.NotificationClientDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.entity.Notification;
+import com.tuvarna.phd.exception.NotificationException;
 import com.tuvarna.phd.mapper.NotificationMapper;
+import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.NotificationRepository;
-import com.tuvarna.phd.service.dto.IdDTO;
-import com.tuvarna.phd.service.dto.NotificationClientDTO;
-import com.tuvarna.phd.service.dto.NotificationDTO;
-import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -25,15 +25,15 @@ public final class NotificationServiceImpl implements NotificationService {
   @Inject private Logger LOG = Logger.getLogger(NotificationServiceImpl.class);
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
-  private final PgPool client;
+  DatabaseModel databaseModel;
 
   public NotificationServiceImpl(
       NotificationRepository notificationRepository,
       DoctoralCenterRepository doctoralCenterRepository,
       NotificationMapper notificationMapper,
-      PgPool client) {
+      DatabaseModel databaseModel) {
     this.notificationRepository = notificationRepository;
-    this.client = client;
+    this.databaseModel = databaseModel;
     this.notificationMapper = notificationMapper;
   }
 
@@ -43,8 +43,7 @@ public final class NotificationServiceImpl implements NotificationService {
     notificationDTO.setCreation(new Timestamp(new Date().getTime()));
 
     if (notificationDTO.getScope().equals("group"))
-      notificationDTO.addRecipients(
-          this.getOidsByGroup(notificationDTO.getGroup()).await().indefinitely());
+      notificationDTO.addRecipients(this.getOidsByGroup(notificationDTO.getGroup()));
 
     LOG.info("Recipient oids to save: " + notificationDTO.getRecipients());
 
@@ -58,25 +57,23 @@ public final class NotificationServiceImpl implements NotificationService {
               recipientOid));
   }
 
-  private Uni<List<String>> getOidsByGroup(String group) {
-    String statement = "";
+  @Override
+  public List<String> getOidsByGroup(String group) {
+    String statement =
+        switch (group) {
+          case "admin" -> {
+            yield "select d.oid from doctoralcenter d join doctoralcenterrole role on d.id=role.id "
+                + " where role.role=$1";
+          }
+          default -> {
+            throw new NotificationException(
+                "Notification error: cannot retrieve oids for unknown group: "
+                    + group
+                    + " Valid groups are: admin");
+          }
+        };
 
-    switch (group) {
-      case "admin" ->
-          statement =
-              "select d.oid from doctoralcenter d join doctoralcenterrole role on d.id=role.id "
-                  + " where role.role=$1";
-    }
-
-    return this.client
-        .preparedQuery(statement)
-        .execute(Tuple.of(group))
-        .map(
-            rowSet -> {
-              List<String> oids = new ArrayList<String>();
-              rowSet.forEach(row -> oids.add(row.getString("oid")));
-              return oids;
-            });
+    return this.databaseModel.selectMapString(statement, Tuple.of(group), "oid");
   }
 
   @Override

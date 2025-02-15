@@ -13,9 +13,7 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class IPBlockServiceImpl implements IPBlockService {
   private final IPBlockRepository ipBlockRepository;
-
   @Inject private Logger LOG;
-
   @Inject RoutingContext ipContext;
 
   @Inject

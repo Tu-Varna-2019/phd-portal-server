@@ -11,7 +11,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import com.tuvarna.phd.exception.LogException;
-import com.tuvarna.phd.service.dto.LogDTO;
+import com.tuvarna.phd.dto.LogDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -28,7 +29,9 @@ public final class LogServiceImpl implements LogService {
 
   @Inject private Logger LOG = Logger.getLogger(LogServiceImpl.class);
   @Inject private ElasticsearchClient client;
-  private final String INDEX = "logs";
+
+  @ConfigProperty(name = "elasticsearch.index-name")
+  private String index;
 
   @Override
   // @CacheInvalidate(cacheName = "logs-cache")
@@ -44,7 +47,6 @@ public final class LogServiceImpl implements LogService {
 
   @Override
   // @CacheResult(cacheName = "logs-cache")
-  @Transactional
   public List<LogDTO> get() {
     LOG.info("Service received a request to fetch logs for admin role");
 
@@ -71,7 +73,7 @@ public final class LogServiceImpl implements LogService {
 
     try {
       IndexRequest<LogDTO> request =
-          IndexRequest.of(b -> b.index(INDEX).document(logDTO).id(logDTO.getId()));
+          IndexRequest.of(b -> b.index(index).document(logDTO).id(logDTO.getId()));
       IndexResponse response = this.client.index(request);
       LOG.info("Response from creating an index: " + response.id());
 
@@ -90,7 +92,7 @@ public final class LogServiceImpl implements LogService {
       SearchRequest searchRequest =
           SearchRequest.of(
               b ->
-                  b.index(INDEX)
+                  b.index(index)
                       .query(
                           QueryBuilders.match()
                               .field(term)
@@ -110,7 +112,7 @@ public final class LogServiceImpl implements LogService {
     try {
       BulkRequest.Builder br = new BulkRequest.Builder();
 
-      for (var log : logs) br.operations(op -> op.delete(idx -> idx.index(INDEX)));
+      for (var log : logs) br.operations(op -> op.delete(idx -> idx.index(index)));
 
       BulkResponse result = client.bulk(br.build());
 

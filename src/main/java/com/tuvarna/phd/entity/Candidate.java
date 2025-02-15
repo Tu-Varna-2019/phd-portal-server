@@ -33,14 +33,8 @@ public class Candidate extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidateSequence")
   private Long id;
 
-  @Column(name = "first_name", nullable = false, unique = false)
-  private String firstName;
-
-  @Column(name = "middle_name", nullable = false, unique = false)
-  private String middleName;
-
-  @Column(name = "last_name", nullable = false, unique = false)
-  private String lastName;
+  @Column(name = "name", nullable = false, unique = false)
+  private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
@@ -58,8 +52,7 @@ public class Candidate extends PanacheEntityBase {
   private String biography;
 
   @Column(nullable = false, unique = false)
-  // NOTE: Default true
-  private Boolean isBlocked;
+  private String status = "waiting";
 
   @Password
   @Column(nullable = false, unique = true, length = 10)

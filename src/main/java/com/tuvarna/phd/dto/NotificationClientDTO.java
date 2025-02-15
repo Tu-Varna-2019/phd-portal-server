@@ -1,4 +1,4 @@
-package com.tuvarna.phd.service.dto;
+package com.tuvarna.phd.dto;
 
 import io.smallrye.common.constraint.NotNull;
 import java.sql.Timestamp;

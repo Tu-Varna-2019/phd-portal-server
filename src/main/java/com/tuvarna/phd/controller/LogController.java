@@ -3,9 +3,9 @@ package com.tuvarna.phd.controller;
 import com.tuvarna.phd.mapper.LogMapper;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.service.LogService;
-import com.tuvarna.phd.service.dto.LogDTO;
-import com.tuvarna.phd.service.dto.UserPrincipalDTO;
-import com.tuvarna.phd.service.dto.sendLogDTO;
+import com.tuvarna.phd.dto.LogDTO;
+import com.tuvarna.phd.dto.UserPrincipalDTO;
+import com.tuvarna.phd.dto.sendLogDTO;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -26,12 +26,13 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestCookie;
 
 @RequestScoped
-// TODO: restrict the endpoint usage only to the admin ??
 @Path("/logs")
+@Tag(name="Logs endpoint", description = "Endpoint for serving logs services")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(

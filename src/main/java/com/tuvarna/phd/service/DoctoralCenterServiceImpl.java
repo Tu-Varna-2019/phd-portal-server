@@ -1,119 +1,147 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.RoleDTO;
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UserDTO;
+import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.PhdStatus;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.model.DatabaseModel;
+import com.tuvarna.phd.model.MailModel;
+import com.tuvarna.phd.model.MailModel.TEMPLATES;
+import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
-import com.tuvarna.phd.service.dto.CandidateDTO;
-import com.tuvarna.phd.service.dto.RoleDTO;
-import com.tuvarna.phd.service.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.service.dto.UserDTO;
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.reactive.ReactiveMailer;
-import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
+
   private final DoctoralCenterRepository doctoralCenterRepository;
   private final DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   private final PhdRepository phdRepository;
   private final CommitteeRepository committeeRepository;
-  private final PhdStatusRepository sPhdRepository;
+  private final CandidateRepository candidateRepository;
   private final UnauthorizedUsersRepository uRepository;
+  private final DatabaseModel databaseModel;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
-  @Inject private ReactiveMailer mailer;
+  MailModel mailModel;
 
   @ConfigProperty(name = "client.base-url")
   private String clientBaseURL;
 
   @Inject
   public DoctoralCenterServiceImpl(
+      DatabaseModel databaseModel,
+      MailModel mailModel,
+      CandidateRepository candidateRepository,
       DoctoralCenterRepository doctoralCenterRepository,
       PhdRepository phdRepository,
       DoctoralCenterRoleRepository doctoralCenterRoleRepository,
       PhdStatusRepository sPhdRepository,
       CommitteeRepository committeeRepository,
       UnauthorizedUsersRepository uRepository) {
+    this.databaseModel = databaseModel;
+    this.mailModel = mailModel;
+    this.candidateRepository = candidateRepository;
     this.doctoralCenterRepository = doctoralCenterRepository;
     this.phdRepository = phdRepository;
     this.doctoralCenterRoleRepository = doctoralCenterRoleRepository;
-    this.sPhdRepository = sPhdRepository;
     this.uRepository = uRepository;
     this.committeeRepository = committeeRepository;
   }
 
   @Override
   @Transactional
-  public void updateCandidateStatus(CandidateDTO candidateDTO, String oid) {
+  public void review(CandidateDTO candidateDTO) throws IOException {
     LOG.info(
         "Service received a request to update status for candidate: " + candidateDTO.toString());
+    Candidate candidate = this.candidateRepository.getByEmail(candidateDTO.getEmail());
 
-    Phd phd = this.phdRepository.getByEmail(candidateDTO.getEmail());
-    PhdStatus statusPhd = this.sPhdRepository.getByStatus(candidateDTO.getStatus());
+    switch (candidateDTO.getStatus()) {
+      case "approved" -> {
+        candidate.setStatus("approved");
 
-    LOG.info("Updating candidate status to: " + candidateDTO.getStatus());
-    phd.setStatus(statusPhd);
+        LOG.info(
+            "Candidate arroved! Now sending email to the candidate personal email about it...");
+
+        this.mailModel.send(
+            "Вашата кандидатура е одобрена!",
+            TEMPLATES.ACCEPTED,
+            candidateDTO.getEmail(),
+            Map.of("$APP_URL", clientBaseURL));
+
+        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
+
+        List<String> adminEmails =
+            this.databaseModel.selectMapString(
+                "SELECT d.email FROM doctoralcenter d JOIN doctoralcenterrole dc ON(d.role ="
+                    + " dc.id) WHERE dc.role = $1",
+                Tuple.of("admin"),
+                "email");
+
+        adminEmails.forEach(
+            email -> {
+              try {
+                this.mailModel.send(
+                    "Заявка за създаване на докторант " + candidateDTO.getEmail(),
+                    TEMPLATES.CREATE_USER,
+                    email,
+                    Map.of("$PHD_USER", candidateDTO.getEmail()));
+              } catch (IOException exception) {
+                LOG.error("Error in sending email to the admins: " + exception);
+                throw new DoctoralCenterException("Error in sending email to the admins!");
+              }
+            });
+      }
+
+      case "rejected" -> {
+        candidate.setStatus("rejected");
+
+        this.mailModel.send(
+            "Вашата докторантска кандидатура в Ту-Варна",
+            TEMPLATES.REJECTED,
+            candidateDTO.getEmail());
+      }
+      default ->
+          throw new CandidateException(
+              "Status is invalid: "
+                  + candidateDTO.getStatus()
+                  + " .Valid statuses are: accepted, declined");
+    }
   }
 
   @Override
   @Transactional
   public void deleteAuthorizedUser(String oid, RoleDTO role) {
     switch (role.getRole()) {
-      case "phd":
-        this.phdRepository.deleteByOid(oid);
-        break;
+      case "phd" -> this.phdRepository.deleteByOid(oid);
+      case "committee" -> this.committeeRepository.deleteByOid(oid);
+      case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
 
-      case "committee":
-        this.committeeRepository.deleteByOid(oid);
-        break;
-
-      case "doctoralCenter":
-        this.doctoralCenterRepository.deleteByOid(oid);
-        break;
-
-      default:
-        throw new UserException("Role is incorrect!", 400);
+      default -> throw new UserException("Role is incorrect!", 400);
     }
-  }
-
-  @Override
-  public Uni<Void> sendEmail(String email) {
-    String body =
-        String.format(
-            """
-            <html>
-            <body>
-                <h3> Добре дошли в докторската платформа за Технически университет Варна!</h3>
-                <p>Вие сте одобрен във вашата кандидатура</p>
-                <p>Създаден ви е профил в Azure Active Directory и в докторантската платформа</p>
-                <p><strong>Линк:</strong> %s </p>
-                <p>С най-добри пожелания,</p>
-                <p> Екипът на Технически университет Варна</p>
-            </body>
-            </html>
-            """,
-            this.clientBaseURL);
-
-    return this.mailer.send(
-        Mail.withHtml(email, "Добре дошли в Технически университет Варна!", body));
   }
 
   @Override
@@ -135,8 +163,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user =
-          new UserDTO(phd.getId(), phd.getOid(), phd.getFullName(), phd.getEmail(), "phd");
+      UserDTO user = new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
       authenticatedUsers.add(user);
     }
 
@@ -184,17 +211,12 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               + " ! Now deleting him from unauthorized users table...");
       this.uRepository.delete(user);
 
-      LOG.info("User" + user.getEmail() + "deleted from that table!");
+      LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
   }
 
   private void createUserByRole(String oid, String name, String email, String role) {
     switch (role) {
-      // TODO: Not sure if the admin should add users as committees
-      // case "committee":
-      //   Committee committee = new Committee(oid, name, email);
-      //   this.committeeRepository.save(committee);
-      //   break;
       case "expert", "manager", "admin":
         DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
         DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);

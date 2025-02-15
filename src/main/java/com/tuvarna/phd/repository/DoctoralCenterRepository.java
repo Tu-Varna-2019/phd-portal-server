@@ -7,24 +7,25 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public final class DoctoralCenterRepository extends SharedUserRepository
-    implements PanacheRepositoryBase<DoctoralCenter, Integer> {
+public final class DoctoralCenterRepository
+    implements PanacheRepositoryBase<DoctoralCenter, Integer>, IUserRepository<DoctoralCenter> {
 
+  @Override
+  public DoctoralCenter getById(Long id) {
+    return find("id", id)
+        .firstResultOptional()
+        .orElseThrow(
+            () ->
+                new DoctoralCenterException(
+                    "DoctoralCenter user with id: " + id + " doesn't exist!"));
+  }
+
+  @Override
   public void save(DoctoralCenter doctoralCenter) {
     doctoralCenter.persist();
   }
 
-  public DoctoralCenter getDoctoralCenterByEmail(String email) {
-    return find("email", email)
-        .firstResultOptional()
-        .orElseThrow(
-            () -> new DoctoralCenterException("User with email: " + email + " doesn't exists!"));
-  }
-
-  public boolean existsByEmail(String email) {
-    return count("email = ?1", email) > 0;
-  }
-
+  @Override
   public DoctoralCenter getByOid(String oid) {
     return find("oid", oid)
         .firstResultOptional()
@@ -34,24 +35,12 @@ public final class DoctoralCenterRepository extends SharedUserRepository
                     "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
   }
 
-  public DoctoralCenter getFullByOid(String oid) {
-    DoctoralCenter doctoralCenter = this.getByOid(oid);
-    doctoralCenter.setPictureBlob(
-        doctoralCenter.getPicture().isEmpty()
-            ? ""
-            : super.getDataUrlPicture(oid, doctoralCenter.getPicture()));
-
-    return doctoralCenter;
-  }
-
-  public List<DoctoralCenter> getAll() {
-    return listAll();
-  }
-
+  @Override
   public void deleteByOid(String oid) {
     delete("oid", oid);
   }
 
+  @Override
   public DoctoralCenter getByEmail(String email) {
     return find("email", email)
         .firstResultOptional()
@@ -59,5 +48,15 @@ public final class DoctoralCenterRepository extends SharedUserRepository
             () ->
                 new DoctoralCenterException(
                     "DoctoralCenter user with email: " + email + " doesn't exist!", 404));
+  }
+
+  @Override
+  public List<DoctoralCenter> getAll() {
+    return listAll();
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    delete("id", id);
   }
 }

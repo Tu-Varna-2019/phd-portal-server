@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.service.S3ClientService;
-import com.tuvarna.phd.service.dto.BlobDataDTO;
-import com.tuvarna.phd.service.dto.FileBlobDTO;
-import com.tuvarna.phd.service.dto.FilenameDTO;
+import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.FileBlobDTO;
+import com.tuvarna.phd.dto.FilenameDTO;
 import com.tuvarna.phd.validator.S3ClientValidator;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.RequestScoped;
@@ -25,12 +25,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/file")
+@Tag(name="File endpoint", description = "Endpoint for serving file services")
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public final class FileController extends BaseController {
 
@@ -67,6 +69,7 @@ public final class FileController extends BaseController {
                     schema = @Schema(implementation = BlobDataDTO.class)))
       })
   @Path("/upload")
+
   public Response upload(BlobDataDTO file, @RestQuery String type, @RestCookie String group) {
     this.s3ClientValidator.validateType(type);
     String oid = jwt.getClaim("oid");

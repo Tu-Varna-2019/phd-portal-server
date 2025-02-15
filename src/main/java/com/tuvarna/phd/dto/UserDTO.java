@@ -1,12 +1,18 @@
-package com.tuvarna.phd.service.dto;
+package com.tuvarna.phd.dto;
 
 import io.smallrye.common.constraint.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "DoctoralCenterDTO", description = "Doctoral Center DTO")
+@Schema(name = "UserDTO", description = "User DTO")
 @Data
-public class DoctoralCenterDTO {
+@AllArgsConstructor
+public class UserDTO {
+
+  @NotNull
+  @Schema(title = "id", required = true)
+  private Long id;
 
   @NotNull
   @Schema(title = "oid", required = true)
@@ -20,11 +26,6 @@ public class DoctoralCenterDTO {
   @Schema(title = "email", required = true)
   private String email;
 
-  @NotNull
-  @Schema(title = "picture", required = true)
-  private String picture;
-
-  @NotNull
   @Schema(title = "role", required = false)
   private String role;
 }

@@ -1,4 +1,4 @@
-package com.tuvarna.phd.models;
+package com.tuvarna.phd.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -5,7 +5,7 @@ import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.IPBlockException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.repository.CandidateRepository;
-import com.tuvarna.phd.service.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
@@ -33,7 +33,7 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
     Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
 
-    if (this.candidateRepository.getByEmail(candidate) != null) {
+    if (this.candidateRepository.getByEmail(candidate.getEmail()) != null) {
       LOG.error("Candidate email: " + candidate.getEmail() + " aleady exists!");
       throw new CandidateException("Error, email already exists!");
     }

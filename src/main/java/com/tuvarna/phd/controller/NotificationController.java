@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.IdDTO;
+import com.tuvarna.phd.dto.NotificationClientDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.service.NotificationService;
-import com.tuvarna.phd.service.dto.IdDTO;
-import com.tuvarna.phd.service.dto.NotificationClientDTO;
-import com.tuvarna.phd.service.dto.NotificationDTO;
 import com.tuvarna.phd.validator.NotificationValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -24,10 +24,12 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 @RequestScoped
 @Path("/notify")
+@Tag(name = "Notification endpoint", description = "Endpoint for serving notifications  services")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(

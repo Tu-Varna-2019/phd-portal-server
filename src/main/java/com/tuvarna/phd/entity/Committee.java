@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "committee")
-public class Committee extends PanacheEntityBase {
+public non-sealed class Committee extends PanacheEntityBase implements UserEntity<Committee> {
 
   @Id
   @SequenceGenerator(

@@ -25,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "phd")
-public class Phd extends PanacheEntityBase {
+public non-sealed class Phd extends PanacheEntityBase implements UserEntity<Phd> {
 
   @Id
   @SequenceGenerator(name = "phdSequence", sequenceName = "phd_id_seq", allocationSize = 1)
@@ -35,14 +35,8 @@ public class Phd extends PanacheEntityBase {
   @Column(name = "oid", nullable = false, unique = true, updatable = false)
   private String oid;
 
-  @Column(name = "first_name", nullable = false, unique = false)
-  private String firstName;
-
-  @Column(name = "middle_name", nullable = false, unique = false)
-  private String middleName;
-
-  @Column(name = "last_name", nullable = false, unique = false)
-  private String lastName;
+  @Column(name = "name", nullable = false, unique = false)
+  private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
@@ -95,8 +89,4 @@ public class Phd extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
-
-  public String getFullName() {
-    return this.getFirstName() + this.getMiddleName() + this.getLastName();
-  }
 }

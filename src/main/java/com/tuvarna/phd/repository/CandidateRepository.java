@@ -4,26 +4,41 @@ import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.exception.CandidateException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 
 @ApplicationScoped
-public class CandidateRepository implements PanacheRepositoryBase<Candidate, Integer> {
+public class CandidateRepository
+    implements PanacheRepositoryBase<Candidate, Integer>, RepositoryStrategy<Candidate> {
 
-  public Candidate getByID(Candidate candidate) {
-    return find("id", candidate.getId())
+  @Override
+  public Candidate getById(Long id) {
+    return find("id", id)
         .firstResultOptional()
-        .orElseThrow(
-            () -> new CandidateException("Candidate not found with id: " + candidate.getId()));
+        .orElseThrow(() -> new CandidateException("Candidate not found with id: " + id));
   }
 
-  public Candidate getByEmail(Candidate candidate) {
-    return find("email", candidate.getEmail()).firstResultOptional().orElseGet(null);
+  public Candidate getByEmail(String email) {
+    return find("email", email)
+        .firstResultOptional()
+        .orElseThrow(() -> new CandidateException("Candidate not found with email: " + email));
   }
 
+  @Override
   public void save(Candidate candidate) {
     candidate.persist();
   }
 
-  public void deleteByID(Long id) {
+  @Override
+  public void deleteById(Long id) {
     delete("id", id);
+  }
+
+  public void deleteByEmail(String email) {
+    delete("email", email);
+  }
+
+  @Override
+  public List<Candidate> getAll() {
+    return listAll();
   }
 }

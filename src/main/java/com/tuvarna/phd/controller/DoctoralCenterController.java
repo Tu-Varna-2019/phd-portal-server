@@ -1,10 +1,9 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
-import com.tuvarna.phd.service.dto.CandidateDTO;
-import com.tuvarna.phd.service.dto.PhdDTO;
-import com.tuvarna.phd.validator.DoctoralCenterValidator;
-import io.smallrye.mutiny.Uni;
+import com.tuvarna.phd.validator.CandidateValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -13,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.IOException;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -20,10 +20,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 @RequestScoped
 @Path("/doctoralcenter")
+@Tag(
+    name = "Doctoral center endpoint",
+    description = "Endpoint for serving doctoral center services")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(
@@ -33,13 +37,14 @@ import org.jboss.logging.Logger;
 public final class DoctoralCenterController extends BaseController {
 
   private final DoctoralCenterService doctoralCenterService;
+  private final CandidateValidator candidateValidator;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
   @Inject
   public DoctoralCenterController(
-      DoctoralCenterService doctoralCenterService,
-      DoctoralCenterValidator doctoralCenterValidator) {
+      DoctoralCenterService doctoralCenterService, CandidateValidator candidateValidator) {
     this.doctoralCenterService = doctoralCenterService;
+    this.candidateValidator = candidateValidator;
   }
 
   @PATCH
@@ -52,37 +57,31 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = PhdDTO.class))),
+                    schema = @Schema(implementation = CandidateDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when approving/rejecting phd's candidate",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = PhdDTO.class))),
+                    schema = @Schema(implementation = CandidateDTO.class))),
       })
-  @Path("/candidate/{oid}/status")
-  public Uni<Response> updateCandidateStatus(CandidateDTO candidateDTO, String oid) {
+  @Path("/candidate/status")
+  public Response updateCandidateStatus(CandidateDTO candidateDTO) {
+    this.candidateValidator.validateStatusExists(candidateDTO.getStatus());
     LOG.info(
-        "Received a request to change candidate's"
-            + oid
-            + "status to: "
+        "Received a request to change candidate's email: "
+            + candidateDTO.getEmail()
+            + " status to: "
             + candidateDTO.getStatus());
 
-    this.doctoralCenterService.updateCandidateStatus(candidateDTO, oid);
-
-    if (candidateDTO.getStatus().equals("approved")) {
-
-      LOG.info("Email is being sent for the candidate: " + candidateDTO.getEmail());
-      Uni<Void> emailSent = this.doctoralCenterService.sendEmail(candidateDTO.getEmail());
-
-      return emailSent
-          .onItem()
-          .transform(
-              v -> {
-                return send("Candidate email sent!");
-              });
+    try {
+      this.doctoralCenterService.review(candidateDTO);
+    } catch (IOException exception) {
+      LOG.error("Error in reading mail template: " + exception);
+      throw new CandidateException("Error in sending email. Please try again later!");
     }
-    return Uni.createFrom().item(send("Canidatestatus changed to: " + candidateDTO.getStatus()));
+
+    return send("Candidate status changed to: " + candidateDTO.getStatus());
   }
 }

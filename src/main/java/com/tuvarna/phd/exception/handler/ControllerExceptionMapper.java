@@ -1,8 +1,8 @@
 package com.tuvarna.phd.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuvarna.phd.controller.ControllerResponse;
 import com.tuvarna.phd.exception.HttpException;
-import com.tuvarna.phd.models.ControllerResponse;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.annotation.Priority;

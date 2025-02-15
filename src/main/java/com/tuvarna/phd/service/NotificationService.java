@@ -1,14 +1,16 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.service.dto.IdDTO;
-import com.tuvarna.phd.service.dto.NotificationClientDTO;
-import com.tuvarna.phd.service.dto.NotificationDTO;
+import com.tuvarna.phd.dto.IdDTO;
+import com.tuvarna.phd.dto.NotificationClientDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import java.util.List;
 
 public sealed interface NotificationService permits NotificationServiceImpl {
   void save(NotificationDTO notificationDTO);
 
   List<NotificationClientDTO> get(String oid);
+
+  List<String> getOidsByGroup(String group);
 
   void delete(List<IdDTO> notificationDTOs);
 }

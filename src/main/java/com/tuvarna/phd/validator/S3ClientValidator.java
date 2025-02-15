@@ -8,7 +8,9 @@ public class S3ClientValidator {
 
   private enum VALID_TYPES {
     avatar,
-    docs
+    docs,
+    biography,
+    report
   }
 
   public void validateType(String type) throws S3ClientException {

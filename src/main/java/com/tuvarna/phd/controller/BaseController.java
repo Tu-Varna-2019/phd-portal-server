@@ -1,6 +1,5 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.models.ControllerResponse;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 
