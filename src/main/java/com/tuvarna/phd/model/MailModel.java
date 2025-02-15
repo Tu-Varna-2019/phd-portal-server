@@ -38,7 +38,7 @@ public class MailModel {
 
     replaceTemplateParams.forEach(
         (staticVal, dynamicVal) -> {
-          body.append(body.toString().replace(staticVal, dynamicVal));
+          body.replace(0, body.length(), body.toString().replace(staticVal, dynamicVal));
         });
 
     this.mailer

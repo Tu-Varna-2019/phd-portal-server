@@ -82,14 +82,15 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     switch (candidateDTO.getStatus()) {
       case "approved" -> {
         candidate.setStatus("approved");
+
         LOG.info(
             "Candidate arroved! Now sending email to the candidate personal email about it...");
 
         this.mailModel.send(
-            "Добре дошли в Технически университет Варна!",
+            "Вашата кандидатура е одобрена!",
             TEMPLATES.ACCEPTED,
             candidateDTO.getEmail(),
-            Map.of("", ""));
+            Map.of("$APP_URL", clientBaseURL));
 
         LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
 
@@ -102,11 +103,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
         adminEmails.forEach(
             email -> {
-              this.mailModel.send(
-                  "Създаване на нов докторант: " + candidateDTO.getEmail(),
-                  TEMPLATES.CREATE_USER,
-                  candidateDTO.getEmail(),
-                  Map.of("", ""));
+              try {
+                this.mailModel.send(
+                    "Заявка за създаване на докторант " + candidateDTO.getEmail(),
+                    TEMPLATES.CREATE_USER,
+                    email,
+                    Map.of("$PHD_USER", candidateDTO.getEmail()));
+              } catch (IOException exception) {
+                LOG.error("Error in sending email to the admins: " + exception);
+                throw new DoctoralCenterException("Error in sending email to the admins!");
+              }
             });
       }
 
@@ -114,7 +120,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         candidate.setStatus("rejected");
 
         this.mailModel.send(
-            "Вие не бяхте одобрен за вашата кандидатура в Ту-Варна",
+            "Вашата докторантска кандидатура в Ту-Варна",
             TEMPLATES.REJECTED,
             candidateDTO.getEmail());
       }
