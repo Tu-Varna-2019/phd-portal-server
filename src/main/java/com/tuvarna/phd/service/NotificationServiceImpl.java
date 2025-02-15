@@ -7,7 +7,6 @@ import com.tuvarna.phd.entity.Notification;
 import com.tuvarna.phd.exception.NotificationException;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.model.DatabaseModel;
-import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.NotificationRepository;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,19 +22,9 @@ import org.jboss.logging.Logger;
 public final class NotificationServiceImpl implements NotificationService {
 
   @Inject private Logger LOG = Logger.getLogger(NotificationServiceImpl.class);
-  private final NotificationRepository notificationRepository;
-  private final NotificationMapper notificationMapper;
-  DatabaseModel databaseModel;
-
-  public NotificationServiceImpl(
-      NotificationRepository notificationRepository,
-      DoctoralCenterRepository doctoralCenterRepository,
-      NotificationMapper notificationMapper,
-      DatabaseModel databaseModel) {
-    this.notificationRepository = notificationRepository;
-    this.databaseModel = databaseModel;
-    this.notificationMapper = notificationMapper;
-  }
+  @Inject NotificationRepository notificationRepository;
+  @Inject NotificationMapper notificationMapper;
+  @Inject DatabaseModel databaseModel;
 
   @Override
   @Transactional

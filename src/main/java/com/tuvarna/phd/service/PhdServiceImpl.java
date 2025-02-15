@@ -13,19 +13,11 @@ import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class PhdServiceImpl implements PhdService {
-  private final PhdRepository pRepository;
-  private final PhdStatusRepository sPhdRepository;
-  private final PhdMapper pMapper;
+  @Inject PhdRepository pRepository;
+  @Inject PhdStatusRepository sPhdRepository;
+  @Inject PhdMapper pMapper;
 
   @Inject private Logger LOG = Logger.getLogger(PhdServiceImpl.class);
-
-  @Inject
-  public PhdServiceImpl(
-      PhdRepository pRepository, PhdStatusRepository sPhdRepository, PhdMapper pMapper) {
-    this.pRepository = pRepository;
-    this.pMapper = pMapper;
-    this.sPhdRepository = sPhdRepository;
-  }
 
   @Override
   @CacheResult(cacheName = "curriculum-cache")
