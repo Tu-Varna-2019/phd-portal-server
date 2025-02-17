@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "CandidateDTO", description = "PHD DTO")
+@Schema(name = "CandidateDTO", description = "Candidate DTO")
 @Data
 @AllArgsConstructor
 public class CandidateDTO {

@@ -2,7 +2,6 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
@@ -108,9 +107,10 @@ public final class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = CandidateDTO.class))),
       })
+  @Path("/candidates")
   public Response getCandidates() {
     LOG.info("Received a request to retrieve all candidates");
-    List<Candidate> candidates = this.doctoralCenterService.getCandidates();
+    List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates();
 
     return send("Candidates retrieved!", candidates);
   }

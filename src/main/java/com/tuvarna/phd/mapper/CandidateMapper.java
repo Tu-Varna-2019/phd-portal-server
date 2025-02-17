@@ -10,4 +10,6 @@ public interface CandidateMapper {
   CandidateMapper mapperInstance = Mappers.getMapper(CandidateMapper.class);
 
   Candidate toEntity(CandidateDTO candidateDTO);
+
+  CandidateDTO toDto(Candidate candidate);
 }

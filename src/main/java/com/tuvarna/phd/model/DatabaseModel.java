@@ -55,7 +55,7 @@ public class DatabaseModel {
 
     return this.client
         .preparedQuery(statement)
-        .execute(prepQueries)
+        .execute()
         .map(
             rowSet -> {
               List<T> rows = new ArrayList<T>();

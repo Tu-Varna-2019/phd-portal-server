@@ -1,5 +1,6 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
@@ -13,6 +14,7 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
@@ -41,6 +43,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CommitteeRepository committeeRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject UnauthorizedUsersRepository uRepository;
+  @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
 
@@ -111,14 +114,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
-  public List<Candidate> getCandidates() {
+  public List<CandidateDTO> getCandidates() {
     LOG.info("Received a service request to retrieve all candidates ");
 
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
             "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
 
-    return candidates;
+        List<CandidateDTO> candidateDTOs =  new ArrayList<>();
+        candidates.forEach(candidate -> candidateDTOs.add ( this.candidateMapper.toDto(candidate) ));
+
+    return candidateDTOs;
   }
 
   @Override
