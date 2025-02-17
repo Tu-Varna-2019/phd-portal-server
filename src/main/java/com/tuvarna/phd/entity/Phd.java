@@ -2,6 +2,7 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -83,10 +84,15 @@ public non-sealed class Phd extends PanacheEntityBase implements UserEntity<Phd>
   private Supervisor supervisor;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Department", nullable = true)
-  private Department department;
+  @JoinColumn(name = "faculty", nullable = true)
+  private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "Report", nullable = true)
   private Report report;
+
+  @Override
+  public Phd toEntity(Row row) {
+    return new Phd();
+  }
 }

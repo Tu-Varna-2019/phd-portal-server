@@ -2,6 +2,7 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "candidate")
-public class Candidate extends PanacheEntityBase {
+public non-sealed class Candidate extends PanacheEntityBase implements UserEntity<Candidate> {
 
   @Id
   @SequenceGenerator(
@@ -51,6 +53,8 @@ public class Candidate extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String biography;
 
+  @Transient private String biographyBlob;
+
   @Column(nullable = false, unique = false)
   private String status = "waiting";
 
@@ -64,7 +68,23 @@ public class Candidate extends PanacheEntityBase {
   @JoinColumn(name = "Curriculum", nullable = true)
   private Curriculum curriculum;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Department", nullable = true)
-  private Department department;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "faculty", nullable = true)
+  private Faculty faculty;
+
+  public Candidate(String name, String email, String biography, String status) {
+    this.name = name;
+    this.email = email;
+    this.biography = biography;
+    this.status = status;
+  }
+
+  @Override
+  public Candidate toEntity(Row row) {
+    return new Candidate(
+        row.getString("name"),
+        row.getString("email"),
+        row.getString("biography"),
+        row.getString("status"));
+  }
 }

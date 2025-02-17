@@ -32,5 +32,5 @@ public class CommitteeRole extends PanacheEntityBase {
   private Long id;
 
   @Column(nullable = false, unique = true)
-  private String type;
+  private String role;
 }

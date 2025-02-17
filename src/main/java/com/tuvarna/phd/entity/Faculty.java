@@ -20,15 +20,12 @@ import lombok.Setter;
 @Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "department")
-public class Department extends PanacheEntityBase {
+@Table(name = "faculty")
+public class Faculty extends PanacheEntityBase {
 
   @Id
-  @SequenceGenerator(
-      name = "departmentSequence",
-      sequenceName = "department_id_seq",
-      allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "departmentSequence")
+  @SequenceGenerator(name = "facultySequence", sequenceName = "faculty_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facultySequence")
   private Long id;
 
   @Column(nullable = false, unique = false)

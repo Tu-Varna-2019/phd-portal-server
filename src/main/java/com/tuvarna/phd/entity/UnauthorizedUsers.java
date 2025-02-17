@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,4 +45,9 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
 
   @Column(nullable = false, unique = false)
   private Timestamp timestamp;
+
+  @Override
+  public UnauthorizedUsers toEntity(Row row) {
+    return new UnauthorizedUsers();
+  }
 }

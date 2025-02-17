@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -51,8 +52,8 @@ public non-sealed class Committee extends PanacheEntityBase implements UserEntit
   private Double grade;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
-  private Department department;
+  @JoinColumn(name = "faculty", nullable = true)
+  private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(nullable = true)
@@ -62,5 +63,10 @@ public non-sealed class Committee extends PanacheEntityBase implements UserEntit
     this.oid = oid;
     this.name = name;
     this.email = email;
+  }
+
+  @Override
+  public Committee toEntity(Row row) {
+    return new Committee();
   }
 }

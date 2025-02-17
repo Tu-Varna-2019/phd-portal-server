@@ -1,18 +1,22 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateStatusDTO;
+import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -57,17 +61,17 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateDTO.class))),
+                    schema = @Schema(implementation = CandidateStatusDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when approving/rejecting phd's candidate",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateDTO.class))),
+                    schema = @Schema(implementation = CandidateStatusDTO.class))),
       })
   @Path("/candidate/status")
-  public Response updateCandidateStatus(CandidateDTO candidateDTO) {
+  public Response updateCandidateStatus(CandidateStatusDTO candidateDTO) {
     this.candidateValidator.validateStatusExists(candidateDTO.getStatus());
     LOG.info(
         "Received a request to change candidate's email: "
@@ -83,5 +87,31 @@ public final class DoctoralCenterController extends BaseController {
     }
 
     return send("Candidate status changed to: " + candidateDTO.getStatus());
+  }
+
+  @GET
+  @Operation(summary = "Get all candidates", description = "Get all candidates")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Candidates retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when approving/rejecting phd's candidate",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+      })
+  public Response getCandidates() {
+    LOG.info("Received a request to retrieve all candidates");
+    List<Candidate> candidates = this.doctoralCenterService.getCandidates();
+
+    return send("Candidates retrieved!", candidates);
   }
 }
