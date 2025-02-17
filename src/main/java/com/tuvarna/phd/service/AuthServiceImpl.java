@@ -74,13 +74,12 @@ public final class AuthServiceImpl implements AuthService {
     } else {
       LOG.info(
           "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
-
+    }
       throw new UserException(
           "User: "
               + userDTO.getOid()
               + " is not present in neither phd, committee or doctoral center tables!",
           401);
-    }
   }
 
   @Override

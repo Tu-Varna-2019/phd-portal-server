@@ -1,5 +1,6 @@
 package com.tuvarna.phd.model;
 
+import com.tuvarna.phd.entity.UserEntity;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.inject.Inject;
@@ -10,6 +11,10 @@ import java.util.List;
 @Singleton
 public class DatabaseModel {
   @Inject PgPool client;
+
+  public void execute(String statement, Tuple prepQueries) {
+    this.client.preparedQuery(statement).execute(prepQueries).await().indefinitely();
+  }
 
   public Boolean selectIfExists(String statement, Tuple prepQueries) {
     return this.client
@@ -45,7 +50,20 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public void execute(String statement, Tuple prepQueries) {
-    this.client.preparedQuery(statement).execute(prepQueries).await().indefinitely();
+  public <T extends UserEntity<T>> List<T> selectMapEntity(
+      String statement, Tuple prepQueries, UserEntity<T> userEntity) {
+
+    return this.client
+        .preparedQuery(statement)
+        .execute()
+        .map(
+            rowSet -> {
+              List<T> rows = new ArrayList<T>();
+              rowSet.forEach(row -> rows.add(userEntity.toEntity(row)));
+
+              return rows;
+            })
+        .await()
+        .indefinitely();
   }
 }

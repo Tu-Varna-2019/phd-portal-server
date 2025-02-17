@@ -40,9 +40,9 @@ public class Supervisor extends PanacheEntityBase {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Title", nullable = false)
-  private SupervisorType title;
+  private SupervisorTitle title;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Department", nullable = false)
-  private Department department;
+  @JoinColumn(name = "faculty", nullable = true)
+  private Faculty faculty;
 }

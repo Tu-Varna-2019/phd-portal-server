@@ -34,10 +34,10 @@ public class Report extends PanacheEntityBase {
   private String name;
 
   @Column(nullable = true, unique = false)
-  // Форма на провеждане
-  private String type;
+  // NOTE: Форма на провеждане
+  private String conduct;
 
-  // Тримесечен и годишен
+  // NOTE: Тримесечен и годишен
   // Автоматично генерирани след като докторанта е одобрен
   @Column(nullable = true, unique = false)
   private Date startDate;

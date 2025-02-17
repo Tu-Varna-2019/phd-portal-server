@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
@@ -13,6 +14,7 @@ import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
 import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
@@ -41,6 +43,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CommitteeRepository committeeRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject UnauthorizedUsersRepository uRepository;
+  @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
 
@@ -51,12 +54,13 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void review(CandidateDTO candidateDTO) throws IOException {
+  public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
     LOG.info(
-        "Service received a request to update status for candidate: " + candidateDTO.toString());
-    Candidate candidate = this.candidateRepository.getByEmail(candidateDTO.getEmail());
+        "Service received a request to update status for candidate: "
+            + candidateStatusDTO.toString());
+    Candidate candidate = this.candidateRepository.getByEmail(candidateStatusDTO.getEmail());
 
-    switch (candidateDTO.getStatus()) {
+    switch (candidateStatusDTO.getStatus()) {
       case "approved" -> {
         candidate.setStatus("approved");
 
@@ -66,7 +70,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         this.mailModel.send(
             "Вашата кандидатура е одобрена!",
             TEMPLATES.ACCEPTED,
-            candidateDTO.getEmail(),
+            candidateStatusDTO.getEmail(),
             Map.of("$APP_URL", clientBaseURL));
 
         LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
@@ -82,10 +86,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
             email -> {
               try {
                 this.mailModel.send(
-                    "Заявка за създаване на докторант " + candidateDTO.getEmail(),
+                    "Заявка за създаване на докторант " + candidateStatusDTO.getEmail(),
                     TEMPLATES.CREATE_USER,
                     email,
-                    Map.of("$PHD_USER", candidateDTO.getEmail()));
+                    Map.of("$PHD_USER", candidateStatusDTO.getEmail()));
               } catch (IOException exception) {
                 LOG.error("Error in sending email to the admins: " + exception);
                 throw new DoctoralCenterException("Error in sending email to the admins!");
@@ -99,14 +103,28 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         this.mailModel.send(
             "Вашата докторантска кандидатура в Ту-Варна",
             TEMPLATES.REJECTED,
-            candidateDTO.getEmail());
+            candidateStatusDTO.getEmail());
       }
       default ->
           throw new CandidateException(
               "Status is invalid: "
-                  + candidateDTO.getStatus()
+                  + candidateStatusDTO.getStatus()
                   + " .Valid statuses are: accepted, declined");
     }
+  }
+
+  @Override
+  public List<CandidateDTO> getCandidates() {
+    LOG.info("Received a service request to retrieve all candidates ");
+
+    List<Candidate> candidates =
+        this.databaseModel.selectMapEntity(
+            "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
+
+        List<CandidateDTO> candidateDTOs =  new ArrayList<>();
+        candidates.forEach(candidate -> candidateDTOs.add ( this.candidateMapper.toDto(candidate) ));
+
+    return candidateDTOs;
   }
 
   @Override

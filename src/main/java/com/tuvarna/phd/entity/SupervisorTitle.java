@@ -20,13 +20,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Table(name = "supervisortype")
-public class SupervisorType extends PanacheEntityBase {
+@Table(name = "supervisortitle")
+public class SupervisorTitle extends PanacheEntityBase {
 
   @Id
   @SequenceGenerator(
-      name = "supervisorTypeSequence",
-      sequenceName = "supervisorType_id_seq",
+      name = "supervisortitleSequence",
+      sequenceName = "supervisortitle_id_seq",
       allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supervisorTypeSequence")
   private Long id;

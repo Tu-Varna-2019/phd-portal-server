@@ -5,6 +5,11 @@ import lombok.Getter;
 @Getter
 public abstract sealed class HttpException extends RuntimeException
     permits BlobException,
+        SubjectException,
+        FacultyException,
+        ReportException,
+        GradeException,
+        CurriculumException,
         CandidateException,
         CommitteeException,
         DoctoralCenterException,

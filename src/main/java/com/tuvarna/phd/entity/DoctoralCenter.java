@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,8 +45,8 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
   @Column(nullable = false, unique = false)
   private String email;
 
-  @Column(nullable = true, unique = false)
-  private String picture;
+  @Column(nullable = false, unique = false)
+  private String picture = "";
 
   @Transient private String pictureBlob;
 
@@ -66,5 +67,10 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
     this.email = email;
     this.picture = picture;
     this.role = role;
+  }
+
+  @Override
+  public DoctoralCenter toEntity(Row row) {
+    return new DoctoralCenter();
   }
 }
