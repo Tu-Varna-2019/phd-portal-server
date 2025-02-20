@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
+import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
@@ -113,5 +114,38 @@ public final class DoctoralCenterController extends BaseController {
     List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates();
 
     return send("Candidates retrieved!", candidates);
+  }
+
+  @GET
+  @Operation(
+      summary = "Unauthorized users",
+      description = "Get all users, that attempted to sign in to the Phd platform and are allowed")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "All unauthorized users retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving unauthorized users!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+      })
+  @Path("/unauthorized-users")
+  public Response getUnauthorizedUsers() {
+    LOG.info("Received a request to get all unauthorized users that have allowed status");
+
+    List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
+
+    unauthorizedUsers.removeIf((user) -> user.getIsAllowed() == false);
+
+    LOG.info("Unauthorized users with allowed status received!");
+    return send("Unauthorized users retrieved!", unauthorizedUsers);
   }
 }

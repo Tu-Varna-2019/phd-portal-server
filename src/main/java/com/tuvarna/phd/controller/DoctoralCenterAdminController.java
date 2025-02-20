@@ -141,7 +141,7 @@ public final class DoctoralCenterAdminController extends BaseController {
     LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
     this.doctoralCenterService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
 
-    return send("Unauthorized user changed is allowed to: " + isAllowed);
+    return send("Unauthorized user changed isAllowed to: " + isAllowed);
   }
 
   @DELETE
