@@ -15,7 +15,7 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   List<CandidateDTO> getCandidates();
 
-  void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role);
+  void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group);
 
   List<UnauthorizedUsers> getUnauthorizedUsers();
 

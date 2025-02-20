@@ -1,10 +1,10 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
+import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -102,13 +102,14 @@ public final class DoctoralCenterAdminController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
       })
-  @Path("/unauthorized-users/role")
+  @Path("/unauthorized-users/group")
   public Response setRoleForUnauthorizedUsers(
-      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String role) {
-    LOG.info("Received a request to set a role for unauthorized users: " + usersDTO.toString());
-    this.doctoralCenterService.setUnauthorizedUserRole(usersDTO, role);
+      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
 
-    return send("Unauthorized user is set for role: " + role);
+    LOG.info("Received a request to set a role for unauthorized users: " + usersDTO.toString());
+    this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
+
+    return send("Unauthorized user is set for role: " + group);
   }
 
   @DELETE

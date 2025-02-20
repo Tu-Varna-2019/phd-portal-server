@@ -1,5 +1,7 @@
 package com.tuvarna.phd.entity;
 
+import java.util.List;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,4 +47,8 @@ public class Supervisor extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
+
+  // TODO: create a functionality where he manually adds diserattions topics
+  @Column(nullable = false, unique = false)
+  private List<String> dissertations;
 }

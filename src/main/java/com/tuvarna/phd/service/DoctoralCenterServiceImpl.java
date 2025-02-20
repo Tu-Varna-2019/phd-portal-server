@@ -121,8 +121,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         this.databaseModel.selectMapEntity(
             "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
 
-        List<CandidateDTO> candidateDTOs =  new ArrayList<>();
-        candidates.forEach(candidate -> candidateDTOs.add ( this.candidateMapper.toDto(candidate) ));
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
     return candidateDTOs;
   }
@@ -189,38 +189,35 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role) {
+  public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
-            + role
+            + group
             + "for unauthorized user: "
             + usersDTO.toString());
 
     for (UnauthorizedUsersDTO userDTO : usersDTO) {
-      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
-      this.createUserByRole(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), role);
+      switch (group) {
+        case "expert", "manager", "admin" -> {
+          UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
+          DoctoralCenter dCenter =
+              new DoctoralCenter(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          DoctoralCenterRole doctoralCenterRole =
+              this.doctoralCenterRoleRepository.getByRole(group);
+          dCenter.setRole(doctoralCenterRole);
 
-      LOG.info(
-          "User created for a role: "
-              + role
-              + " ! Now deleting him from unauthorized users table...");
-      this.uRepository.delete(user);
+          this.doctoralCenterRepository.save(dCenter);
 
-      LOG.info("User " + user.getEmail() + " deleted from that table!");
-    }
-  }
+          LOG.info(
+              "User created for a role: "
+                  + group
+                  + " !Now deleting him from unauthorized users table...");
+          this.uRepository.delete(user);
 
-  private void createUserByRole(String oid, String name, String email, String role) {
-    switch (role) {
-      case "expert", "manager", "admin":
-        DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
-        DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);
-        dCenter.setRole(doctoralCenterRole);
-
-        this.doctoralCenterRepository.save(dCenter);
-        break;
-      default:
-        throw new DoctoralCenterException("Role: " + role + " doesn't exist!");
+          LOG.info("User " + user.getEmail() + " deleted from that table!");
+        }
+        default -> throw new DoctoralCenterException("Group: " + group + " doesn't exist!");
+      }
     }
   }
 }
