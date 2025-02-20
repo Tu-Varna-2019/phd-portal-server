@@ -47,7 +47,7 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
   private Timestamp timestamp;
 
   @Column(nullable = false, unique = false)
-  private Boolean isAllowed;
+  private Boolean isAllowed = false;
 
   @Override
   public UnauthorizedUsers toEntity(Row row) {

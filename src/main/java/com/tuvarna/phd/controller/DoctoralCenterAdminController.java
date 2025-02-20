@@ -1,5 +1,6 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.OidDTO;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
@@ -11,6 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -110,6 +112,36 @@ public final class DoctoralCenterAdminController extends BaseController {
     this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
 
     return send("Unauthorized user is set for role: " + group);
+  }
+
+  @PATCH
+  @Operation(
+      summary = "Allow/Deny unauthorized users",
+      description = "Allow/Deny unauthorized users")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Unauthorized users allowed/denied",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = " Error in setting allowed/denied for unauthorized users",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/unauthorized-users/is-allowed")
+  public Response seIsAllowedForUnauthorizedUsers(OidDTO oid, @RestQuery Boolean isAllowed) {
+
+    LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
+    this.doctoralCenterService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
+
+    return send("Unauthorized user changed is allowed to: " + isAllowed);
   }
 
   @DELETE

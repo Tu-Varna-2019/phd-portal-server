@@ -220,4 +220,19 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
     }
   }
+
+  @Override
+  @Transactional
+  public void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed) {
+    LOG.info(
+        "Service received a request to change isAllowed: "
+            + isAllowed
+            + " for oid unauthorized user: "
+            + oid);
+
+    this.databaseModel.execute(
+        "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
+
+    LOG.info("IsAllowed has been successfully changed!");
+  }
 }

@@ -17,6 +17,8 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group);
 
+  void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed);
+
   List<UnauthorizedUsers> getUnauthorizedUsers();
 
   List<UserDTO> getAuthorizedUsers();
