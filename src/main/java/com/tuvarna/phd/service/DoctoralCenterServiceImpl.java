@@ -10,6 +10,7 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
+import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
@@ -23,6 +24,8 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
+import com.tuvarna.phd.repository.PhdStatusRepository;
+import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,7 +43,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject DoctoralCenterRepository doctoralCenterRepository;
   @Inject DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   @Inject PhdRepository phdRepository;
+  @Inject PhdStatusRepository phdStatusRepository;
   @Inject CommitteeRepository committeeRepository;
+  @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject UnauthorizedUsersRepository uRepository;
   @Inject CandidateMapper candidateMapper;
@@ -197,9 +202,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
             + usersDTO.toString());
 
     for (UnauthorizedUsersDTO userDTO : usersDTO) {
+
+      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
         case "expert", "manager", "admin" -> {
-          UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
           DoctoralCenter dCenter =
               new DoctoralCenter(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
           DoctoralCenterRole doctoralCenterRole =
@@ -207,17 +213,36 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           dCenter.setRole(doctoralCenterRole);
 
           this.doctoralCenterRepository.save(dCenter);
-
-          LOG.info(
-              "User created for a role: "
-                  + group
-                  + " !Now deleting him from unauthorized users table...");
-          this.uRepository.delete(user);
-
-          LOG.info("User " + user.getEmail() + " deleted from that table!");
         }
+        // TODO: maybe move this create to separate method in client
+        case "phd" -> {
+          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
+          this.phdRepository.save(phd);
+        }
+
+        case "committee" -> {
+          Committee committee =
+              new Committee(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          this.committeeRepository.save(committee);
+        }
+
+        case "supervisor" -> {
+          Supervisor supervisor =
+              new Supervisor(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          this.supervisorRepository.save(supervisor);
+        }
+
         default -> throw new DoctoralCenterException("Group: " + group + " doesn't exist!");
       }
+
+      LOG.info(
+          "User created for a role: "
+              + group
+              + " !Now deleting him from unauthorized users table...");
+      this.uRepository.delete(user);
+
+      LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
   }
 
