@@ -154,20 +154,20 @@ public final class DoctoralCenterController extends BaseController {
 
   @POST
   @Operation(
-      summary = "Set role for unauthorized users",
-      description = "Set a role for unauthorized users")
+      summary = "Set group for unauthorized users",
+      description = "Set a group for unauthorized users")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Role set to unauthorized user",
+            description = "Group set to unauthorized user",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
         @APIResponse(
             responseCode = "400",
-            description = "Error when setting a role for a unauthorized users!",
+            description = "Error when setting a group for a unauthorized users!",
             content =
                 @Content(
                     mediaType = "application/json",
@@ -177,9 +177,9 @@ public final class DoctoralCenterController extends BaseController {
   public Response setRoleForUnauthorizedUsers(
       List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
 
-    LOG.info("Received a request to set a role for unauthorized users: " + usersDTO.toString());
+    LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
     this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
 
-    return send("Unauthorized user is set for role: " + group);
+    return send("Unauthorized user is set for group: " + group);
   }
 }

@@ -39,8 +39,8 @@ public final class SupervisorRepository
   }
 
   @Override
-  public void save(Supervisor committee) {
-    committee.persist();
+  public void save(Supervisor supervisor) {
+    supervisor.persist();
   }
 
   @Override
