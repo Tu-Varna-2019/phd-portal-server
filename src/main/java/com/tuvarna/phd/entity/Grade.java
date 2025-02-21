@@ -43,4 +43,7 @@ public class Grade extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "Phd", nullable = false)
   private Phd phd;
+
+  @Column(name = "report", nullable = false, unique = false)
+  private String report;
 }

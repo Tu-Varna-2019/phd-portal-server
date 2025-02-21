@@ -2,6 +2,8 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
+import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
@@ -10,6 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -25,6 +28,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/doctoralcenter")
@@ -113,5 +117,69 @@ public final class DoctoralCenterController extends BaseController {
     List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates();
 
     return send("Candidates retrieved!", candidates);
+  }
+
+  @GET
+  @Operation(
+      summary = "Unauthorized users",
+      description = "Get all users, that attempted to sign in to the Phd platform and are allowed")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "All unauthorized users retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving unauthorized users!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+      })
+  @Path("/unauthorized-users")
+  public Response getUnauthorizedUsers() {
+    LOG.info("Received a request to get all unauthorized users that have allowed status");
+
+    List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
+
+    unauthorizedUsers.removeIf((user) -> user.getIsAllowed() == false);
+
+    LOG.info("Unauthorized users with allowed status received!");
+    return send("Unauthorized users retrieved!", unauthorizedUsers);
+  }
+
+  @POST
+  @Operation(
+      summary = "Set group for unauthorized users",
+      description = "Set a group for unauthorized users")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Group set to unauthorized user",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when setting a group for a unauthorized users!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+      })
+  @Path("/unauthorized-users/group")
+  public Response setRoleForUnauthorizedUsers(
+      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
+
+    LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
+    this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
+
+    return send("Unauthorized user is set for group: " + group);
   }
 }

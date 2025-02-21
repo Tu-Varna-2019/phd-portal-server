@@ -10,6 +10,7 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
+import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.CandidateException;
 import com.tuvarna.phd.exception.DoctoralCenterException;
@@ -23,6 +24,8 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
+import com.tuvarna.phd.repository.PhdStatusRepository;
+import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,7 +43,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject DoctoralCenterRepository doctoralCenterRepository;
   @Inject DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   @Inject PhdRepository phdRepository;
+  @Inject PhdStatusRepository phdStatusRepository;
   @Inject CommitteeRepository committeeRepository;
+  @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject UnauthorizedUsersRepository uRepository;
   @Inject CandidateMapper candidateMapper;
@@ -121,8 +126,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         this.databaseModel.selectMapEntity(
             "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
 
-        List<CandidateDTO> candidateDTOs =  new ArrayList<>();
-        candidates.forEach(candidate -> candidateDTOs.add ( this.candidateMapper.toDto(candidate) ));
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
     return candidateDTOs;
   }
@@ -189,38 +194,70 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void setUnauthorizedUserRole(List<UnauthorizedUsersDTO> usersDTO, String role) {
+  public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
-            + role
+            + group
             + "for unauthorized user: "
             + usersDTO.toString());
 
     for (UnauthorizedUsersDTO userDTO : usersDTO) {
+
       UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
-      this.createUserByRole(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), role);
+      switch (group) {
+        case "expert", "manager", "admin" -> {
+          DoctoralCenter dCenter =
+              new DoctoralCenter(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          DoctoralCenterRole doctoralCenterRole =
+              this.doctoralCenterRoleRepository.getByRole(group);
+          dCenter.setRole(doctoralCenterRole);
+
+          this.doctoralCenterRepository.save(dCenter);
+        }
+        // TODO: maybe move this create to separate method in client
+        case "phd" -> {
+          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
+          this.phdRepository.save(phd);
+        }
+
+        case "committee" -> {
+          Committee committee =
+              new Committee(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          this.committeeRepository.save(committee);
+        }
+
+        case "supervisor" -> {
+          Supervisor supervisor =
+              new Supervisor(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          this.supervisorRepository.save(supervisor);
+        }
+
+        default -> throw new DoctoralCenterException("Group: " + group + " doesn't exist!");
+      }
 
       LOG.info(
           "User created for a role: "
-              + role
-              + " ! Now deleting him from unauthorized users table...");
+              + group
+              + " !Now deleting him from unauthorized users table...");
       this.uRepository.delete(user);
 
       LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
   }
 
-  private void createUserByRole(String oid, String name, String email, String role) {
-    switch (role) {
-      case "expert", "manager", "admin":
-        DoctoralCenter dCenter = new DoctoralCenter(oid, name, email);
-        DoctoralCenterRole doctoralCenterRole = this.doctoralCenterRoleRepository.getByRole(role);
-        dCenter.setRole(doctoralCenterRole);
+  @Override
+  @Transactional
+  public void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed) {
+    LOG.info(
+        "Service received a request to change isAllowed: "
+            + isAllowed
+            + " for oid unauthorized user: "
+            + oid);
 
-        this.doctoralCenterRepository.save(dCenter);
-        break;
-      default:
-        throw new DoctoralCenterException("Role: " + role + " doesn't exist!");
-    }
+    this.databaseModel.execute(
+        "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
+
+    LOG.info("IsAllowed has been successfully changed!");
   }
 }

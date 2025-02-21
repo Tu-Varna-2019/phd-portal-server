@@ -24,8 +24,8 @@ public class UnauthorizedUsersDTO {
   private String email;
 
   @Nullable
-  @Schema(title = "role", required = true)
-  private String role;
+  @Schema(title = "group", required = true)
+  private String group;
 
   @NotNull
   @JsonFormat(

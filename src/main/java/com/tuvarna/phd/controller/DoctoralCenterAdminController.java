@@ -1,16 +1,18 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.service.DoctoralCenterService;
+import com.tuvarna.phd.dto.OidDTO;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
+import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -83,32 +85,63 @@ public final class DoctoralCenterAdminController extends BaseController {
 
   @POST
   @Operation(
-      summary = "Set role for unauthorized users",
-      description = "Set a role for unauthorized users")
+      summary = "Set group for unauthorized users",
+      description = "Set a group for unauthorized users")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Role set to unauthorized user",
+            description = "Group set to unauthorized user",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
         @APIResponse(
             responseCode = "400",
-            description = "Error when setting a role for a unauthorized users!",
+            description = "Error when setting a group for a unauthorized users!",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
       })
-  @Path("/unauthorized-users/role")
+  @Path("/unauthorized-users/group")
   public Response setRoleForUnauthorizedUsers(
-      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String role) {
-    LOG.info("Received a request to set a role for unauthorized users: " + usersDTO.toString());
-    this.doctoralCenterService.setUnauthorizedUserRole(usersDTO, role);
+      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
 
-    return send("Unauthorized user is set for role: " + role);
+    LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
+    this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
+
+    return send("Unauthorized user is set for group: " + group);
+  }
+
+  @PATCH
+  @Operation(
+      summary = "Allow/Deny unauthorized users",
+      description = "Allow/Deny unauthorized users")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Unauthorized users allowed/denied",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = " Error in setting allowed/denied for unauthorized users",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/unauthorized-users/is-allowed")
+  public Response seIsAllowedForUnauthorizedUsers(OidDTO oid, @RestQuery Boolean isAllowed) {
+
+    LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
+    this.doctoralCenterService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
+
+    return send("Unauthorized user changed isAllowed to: " + isAllowed);
   }
 
   @DELETE
