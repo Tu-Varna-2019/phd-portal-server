@@ -5,7 +5,7 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.entity.UserEntity;
+import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.model.DatabaseModel;
@@ -84,7 +84,7 @@ public final class AuthServiceImpl implements AuthService {
 
   @Override
   @Transactional(dontRollbackOn = HttpException.class)
-  public Tuple2<UserEntity<?>, String> login(UnauthorizedUsersDTO userDTO) {
+  public Tuple2<IUserEntity<?>, String> login(UnauthorizedUsersDTO userDTO) {
     String group;
     LOG.info("Service received a request to login as a user: " + userDTO);
 
@@ -97,7 +97,7 @@ public final class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public UserEntity<?> getUser(String oid, String group) {
+  public IUserEntity<?> getUser(String oid, String group) {
     if (group.equals(this.groups.get(0))) {
       Phd phd = this.phdRepository.getByOid(oid);
       phd.setPictureBlob(this.setPictureBlobBase64(oid, phd.getPicture()));

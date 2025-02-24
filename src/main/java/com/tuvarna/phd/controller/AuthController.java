@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.entity.UserEntity;
+import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.AuthService;
 import io.smallrye.mutiny.tuples.Tuple2;
@@ -68,7 +68,7 @@ public final class AuthController extends BaseController {
       throw new HttpException("Error: Timestamp is invaid!");
     LOG.info("Received a request to login with user creds: " + userDTO);
 
-    Tuple2<UserEntity<?>, String> user = this.authService.login(userDTO);
+    Tuple2<IUserEntity<?>, String> user = this.authService.login(userDTO);
     return send("User logged in!", user.getItem1(), user.getItem2());
   }
 }
