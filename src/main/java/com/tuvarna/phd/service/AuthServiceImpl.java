@@ -6,7 +6,7 @@ import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.entity.UserEntity;
-import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.S3Model;
@@ -75,15 +75,15 @@ public final class AuthServiceImpl implements AuthService {
       LOG.info(
           "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
     }
-      throw new UserException(
-          "User: "
-              + userDTO.getOid()
-              + " is not present in neither phd, committee or doctoral center tables!",
-          401);
+    throw new HttpException(
+        "User: "
+            + userDTO.getOid()
+            + " is not present in neither phd, committee or doctoral center tables!",
+        401);
   }
 
   @Override
-  @Transactional(dontRollbackOn = UserException.class)
+  @Transactional(dontRollbackOn = HttpException.class)
   public Tuple2<UserEntity<?>, String> login(UnauthorizedUsersDTO userDTO) {
     String group;
     LOG.info("Service received a request to login as a user: " + userDTO);
@@ -111,7 +111,7 @@ public final class AuthServiceImpl implements AuthService {
       doctoralCenter.setPictureBlob(this.setPictureBlobBase64(oid, doctoralCenter.getPicture()));
       return doctoralCenter;
     }
-    throw new UserException("Error: Cannot getUser because of non existing group!");
+    throw new HttpException("Error: Cannot getUser because of non existing group!");
   }
 
   private String setPictureBlobBase64(String oid, String picture) {

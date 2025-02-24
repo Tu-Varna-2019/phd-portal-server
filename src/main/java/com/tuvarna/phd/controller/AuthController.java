@@ -1,8 +1,9 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.entity.UserEntity;
-import com.tuvarna.phd.service.AuthService;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.entity.UserEntity;
+import com.tuvarna.phd.exception.HttpException;
+import com.tuvarna.phd.service.AuthService;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -40,7 +41,6 @@ public final class AuthController extends BaseController {
     this.authService = authService;
   }
 
-
   @POST
   @Operation(
       summary = "Verify the user is present in the database",
@@ -64,6 +64,8 @@ public final class AuthController extends BaseController {
       })
   @Path("/login")
   public Response login(UnauthorizedUsersDTO userDTO) {
+    if (userDTO.getTimestamp() == null || userDTO.getTimestamp().getTime() == 0)
+      throw new HttpException("Error: Timestamp is invaid!");
     LOG.info("Received a request to login with user creds: " + userDTO);
 
     Tuple2<UserEntity<?>, String> user = this.authService.login(userDTO);
