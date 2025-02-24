@@ -1,11 +1,10 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
+import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
 import com.tuvarna.phd.model.DatabaseModel;
@@ -14,11 +13,13 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import io.quarkus.security.UnauthorizedException;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -62,56 +63,53 @@ public final class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void addToUnauthorized(UnauthorizedUsersDTO userDTO, String group) {
-    if (this.unauthorizedUsersRepository.getByOid(userDTO.getOid()) == null) {
-      LOG.info(
-          "User: "
-              + userDTO.getEmail()
-              + " is not present in any of the tables. Adding him now...");
+  public void addToUnauthorizedTable(String oid, String name, String email, String group) {
+    LOG.info("User: " + email + " is not present in any of the tables. Adding him now...");
 
-      UnauthorizedUsers users = this.mapper.toEntity(userDTO);
-      this.unauthorizedUsersRepository.save(users);
-    } else {
-      LOG.info(
-          "User: " + userDTO.getEmail() + " is already present in the table. No need to add him");
-    }
-    throw new HttpException(
-        "User: "
-            + userDTO.getOid()
-            + " is not present in neither phd, committee or doctoral center tables!",
-        401);
+    UnauthorizedUsers users =
+        new UnauthorizedUsers(oid, name, email, new Timestamp(System.currentTimeMillis()));
+    this.unauthorizedUsersRepository.save(users);
+
+    throw new UnauthorizedException(
+        "User: " + oid + " is not present in neither phd, committee or doctoral center tables!");
   }
 
   @Override
-  @Transactional(dontRollbackOn = HttpException.class)
-  public Tuple2<IUserEntity<?>, String> login(UnauthorizedUsersDTO userDTO) {
+  @Transactional(dontRollbackOn = UnauthorizedException.class)
+  public Tuple2<IUserEntity<?>, String> login(String oid, String name, String email) {
     String group;
-    LOG.info("Service received a request to login as a user: " + userDTO);
+    LOG.info("Service received a request to login as a user: " + email);
 
-    if (!(group = this.getGroupByOid(userDTO.getOid())).isEmpty()) {
-      return Tuple2.of(this.getUser(userDTO.getOid(), group), group);
+    if (!(group = this.getGroupByOid(oid)).isEmpty()) {
+      return Tuple2.of(this.getAuthenticatedUser(oid, group), group);
     } else {
-      this.addToUnauthorized(userDTO, group);
+      this.addToUnauthorizedTable(oid, name, email, group);
     }
     return null;
   }
 
   @Override
-  public IUserEntity<?> getUser(String oid, String group) {
-    if (group.equals(this.groups.get(0))) {
-      Phd phd = this.phdRepository.getByOid(oid);
-      phd.setPictureBlob(this.setPictureBlobBase64(oid, phd.getPicture()));
-      return phd;
-    } else if (group.equals(this.groups.get(1))) {
-      Committee committee = this.committeeRepository.getByOid(oid);
-      committee.setPictureBlob(this.setPictureBlobBase64(oid, committee.getPicture()));
-      return committee;
-    } else if (group.equals(this.groups.get(2))) {
-      DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
-      doctoralCenter.setPictureBlob(this.setPictureBlobBase64(oid, doctoralCenter.getPicture()));
-      return doctoralCenter;
+  public IUserEntity<?> getAuthenticatedUser(String oid, String group) {
+    switch (group) {
+      case "phd" -> {
+        Phd phd = this.phdRepository.getByOid(oid);
+        phd.setPictureBlob(this.setPictureBlobBase64(oid, phd.getPicture()));
+        return phd;
+      }
+      case "committee" -> {
+        Committee committee = this.committeeRepository.getByOid(oid);
+        committee.setPictureBlob(this.setPictureBlobBase64(oid, committee.getPicture()));
+        return committee;
+      }
+      case "doctoralCenter" -> {
+        DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
+        doctoralCenter.setPictureBlob(this.setPictureBlobBase64(oid, doctoralCenter.getPicture()));
+        return doctoralCenter;
+      }
+      default -> {
+        throw new HttpException("Error: Cannot getUser because of non existing group!");
+      }
     }
-    throw new HttpException("Error: Cannot getUser because of non existing group!");
   }
 
   private String setPictureBlobBase64(String oid, String picture) {

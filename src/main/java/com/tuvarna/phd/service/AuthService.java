@@ -1,15 +1,14 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.IUserEntity;
 import io.smallrye.mutiny.tuples.Tuple2;
 
 public sealed interface AuthService permits AuthServiceImpl {
-  Tuple2<IUserEntity<?>, String> login(UnauthorizedUsersDTO uDto);
+  Tuple2<IUserEntity<?>, String> login(String oid, String name, String email);
 
-  IUserEntity<?> getUser(String oid, String group);
+  IUserEntity<?> getAuthenticatedUser(String oid, String group);
 
   String getGroupByOid(String oid);
 
-  void addToUnauthorized(UnauthorizedUsersDTO unauthorizedUsersDTO, String group);
+  void addToUnauthorizedTable(String oid, String name, String email, String group);
 }
