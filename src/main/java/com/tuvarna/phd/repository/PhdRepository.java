@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.exception.PhdException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,21 +14,21 @@ public final class PhdRepository
   public Phd getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new PhdException("Phd user with id: " + id + " doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Phd user with id: " + id + " doesn't exist!"));
   }
 
   @Override
   public Phd getByOid(String oid) {
     return find("oid", oid)
         .firstResultOptional()
-        .orElseThrow(() -> new PhdException("Phd user with oid: " + oid + " doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Phd user with oid: " + oid + " doesn't exist!"));
   }
 
   @Override
   public Phd getByEmail(String email) {
     return find("email", email)
         .firstResultOptional()
-        .orElseThrow(() -> new PhdException("Phd user with email: " + email + " doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Phd user with email: " + email + " doesn't exist!"));
   }
 
   @Override

@@ -2,8 +2,7 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.entity.Candidate;
-import com.tuvarna.phd.exception.CandidateException;
-import com.tuvarna.phd.exception.IPBlockException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.repository.CandidateRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,11 +24,11 @@ public final class CandidateServiceImpl implements CandidateService {
 
     if (this.candidateRepository.getByEmail(candidate.getEmail()) != null) {
       LOG.error("Candidate email: " + candidate.getEmail() + " aleady exists!");
-      throw new CandidateException("Error, email already exists!");
+      throw new HttpException("Error, email already exists!");
     }
 
     if (this.ipBlockService.isClientIPBlocked()) {
-      throw new IPBlockException("Error, client is ip blocked!", 401);
+      throw new HttpException("Error, client is ip blocked!", 401);
     }
 
     LOG.info(

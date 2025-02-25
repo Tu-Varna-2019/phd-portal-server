@@ -1,7 +1,7 @@
 package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.dto.NotificationDTO;
-import com.tuvarna.phd.exception.NotificationException;
+import com.tuvarna.phd.exception.HttpException;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
@@ -19,28 +19,27 @@ public class NotificationValidator {
     group
   }
 
-  public void validateScopesExists(NotificationDTO notificationDTO) throws NotificationException {
+  public void validateScopesExists(NotificationDTO notificationDTO) throws HttpException {
     try {
       VALID_SCOPES scope = VALID_SCOPES.valueOf(notificationDTO.getScope());
       System.out.println(notificationDTO.toString());
 
       if (scope.equals(VALID_SCOPES.single) && notificationDTO.getRecipients() == null)
-        throw new NotificationException("Single scope cannot be with emty recipients!");
+        throw new HttpException("Single scope cannot be with emty recipients!");
       else if (scope.equals(VALID_SCOPES.group) && notificationDTO.getGroup() == null)
-        throw new NotificationException("Group scope cannot have empty group key!");
+        throw new HttpException("Group scope cannot have empty group key!");
 
     } catch (IllegalArgumentException e) {
-      throw new NotificationException("Scope " + notificationDTO.getScope() + " doesn't exist!");
+      throw new HttpException("Scope " + notificationDTO.getScope() + " doesn't exist!");
     }
     ;
   }
 
-  public void validateSeverityExists(NotificationDTO notificationDTO) throws NotificationException {
+  public void validateSeverityExists(NotificationDTO notificationDTO) throws HttpException {
     try {
       VALID_SEVERITY.valueOf(notificationDTO.getSeverity());
     } catch (IllegalArgumentException e) {
-      throw new NotificationException(
-          "Severity " + notificationDTO.getSeverity() + " doesn't exist!");
+      throw new HttpException("Severity " + notificationDTO.getSeverity() + " doesn't exist!");
     }
     ;
   }

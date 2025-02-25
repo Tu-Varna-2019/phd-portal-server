@@ -1,8 +1,7 @@
-package com.tuvarna.phd.exception.handler;
+package com.tuvarna.phd.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuvarna.phd.controller.ControllerResponse;
-import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.annotation.Priority;
@@ -23,11 +22,7 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
   @Override
   public Response toResponse(Exception exception) {
     Response response = mapExceptionToResponse(exception);
-    log.error(
-        "Error with exception: "
-            + exception.getClass()
-            + " with message: "
-            + exception.getMessage());
+    log.error("Exception: " + exception.getClass() + " with message: " + exception.getMessage());
 
     return Response.fromResponse(response).type(MediaType.APPLICATION_JSON).build();
   }

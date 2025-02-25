@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "unauthorizedusers")
 public non-sealed class UnauthorizedUsers extends PanacheEntityBase
-    implements UserEntity<UnauthorizedUsers> {
+    implements IUserEntity<UnauthorizedUsers> {
 
   @Id
   @SequenceGenerator(
@@ -48,6 +48,13 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
 
   @Column(nullable = false, unique = false)
   private Boolean isAllowed = false;
+
+  public UnauthorizedUsers(String oid, String name, String email, Timestamp timestamp) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.timestamp = timestamp;
+  }
 
   @Override
   public UnauthorizedUsers toEntity(Row row) {

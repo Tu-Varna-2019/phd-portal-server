@@ -1,6 +1,6 @@
 package com.tuvarna.phd.validator;
 
-import com.tuvarna.phd.exception.CandidateException;
+import com.tuvarna.phd.exception.HttpException;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
@@ -15,7 +15,7 @@ public class CandidateValidator {
     try {
       VALID_STASUSES.valueOf(status);
     } catch (IllegalArgumentException e) {
-      throw new CandidateException("Status " + status + " doesn't exist!");
+      throw new HttpException("Status " + status + " doesn't exist!");
     }
     ;
   }

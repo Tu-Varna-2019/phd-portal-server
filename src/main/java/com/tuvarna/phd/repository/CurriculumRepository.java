@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Curriculum;
-import com.tuvarna.phd.exception.CurriculumException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,7 +14,7 @@ public class CurriculumRepository
   public Curriculum getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new CurriculumException("Curriculum not found with id: " + id));
+        .orElseThrow(() -> new HttpException("Curriculum not found with id: " + id));
   }
 
   @Override

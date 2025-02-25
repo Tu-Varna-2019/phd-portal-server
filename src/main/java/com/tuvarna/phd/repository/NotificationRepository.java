@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Notification;
-import com.tuvarna.phd.exception.NotificationException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -9,9 +9,8 @@ import java.util.List;
 @ApplicationScoped
 public class NotificationRepository implements PanacheRepositoryBase<Notification, Integer> {
 
-  public Notification getById(Integer id) throws NotificationException {
-    return findByIdOptional(id)
-        .orElseThrow(() -> new NotificationException("Notification doesn't exist!"));
+  public Notification getById(Integer id) throws HttpException {
+    return findByIdOptional(id).orElseThrow(() -> new HttpException("Notification doesn't exist!"));
   }
 
   public List<Notification> getByRecipient(String oid) {

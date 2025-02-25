@@ -3,28 +3,16 @@ package com.tuvarna.phd.exception;
 import lombok.Getter;
 
 @Getter
-public abstract sealed class HttpException extends RuntimeException
-    permits BlobException,
-        SupervisorException,
-        SubjectException,
-        FacultyException,
-        ReportException,
-        GradeException,
-        CurriculumException,
-        CandidateException,
-        CommitteeException,
-        DoctoralCenterException,
-        DoctoralCenterRoleException,
-        IPBlockException,
-        LogException,
-        NotificationException,
-        PhdException,
-        S3ClientException,
-        UserException {
+public class HttpException extends RuntimeException {
   private final int status;
 
-  protected HttpException(String message, int status) {
+  public HttpException(String message, int status) {
     super(message);
     this.status = status;
+  }
+
+  public HttpException(String message) {
+    super(message);
+    this.status = 400;
   }
 }

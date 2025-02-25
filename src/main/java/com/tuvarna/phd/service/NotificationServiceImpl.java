@@ -4,7 +4,7 @@ import com.tuvarna.phd.dto.IdDTO;
 import com.tuvarna.phd.dto.NotificationClientDTO;
 import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.entity.Notification;
-import com.tuvarna.phd.exception.NotificationException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.NotificationRepository;
@@ -55,7 +55,7 @@ public final class NotificationServiceImpl implements NotificationService {
                 + " where role.role=$1";
           }
           default -> {
-            throw new NotificationException(
+            throw new HttpException(
                 "Notification error: cannot retrieve oids for unknown group: "
                     + group
                     + " Valid groups are: admin");
