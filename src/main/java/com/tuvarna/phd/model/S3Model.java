@@ -2,8 +2,7 @@ package com.tuvarna.phd.model;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.FileBlobDTO;
-import com.tuvarna.phd.exception.BlobException;
-import com.tuvarna.phd.exception.S3ClientException;
+import com.tuvarna.phd.exception.HttpException;
 import io.vertx.ext.auth.NoSuchKeyIdException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -64,7 +63,7 @@ public class S3Model {
 
     } catch (S3Exception exception) {
       LOG.error("Error in deleting object");
-      throw new S3ClientException("Error in deleting object");
+      throw new HttpException("Error in deleting object");
     }
   }
 
@@ -78,20 +77,20 @@ public class S3Model {
       return fileBlobDTO;
     } catch (NoSuchKeyIdException exception) {
       LOG.error("Unable to find file in path: " + objectName);
-      throw new S3ClientException(
+      throw new HttpException(
           "Unable to find file in path: " + objectName + " with exception: " + exception);
     }
   }
 
   public void uploadBlob(String objectName, BlobDataDTO file) {
     if (file.getMimetype() == null || file.getMimetype().isEmpty())
-      throw new BlobException("File extension for file not found!", 415);
+      throw new HttpException("File extension for file not found!", 415);
 
     PutObjectResponse pResponse =
         this.client.putObject(
             this.buildPutRequest(objectName, file.getMimetype()),
             RequestBody.fromFile(file.getData().filePath()));
 
-    if (pResponse == null) throw new BlobException("Error in uploading file!");
+    if (pResponse == null) throw new HttpException("Error in uploading file!");
   }
 }

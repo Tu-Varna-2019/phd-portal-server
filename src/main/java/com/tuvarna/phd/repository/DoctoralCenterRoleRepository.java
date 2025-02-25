@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.DoctoralCenterRole;
-import com.tuvarna.phd.exception.DoctoralCenterException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,12 +11,12 @@ public class DoctoralCenterRoleRepository
 
   public DoctoralCenterRole getById(Integer id) {
     return findByIdOptional(id)
-        .orElseThrow(() -> new DoctoralCenterException("Role for doctor center doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Role for doctor center doesn't exist!"));
   }
 
   public DoctoralCenterRole getByRole(String role) {
     return find("role", role)
         .firstResultOptional()
-        .orElseThrow(() -> new DoctoralCenterException("Role for doctor center doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Role for doctor center doesn't exist!"));
   }
 }

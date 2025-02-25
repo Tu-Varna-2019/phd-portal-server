@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Grade;
-import com.tuvarna.phd.exception.GradeException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -13,7 +13,7 @@ public class GradeRepository
   public Grade getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new GradeException("Grade not found with id: " + id));
+        .orElseThrow(() -> new HttpException("Grade not found with id: " + id));
   }
 
   @Override

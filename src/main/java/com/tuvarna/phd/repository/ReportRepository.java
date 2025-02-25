@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Report;
-import com.tuvarna.phd.exception.ReportException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -13,7 +13,7 @@ public class ReportRepository
   public Report getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new ReportException("Report not found with id: " + id));
+        .orElseThrow(() -> new HttpException("Report not found with id: " + id));
   }
 
   @Override

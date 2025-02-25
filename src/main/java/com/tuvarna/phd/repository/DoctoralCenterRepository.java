@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.DoctoralCenter;
-import com.tuvarna.phd.exception.DoctoralCenterException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -15,9 +15,7 @@ public final class DoctoralCenterRepository
     return find("id", id)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new DoctoralCenterException(
-                    "DoctoralCenter user with id: " + id + " doesn't exist!"));
+            () -> new HttpException("DoctoralCenter user with id: " + id + " doesn't exist!"));
   }
 
   @Override
@@ -31,8 +29,7 @@ public final class DoctoralCenterRepository
         .firstResultOptional()
         .orElseThrow(
             () ->
-                new DoctoralCenterException(
-                    "DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
+                new HttpException("DoctoralCenter user with oid: " + oid + " doesn't exist!", 404));
   }
 
   @Override
@@ -46,7 +43,7 @@ public final class DoctoralCenterRepository
         .firstResultOptional()
         .orElseThrow(
             () ->
-                new DoctoralCenterException(
+                new HttpException(
                     "DoctoralCenter user with email: " + email + " doesn't exist!", 404));
   }
 
