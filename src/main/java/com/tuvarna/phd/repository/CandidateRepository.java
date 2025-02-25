@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Candidate;
-import com.tuvarna.phd.exception.CandidateException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,13 +14,13 @@ public class CandidateRepository
   public Candidate getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new CandidateException("Candidate not found with id: " + id));
+        .orElseThrow(() -> new HttpException("Candidate not found with id: " + id));
   }
 
   public Candidate getByEmail(String email) {
     return find("email", email)
         .firstResultOptional()
-        .orElseThrow(() -> new CandidateException("Candidate not found with email: " + email));
+        .orElseThrow(() -> new HttpException("Candidate not found with email: " + email));
   }
 
   @Override

@@ -12,9 +12,7 @@ import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.exception.CandidateException;
-import com.tuvarna.phd.exception.DoctoralCenterException;
-import com.tuvarna.phd.exception.UserException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
@@ -97,7 +95,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
                     Map.of("$PHD_USER", candidateStatusDTO.getEmail()));
               } catch (IOException exception) {
                 LOG.error("Error in sending email to the admins: " + exception);
-                throw new DoctoralCenterException("Error in sending email to the admins!");
+                throw new HttpException("Error in sending email to the admins!");
               }
             });
       }
@@ -111,7 +109,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
             candidateStatusDTO.getEmail());
       }
       default ->
-          throw new CandidateException(
+          throw new HttpException(
               "Status is invalid: "
                   + candidateStatusDTO.getStatus()
                   + " .Valid statuses are: accepted, declined");
@@ -140,7 +138,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       case "committee" -> this.committeeRepository.deleteByOid(oid);
       case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
 
-      default -> throw new UserException("Role is incorrect!", 400);
+      default -> throw new HttpException("Role is incorrect!", 400);
     }
   }
 
@@ -233,7 +231,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           this.supervisorRepository.save(supervisor);
         }
 
-        default -> throw new DoctoralCenterException("Group: " + group + " doesn't exist!");
+        default -> throw new HttpException("Group: " + group + " doesn't exist!");
       }
 
       LOG.info(

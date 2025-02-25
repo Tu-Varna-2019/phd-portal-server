@@ -26,7 +26,7 @@ import lombok.Setter;
 // @UserDefinition
 @Table(name = "doctoralcenter")
 public non-sealed class DoctoralCenter extends PanacheEntityBase
-    implements UserEntity<DoctoralCenter> {
+    implements IUserEntity<DoctoralCenter> {
 
   @Id
   @SequenceGenerator(

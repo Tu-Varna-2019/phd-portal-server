@@ -1,7 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.PhdDTO;
-import com.tuvarna.phd.exception.PhdException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.PhdService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -63,7 +63,7 @@ public final class PhdController extends BaseController {
                     schema = @Schema(implementation = PhdDTO.class))),
       })
   @Path("/login")
-  public Response login(PhdDTO pDto) throws PhdException {
+  public Response login(PhdDTO pDto) throws HttpException {
     // LOG.info("Received a request to login from using Phd user creds: " + pDto);
     // this.phdService.login(pDto);
 
