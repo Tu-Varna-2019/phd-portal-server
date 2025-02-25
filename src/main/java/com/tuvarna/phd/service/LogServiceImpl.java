@@ -10,8 +10,8 @@ import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
-import com.tuvarna.phd.exception.LogException;
 import com.tuvarna.phd.dto.LogDTO;
+import com.tuvarna.phd.exception.HttpException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -79,7 +79,7 @@ public final class LogServiceImpl implements LogService {
 
     } catch (IOException exception) {
       LOG.error("Error in log indexing: " + exception.getMessage());
-      throw new LogException("Error in log indexing!");
+      throw new HttpException("Error in log indexing!");
     }
   }
 
@@ -104,7 +104,7 @@ public final class LogServiceImpl implements LogService {
       HitsMetadata<LogDTO> hits = searchResponse.hits();
       return hits.hits().stream().map(hit -> hit.source()).collect(Collectors.toList());
     } catch (IOException exception) {
-      throw new LogException("Error in log searching!");
+      throw new HttpException("Error in log searching!");
     }
   }
 
@@ -116,10 +116,10 @@ public final class LogServiceImpl implements LogService {
 
       BulkResponse result = client.bulk(br.build());
 
-      if (result.errors()) throw new LogException("The deleting operation encountered errors.");
+      if (result.errors()) throw new HttpException("The deleting operation encountered errors.");
 
     } catch (IOException exception) {
-      throw new LogException("Error in deleting logs!");
+      throw new HttpException("Error in deleting logs!");
     }
   }
 }

@@ -2,7 +2,7 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.FileBlobDTO;
-import com.tuvarna.phd.exception.S3ClientException;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.S3Model;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -30,7 +30,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
             yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
           }
           default -> {
-            throw new S3ClientException(
+            throw new HttpException(
                 "Unable to change user picture. The group is incorrect: " + group);
           }
         };

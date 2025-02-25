@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Committee;
-import com.tuvarna.phd.exception.CommitteeException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,8 +14,7 @@ public final class CommitteeRepository
   public Committee getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(
-            () -> new CommitteeException("Committee user with id: " + id + " doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Committee user with id: " + id + " doesn't exist!"));
   }
 
   @Override
@@ -23,8 +22,7 @@ public final class CommitteeRepository
     return find("oid", oid)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new CommitteeException("Committee user with oid: " + oid + " doesn't exist!", 404));
+            () -> new HttpException("Committee user with oid: " + oid + " doesn't exist!", 404));
   }
 
   @Override
@@ -32,8 +30,7 @@ public final class CommitteeRepository
     return find("email", email)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new CommitteeException("Committee user with email: " + email + " doesn't exist!"));
+            () -> new HttpException("Committee user with email: " + email + " doesn't exist!"));
   }
 
   @Override

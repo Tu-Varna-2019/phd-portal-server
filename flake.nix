@@ -42,11 +42,24 @@
           };
 
           # NOTE: use devenv up to run the service
-          services.elasticsearch = {
-            enable = true;
-            cluster_name = "elasicsearch";
-            port = 9200;
+          services = {
+            postgres = {
+              enable = false;
+              initialDatabases.phd.name = {
+                name = "phd";
+                user = "phd";
+                pass = "phd";
+                listen_addresses = "127.0.0.1";
+                port = 5432;
+              };
+            };
+            elasticsearch = {
+              enable = true;
+              cluster_name = "elasicsearch";
+              port = 9200;
+            };
           };
+
 
           git-hooks.hooks = {
             # Common

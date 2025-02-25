@@ -1,6 +1,6 @@
 package com.tuvarna.phd.validator;
 
-import com.tuvarna.phd.exception.LogException;
+import com.tuvarna.phd.exception.HttpException;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
@@ -21,26 +21,26 @@ public class LogValidator {
     warn
   }
 
-  public void validateGroupExists(String group) throws LogException {
+  public void validateGroupExists(String group) throws HttpException {
     try {
       if (!"user".equals(group)) VALID_GROUPS.valueOf(group);
     } catch (IllegalArgumentException e) {
-      throw new LogException("Group " + group + " doesn't exist!");
+      throw new HttpException("Group " + group + " doesn't exist!");
     }
     ;
   }
 
-  public void isRoleAdmin(String role) throws LogException {
+  public void isRoleAdmin(String role) throws HttpException {
     if (!role.equals("admin"))
-      throw new LogException(
+      throw new HttpException(
           "Fetching logs for role: " + role + " is not permitted! Only admin is allowed.");
   }
 
-  public void validateLevel(String level) throws LogException {
+  public void validateLevel(String level) throws HttpException {
     try {
       VALID_LEVEL.valueOf(level);
     } catch (IllegalArgumentException e) {
-      throw new LogException("Level " + level + " is invalid");
+      throw new HttpException("Level " + level + " is invalid");
     }
   }
 }

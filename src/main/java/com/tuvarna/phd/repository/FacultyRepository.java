@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Faculty;
-import com.tuvarna.phd.exception.FacultyException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,6 +11,6 @@ public class FacultyRepository implements PanacheRepositoryBase<Faculty, Integer
   public Faculty getByname(String name) {
     return find("name", name)
         .firstResultOptional()
-        .orElseThrow(() -> new FacultyException("Faculty not found with name: " + name));
+        .orElseThrow(() -> new HttpException("Faculty not found with name: " + name));
   }
 }
