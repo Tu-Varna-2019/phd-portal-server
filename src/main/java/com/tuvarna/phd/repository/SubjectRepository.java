@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Subject;
-import com.tuvarna.phd.exception.SubjectException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,7 +14,7 @@ public class SubjectRepository
   public Subject getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(() -> new SubjectException("Subject not found with id: " + id));
+        .orElseThrow(() -> new HttpException("Subject not found with id: " + id));
   }
 
   @Override
