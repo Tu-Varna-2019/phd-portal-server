@@ -1,7 +1,7 @@
 package com.tuvarna.phd.repository;
 
 import com.tuvarna.phd.entity.Supervisor;
-import com.tuvarna.phd.exception.SupervisorException;
+import com.tuvarna.phd.exception.HttpException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -14,8 +14,7 @@ public final class SupervisorRepository
   public Supervisor getById(Long id) {
     return find("id", id)
         .firstResultOptional()
-        .orElseThrow(
-            () -> new SupervisorException("Supervisor user with id: " + id + " doesn't exist!"));
+        .orElseThrow(() -> new HttpException("Supervisor user with id: " + id + " doesn't exist!"));
   }
 
   @Override
@@ -23,9 +22,7 @@ public final class SupervisorRepository
     return find("oid", oid)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new SupervisorException(
-                    "Supervisor user with oid: " + oid + " doesn't exist!", 404));
+            () -> new HttpException("Supervisor user with oid: " + oid + " doesn't exist!", 404));
   }
 
   @Override
@@ -33,9 +30,7 @@ public final class SupervisorRepository
     return find("email", email)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new SupervisorException(
-                    "Supervisor user with email: " + email + " doesn't exist!"));
+            () -> new HttpException("Supervisor user with email: " + email + " doesn't exist!"));
   }
 
   @Override

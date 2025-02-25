@@ -1,6 +1,6 @@
 package com.tuvarna.phd.model;
 
-import com.tuvarna.phd.entity.UserEntity;
+import com.tuvarna.phd.entity.IUserEntity;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.inject.Inject;
@@ -50,8 +50,8 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public <T extends UserEntity<T>> List<T> selectMapEntity(
-      String statement, Tuple prepQueries, UserEntity<T> userEntity) {
+  public <T extends IUserEntity<T>> List<T> selectMapEntity(
+      String statement, Tuple prepQueries, IUserEntity<T> userEntity) {
 
     return this.client
         .preparedQuery(statement)
