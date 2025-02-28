@@ -7,7 +7,6 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -22,6 +21,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
+@PermitAll
 @RequestScoped
 @Path("/candidate")
 @Tag(name = "Candidate endpoint", description = "Endpoint for serving candidate services")
@@ -41,7 +41,6 @@ public final class CandidateController extends BaseController {
     this.candidateService = candidateService;
   }
 
-  @POST
   @PermitAll
   @Operation(summary = "Phd's candidate", description = "Approve or reject phd's candidate")
   @APIResponses(

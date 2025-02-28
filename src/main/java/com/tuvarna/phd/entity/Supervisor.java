@@ -34,21 +34,21 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supervisorSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true, updatable = false)
   private String oid;
 
   @Column(nullable = false, unique = false)
   private String name;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String email;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Title", nullable = false)
+  @JoinColumn(nullable = false)
   private SupervisorTitle title;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(nullable = true)
   private Faculty faculty;
 
   // TODO: create a functionality where he manually adds diserattions topics

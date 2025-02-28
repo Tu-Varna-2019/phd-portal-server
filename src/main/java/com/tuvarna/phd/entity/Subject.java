@@ -15,14 +15,12 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.sql.Date;
 import java.util.Set;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Getter
@@ -42,10 +40,10 @@ public class Subject extends PanacheEntityBase {
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Grade", nullable = true)
-  private Grade grade;
+  @JoinColumn(nullable = true)
+  private Grade finalGrade;
 
-  @JoinColumn(name = "examDate", nullable = true)
+  @JoinColumn(name = "examdate", nullable = true)
   private Date examDate;
 
   @ManyToMany(mappedBy = "subjects", fetch = FetchType.EAGER)
@@ -53,6 +51,6 @@ public class Subject extends PanacheEntityBase {
   private Set<Curriculum> curriculums;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Committee", nullable = true)
+  @JoinColumn(name = "teacher", nullable = true)
   private Committee teacher;
 }

@@ -33,16 +33,16 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phdSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = false, unique = true, updatable = false)
+  @Column(unique = true, updatable = false)
   private String oid;
 
-  @Column(name = "name", nullable = false, unique = false)
+  @Column(nullable = false, unique = false)
   private String name;
 
   @Column(nullable = false, unique = false)
   private String email;
 
-  @Column(name = "picture", nullable = true, unique = false)
+  @Column(nullable = true, unique = false)
   private String picture;
 
   @Transient private String pictureBlob;
@@ -62,33 +62,33 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   // ЕГН
   private String pin;
 
-  @Column(name = "dissertation_topic", nullable = true, unique = false)
+  @Column(nullable = true, unique = false)
   private String dissertationTopic;
 
-  @Column(name = "enroll_date", nullable = true, unique = false)
+  @Column(nullable = true, unique = false)
   private Date enrollDate;
 
-  @Column(name = "grad_date", nullable = true, unique = false)
+  @Column(nullable = true, unique = false)
   private Date gradDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "PhdStatus", nullable = false)
+  @JoinColumn(nullable = false)
   private PhdStatus status;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Curriculum", nullable = true)
+  @JoinColumn(nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Supervisor", nullable = true)
+  @JoinColumn(nullable = true)
   private Supervisor supervisor;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(nullable = true)
   private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Report", nullable = true)
+  @JoinColumn(nullable = true)
   private Report report;
 
   @Override
@@ -96,11 +96,10 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
     return new Phd();
   }
 
-  public Phd(String oid, String name, String email,String pin) {
+  public Phd(String oid, String name, String email, String pin) {
     this.oid = oid;
     this.name = name;
     this.email = email;
-    this.pin=pin;
+    this.pin = pin;
   }
-
 }

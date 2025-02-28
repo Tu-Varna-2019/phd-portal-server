@@ -35,7 +35,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidateSequence")
   private Long id;
 
-  @Column(name = "name", nullable = false, unique = false)
+  @Column(nullable = false, unique = false)
   private String name;
 
   @Column(nullable = false, unique = false)
@@ -65,11 +65,11 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String pin;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "Curriculum", nullable = true)
+  @JoinColumn(nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(nullable = true)
   private Faculty faculty;
 
   public Candidate(String name, String email, String biography, String status) {

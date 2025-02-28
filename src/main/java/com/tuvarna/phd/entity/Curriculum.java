@@ -64,4 +64,8 @@ public class Curriculum extends PanacheEntityBase {
       joinColumns = @JoinColumn(name = "curriculum_id"),
       inverseJoinColumns = @JoinColumn(name = "subject_id"))
   private Set<Subject> subjects;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(nullable = true)
+  private Faculty faculty;
 }

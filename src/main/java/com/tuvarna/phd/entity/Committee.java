@@ -34,13 +34,13 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeeSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  @Column(nullable = false, unique = true, updatable = false)
   private String oid;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = false)
   private String name;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = false, unique = true)
   private String email;
 
   @Column(nullable = true, unique = false)
@@ -52,11 +52,11 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   private Double grade;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(nullable = true)
   private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
+  @JoinColumn(nullable = false)
   private CommitteeRole role;
 
   public Committee(String oid, String name, String email) {
