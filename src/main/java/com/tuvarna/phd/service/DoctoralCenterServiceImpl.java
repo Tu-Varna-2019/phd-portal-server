@@ -214,8 +214,11 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         }
         // TODO: maybe move this create to separate method in client
         case "phd" -> {
-          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+
+          // TODO: Need to retrive the pin from Azure AD somehow...
+          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), "111111111");
           phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
+          // TODO: generate all reports
           this.phdRepository.save(phd);
         }
 
