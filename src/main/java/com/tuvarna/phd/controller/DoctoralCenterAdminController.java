@@ -5,7 +5,7 @@ import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
-import com.tuvarna.phd.service.DoctoralCenterService;
+import com.tuvarna.phd.service.DoctoralCenterAdminService;
 import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -42,15 +42,14 @@ import org.jboss.resteasy.reactive.RestQuery;
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
 public final class DoctoralCenterAdminController extends BaseController {
-
-  private final DoctoralCenterService doctoralCenterService;
+  private final DoctoralCenterAdminService doctoralCenterAdminService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterAdminController.class);
 
   @Inject
   public DoctoralCenterAdminController(
-      DoctoralCenterService doctoralCenterService,
+      DoctoralCenterAdminService doctoralCenterAdminService,
       DoctoralCenterValidator doctoralCenterValidator) {
-    this.doctoralCenterService = doctoralCenterService;
+    this.doctoralCenterAdminService = doctoralCenterAdminService;
   }
 
   @GET
@@ -77,7 +76,8 @@ public final class DoctoralCenterAdminController extends BaseController {
   @Path("/unauthorized-users")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users");
-    List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
+    List<UnauthorizedUsers> unauthorizedUsers =
+        this.doctoralCenterAdminService.getUnauthorizedUsers();
 
     LOG.info("Unauthorized users received! Now sending to client...");
     return send("Unauthorized users retrieved!", unauthorizedUsers);
@@ -109,7 +109,7 @@ public final class DoctoralCenterAdminController extends BaseController {
       List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
 
     LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
-    this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);
+    this.doctoralCenterAdminService.setUnauthorizedUserGroup(usersDTO, group);
 
     return send("Unauthorized user is set for group: " + group);
   }
@@ -139,7 +139,7 @@ public final class DoctoralCenterAdminController extends BaseController {
   public Response seIsAllowedForUnauthorizedUsers(OidDTO oid, @RestQuery Boolean isAllowed) {
 
     LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
-    this.doctoralCenterService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
+    this.doctoralCenterAdminService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
 
     return send("Unauthorized user changed isAllowed to: " + isAllowed);
   }
@@ -160,7 +160,7 @@ public final class DoctoralCenterAdminController extends BaseController {
   @Path("/authorized-users")
   public Response deleteAuthorizedUser(@RestQuery String oid, RoleDTO role) {
     LOG.info("Received a request to delete an auth user oid: " + oid + "for role: " + role);
-    this.doctoralCenterService.deleteAuthorizedUser(oid, role);
+    this.doctoralCenterAdminService.deleteAuthorizedUser(oid, role);
 
     return send("User: " + oid + " removed!");
   }
@@ -187,7 +187,7 @@ public final class DoctoralCenterAdminController extends BaseController {
   @Path("/authorized-users")
   public Response getAuthorizedUsers() {
     LOG.info("Received a request to get all authorized users");
-    List<UserDTO> authorizedUsers = this.doctoralCenterService.getAuthorizedUsers();
+    List<UserDTO> authorizedUsers = this.doctoralCenterAdminService.getAuthorizedUsers();
 
     return send("authorized users retrieved!", authorizedUsers);
   }
