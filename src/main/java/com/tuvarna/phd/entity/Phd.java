@@ -47,13 +47,13 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
 
   @Transient private String pictureBlob;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = true, unique = false)
   private String country;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = true, unique = false)
   private String city;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = true, unique = false)
   private String address;
 
   @Password
@@ -96,10 +96,11 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
     return new Phd();
   }
 
-  public Phd(String oid, String name, String email) {
+  public Phd(String oid, String name, String email,String pin) {
     this.oid = oid;
     this.name = name;
     this.email = email;
+    this.pin=pin;
   }
 
 }

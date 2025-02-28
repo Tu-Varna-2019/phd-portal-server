@@ -2,13 +2,9 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
-import com.tuvarna.phd.entity.DoctoralCenter;
-import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
@@ -132,62 +128,11 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void deleteAuthorizedUser(String oid, RoleDTO role) {
-    switch (role.getRole()) {
-      case "phd" -> this.phdRepository.deleteByOid(oid);
-      case "committee" -> this.committeeRepository.deleteByOid(oid);
-      case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
-
-      default -> throw new HttpException("Role is incorrect!", 400);
-    }
-  }
-
-  @Override
-  @Transactional
   public List<UnauthorizedUsers> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
     List<UnauthorizedUsers> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
-  }
-
-  @Override
-  @Transactional
-  public List<UserDTO> getAuthorizedUsers() {
-    LOG.info("Service received to retrieve all unauthorized users");
-    List<UserDTO> authenticatedUsers = new ArrayList<>();
-    List<Phd> phds = this.phdRepository.getAll();
-    List<Committee> committees = this.committeeRepository.getAll();
-    List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
-
-    for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
-      authenticatedUsers.add(user);
-    }
-
-    for (Committee commitee : committees) {
-      UserDTO user =
-          new UserDTO(
-              commitee.getId(),
-              commitee.getOid(),
-              commitee.getName(),
-              commitee.getEmail(),
-              "committee");
-      authenticatedUsers.add(user);
-    }
-
-    for (DoctoralCenter dCenter : doctoralCenters) {
-      UserDTO user =
-          new UserDTO(
-              dCenter.getId(),
-              dCenter.getOid(),
-              dCenter.getName(),
-              dCenter.getEmail(),
-              dCenter.getRole().getRole());
-      authenticatedUsers.add(user);
-    }
-
-    return authenticatedUsers;
   }
 
   @Override
@@ -203,19 +148,13 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
       UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
-        case "expert", "manager", "admin" -> {
-          DoctoralCenter dCenter =
-              new DoctoralCenter(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
-          DoctoralCenterRole doctoralCenterRole =
-              this.doctoralCenterRoleRepository.getByRole(group);
-          dCenter.setRole(doctoralCenterRole);
-
-          this.doctoralCenterRepository.save(dCenter);
-        }
         // TODO: maybe move this create to separate method in client
         case "phd" -> {
-          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+
+          // TODO: Need to retrive the pin from Azure AD somehow...
+          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), "111111111");
           phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
+          // TODO: generate all reports
           this.phdRepository.save(phd);
         }
 
@@ -242,20 +181,5 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
       LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
-  }
-
-  @Override
-  @Transactional
-  public void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed) {
-    LOG.info(
-        "Service received a request to change isAllowed: "
-            + isAllowed
-            + " for oid unauthorized user: "
-            + oid);
-
-    this.databaseModel.execute(
-        "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
-
-    LOG.info("IsAllowed has been successfully changed!");
   }
 }
