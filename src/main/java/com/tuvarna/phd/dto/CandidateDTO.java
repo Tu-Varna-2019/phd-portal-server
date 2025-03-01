@@ -18,10 +18,30 @@ public class CandidateDTO {
   private String email;
 
   @NotNull
+  @Schema(title = "country", required = true)
+  private String country;
+
+  @NotNull
+  @Schema(title = "city", required = true)
+  private String city;
+
+  @NotNull
+  @Schema(title = "address", required = true)
+  private String address;
+
+  @NotNull
   @Schema(title = "biography", required = true)
   private String biography;
 
   @NotNull
-  @Schema(title = "status", required = true)
-  private String status;
+  @Schema(title = "pin", required = true)
+  private String pin;
+
+  @NotNull
+  @Schema(title = "curriculum", required = true)
+  private CurriculumDTO curriculum;
+
+  @NotNull
+  @Schema(title = "faculty", required = true)
+  private String faculty;
 }

@@ -47,7 +47,7 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
 
   @Transient private String pictureBlob;
 
-  // TODO: Remve this ?
+  // TODO: Remove this ?
   // You can't have 1 grade for committee per multiple commisions
   @Column(nullable = true, unique = false)
   private Double grade;
