@@ -25,7 +25,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "committee")
 public non-sealed class Committee extends PanacheEntityBase implements IUserEntity<Committee> {
-
   @Id
   @SequenceGenerator(
       name = "committeeSequence",
@@ -44,19 +43,21 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   private String email;
 
   @Column(nullable = true, unique = false)
-  private String picture;
+  private String picture = "";
 
   @Transient private String pictureBlob;
 
-  @Column(nullable = false, unique = false)
+  // TODO: Remve this ?
+  // You can't have 1 grade for committee per multiple commisions
+  @Column(nullable = true, unique = false)
   private Double grade;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "role", nullable = false)
   private CommitteeRole role;
 
   public Committee(String oid, String name, String email) {

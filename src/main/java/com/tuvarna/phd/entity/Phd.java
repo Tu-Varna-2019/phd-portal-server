@@ -72,7 +72,7 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   private Date gradDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "status", nullable = false)
   private PhdStatus status;
 
   @ManyToOne(fetch = FetchType.EAGER)

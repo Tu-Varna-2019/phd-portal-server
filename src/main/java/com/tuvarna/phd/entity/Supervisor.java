@@ -44,7 +44,7 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
   private String email;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "title", nullable = false)
   private SupervisorTitle title;
 
   @ManyToOne(fetch = FetchType.LAZY)
