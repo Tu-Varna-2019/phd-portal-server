@@ -13,8 +13,14 @@ public interface CandidateMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "curriculum", ignore = true)
+  @Mapping(target = "biography", ignore = true)
   @Mapping(target = "biographyBlob", ignore = true)
   @Mapping(target = "faculty", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
   Candidate toEntity(CandidateDTO candidateDTO);
+
+  @Mapping(target = "faculty", ignore = true)
+  @Mapping(target = "biography", ignore = true)
+  @Mapping(target = "curriculum", ignore = true)
+  CandidateDTO toDto(Candidate candidate);
 }

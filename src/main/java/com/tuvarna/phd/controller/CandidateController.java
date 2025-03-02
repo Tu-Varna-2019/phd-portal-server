@@ -7,6 +7,8 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -42,6 +44,7 @@ public final class CandidateController extends BaseController {
     this.candidateService = candidateService;
   }
 
+  @POST
   @Operation(
       summary = "Register to phd as a candidate",
       description = "Register to phd as a candidate")
@@ -70,6 +73,7 @@ public final class CandidateController extends BaseController {
     return send("Registration finished successfully!");
   }
 
+  @GET
   @Operation(summary = "Get curriculums", description = "Get curriculums")
   @APIResponses(
       value = {

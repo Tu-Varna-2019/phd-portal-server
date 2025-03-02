@@ -11,5 +11,7 @@ public interface UnauthorizedUsersMapper {
   UnauthorizedUsersMapper uMapper = Mappers.getMapper(UnauthorizedUsersMapper.class);
 
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "toEntity", ignore = true)
+  @Mapping(target = "isAllowed", ignore = true)
   UnauthorizedUsers toEntity(UnauthorizedUsersDTO users);
 }
