@@ -181,7 +181,19 @@ INSERT INTO "curriculum_subject" ("curriculum_id", "subject_id")
    (1, 9),
    (1, 10),
    (1, 11),
-   (1, 12);
+   (1, 12),
+   (2, 1),
+   (2, 2),
+   (2, 3),
+   (2, 4),
+   (2, 5),
+   (2, 6),
+   (2, 7),
+   (2, 8),
+   (2, 9),
+   (2, 10),
+   (2, 11),
+   (2, 12);
 
 -- NOTE: PHD
 INSERT INTO "phd" ("id", "oid", "name", "email", "pin", "status")

@@ -8,10 +8,12 @@ import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
+import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
+import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject CandidateRepository candidateRepository;
   @Inject CurriculumRepository curriculumRepository;
   @Inject FacultyRepository facultyRepository;
+  @Inject DatabaseModel databaseModel;
   @Inject ModeRepository modeRepository;
   @Inject IPBlockService ipBlockService;
 
@@ -68,7 +71,20 @@ public final class CandidateServiceImpl implements CandidateService {
 
     curriculums.forEach(
         (curriculum) -> {
-          curriculumDTOs.add(this.curriculumMapper.toDto(curriculum));
+          CurriculumDTO curriculumDTO = this.curriculumMapper.toDto(curriculum);
+          curriculumDTO.setSubjects(
+              this.databaseModel.selectMapString(
+                  """
+                  SELECT s.name
+                  FROM curriculum_subject cs
+                  JOIN subject s
+                  ON (cs.subject_id = s.id)
+                  WHERE cs.curriculum_id = $1
+                  """,
+                  Tuple.of(curriculum.getId()),
+                  "name"));
+
+          curriculumDTOs.add(curriculumDTO);
         });
 
     LOG.info("All curriculums retrieved!");
