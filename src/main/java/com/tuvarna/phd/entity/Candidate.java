@@ -65,11 +65,11 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String pin;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "curriculum", nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
   public Candidate(String name, String email, String biography, String status) {

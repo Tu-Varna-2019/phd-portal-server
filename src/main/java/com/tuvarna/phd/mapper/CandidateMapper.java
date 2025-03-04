@@ -1,6 +1,7 @@
 package com.tuvarna.phd.mapper;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateEssentialDTO;
 import com.tuvarna.phd.entity.Candidate;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,4 +24,6 @@ public interface CandidateMapper {
   @Mapping(target = "biography", ignore = true)
   @Mapping(target = "curriculum", ignore = true)
   CandidateDTO toDto(Candidate candidate);
+
+  CandidateEssentialDTO toEssentialDto(Candidate candidate);
 }
