@@ -17,6 +17,15 @@ public class CurriculumRepository
         .orElseThrow(() -> new HttpException("Curriculum not found with id: " + id));
   }
 
+  public Curriculum getByDescriptionAndModeId(String description, Long modeId) {
+    return find("description = ?1 and mode.mode = ?2", description, modeId)
+        .firstResultOptional()
+        .orElseThrow(
+            () ->
+                new HttpException(
+                    "Curriculum description is not found: " + description + " " + modeId));
+  }
+
   @Override
   public void save(Curriculum curriculum) {
     curriculum.persist();
