@@ -16,16 +16,8 @@ public class PhdDTO {
   private String oid;
 
   @NotNull
-  @Schema(title = "first_name", required = true)
-  private String firstName;
-
-  @NotNull
-  @Schema(title = "middle_name", required = true)
-  private String middleName;
-
-  @NotNull
-  @Schema(title = "last_name", required = true)
-  private String lastName;
+  @Schema(title = "name", required = true)
+  private String name;
 
   @NotNull
   @Schema(title = "picture", required = true)
@@ -57,11 +49,8 @@ public class PhdDTO {
   @Schema(title = "email", required = true)
   private String email;
 
-  public PhdDTO(String oid, String firstName, String middleName, String lastName, String email) {
-    this.oid = oid;
-    this.firstName = firstName;
-    this.middleName = middleName;
-    this.lastName = lastName;
+  public PhdDTO(String name, String email) {
+    this.name = name;
     this.email = email;
   }
 }

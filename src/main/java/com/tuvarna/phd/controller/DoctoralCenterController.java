@@ -1,6 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CandidateEssentialDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
@@ -114,7 +115,7 @@ public final class DoctoralCenterController extends BaseController {
   @Path("/candidates")
   public Response getCandidates() {
     LOG.info("Received a request to retrieve all candidates");
-    List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates();
+    List<CandidateEssentialDTO> candidates = this.doctoralCenterService.getCandidates();
 
     return send("Candidates retrieved!", candidates);
   }

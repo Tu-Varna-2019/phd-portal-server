@@ -6,7 +6,6 @@ public record ControllerResponse(
     String message,
     @JsonInclude(JsonInclude.Include.NON_NULL) Object data,
     @JsonInclude(JsonInclude.Include.NON_NULL) String group) {
-
   public ControllerResponse(String message) {
     this(message, null, null);
   }

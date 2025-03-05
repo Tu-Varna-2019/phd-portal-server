@@ -32,7 +32,7 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "unauthorizedUsersSequence")
   private Long id;
 
-  @Column(name = "oid", nullable = true, unique = true, updatable = false)
+  @Column( nullable = false, unique = true, updatable = false)
   private String oid;
 
   @Column(nullable = false, unique = false)
