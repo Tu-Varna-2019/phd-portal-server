@@ -40,7 +40,7 @@ INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
     (
       1,
       'de6b478e-e4e4-422d-88fb-293fe69c6519',
-      'admin',
+      'Администратор',
       's19621609@onlineedu.tu-varna.bg',
       '',
       1
@@ -78,6 +78,18 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "bi
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
       '1111111111',
       'waiting'
+    );
+
+-- NOTE: Unauthorized Users
+INSERT INTO "unauthorizedusers" ("id", "oid", "name", "email", "timestamp","isallowed")
+  VALUES
+    (
+      1,
+      'c3e9208f-922e-4dbd-95b0-f9b76350d668',
+      'Velislav Kolesnichenko',
+      'vkolesnichenko@tu-varna.bg',
+      '2025-02-04T16:15:50Z',
+      false
     );
 
 -- NOTE: Phd status

@@ -15,6 +15,5 @@ public interface NotificationMapper {
   @Mapping(target = "recipient", ignore = true)
   Notification toEntity(NotificationDTO notificationDTO);
 
-  @Mapping(source = "id", target = "id")
   NotificationClientDTO toDto(Notification notification);
 }

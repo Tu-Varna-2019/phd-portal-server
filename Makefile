@@ -29,3 +29,7 @@ install:
 .PHONY: help
 help:
 	quarkus --help
+
+.PHONY: elastic-attach
+elastic-attach:
+	process-compose attach

@@ -80,29 +80,20 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
+      UserDTO user = new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), "phd");
       authenticatedUsers.add(user);
     }
 
     for (Committee commitee : committees) {
       UserDTO user =
-          new UserDTO(
-              commitee.getId(),
-              commitee.getOid(),
-              commitee.getName(),
-              commitee.getEmail(),
-              "committee");
+          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
       authenticatedUsers.add(user);
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
       UserDTO user =
           new UserDTO(
-              dCenter.getId(),
-              dCenter.getOid(),
-              dCenter.getName(),
-              dCenter.getEmail(),
-              dCenter.getRole().getRole());
+              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
       authenticatedUsers.add(user);
     }
 

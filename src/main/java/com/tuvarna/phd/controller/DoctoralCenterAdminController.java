@@ -202,14 +202,14 @@ public final class DoctoralCenterAdminController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
+                    schema = @Schema(implementation = String.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when retrieving al doc center roles",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UserDTO.class))),
+                    schema = @Schema(implementation = String.class))),
       })
   @Path("/roles")
   public Response getDoctoralCenterRoles() {

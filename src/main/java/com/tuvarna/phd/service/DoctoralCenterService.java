@@ -11,6 +11,8 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   void review(CandidateStatusDTO candidateStatusDTO) throws IOException;
 
+  List<String> getDoctoralCenterRoles();
+
   List<CandidateEssentialDTO> getCandidates();
 
   void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group);

@@ -1,6 +1,5 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateEssentialDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
@@ -22,6 +21,7 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -183,5 +183,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
       LOG.info("User " + user.getEmail() + " deleted from that table!");
     }
+  }
+
+  @Override
+  @Transactional
+  @CacheResult(cacheName = "doc-center-roles-cache")
+  public List<String> getDoctoralCenterRoles() {
+    LOG.info("Received a request to retrieve all doctoral center roles");
+    List<String> docCenterPermitRoles = List.of("phd", "committee", "supervisor");
+
+    LOG.info("All doc center roles have been retrieved: " + docCenterPermitRoles.toString());
+    return docCenterPermitRoles;
   }
 }

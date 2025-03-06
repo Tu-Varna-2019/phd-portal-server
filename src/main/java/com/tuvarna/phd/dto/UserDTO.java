@@ -11,10 +11,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class UserDTO {
 
   @NotNull
-  @Schema(title = "id", required = true)
-  private Long id;
-
-  @NotNull
   @Schema(title = "oid", required = true)
   private String oid;
 
@@ -26,6 +22,6 @@ public class UserDTO {
   @Schema(title = "email", required = true)
   private String email;
 
-  @Schema(title = "role", required = false)
-  private String role;
+  @Schema(title = "group", required = false)
+  private String group;
 }
