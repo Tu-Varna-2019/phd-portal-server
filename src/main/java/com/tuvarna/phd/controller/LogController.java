@@ -1,11 +1,11 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.mapper.LogMapper;
-import com.tuvarna.phd.repository.DoctoralCenterRepository;
-import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.dto.LogDTO;
 import com.tuvarna.phd.dto.UserPrincipalDTO;
 import com.tuvarna.phd.dto.sendLogDTO;
+import com.tuvarna.phd.mapper.LogMapper;
+import com.tuvarna.phd.repository.DoctoralCenterRepository;
+import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -32,7 +32,7 @@ import org.jboss.resteasy.reactive.RestCookie;
 
 @RequestScoped
 @Path("/logs")
-@Tag(name="Logs endpoint", description = "Endpoint for serving logs services")
+@Tag(name = "Logs endpoint", description = "Endpoint for serving logs services")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityScheme(
@@ -43,7 +43,6 @@ public final class LogController extends BaseController {
 
   private LogService logService;
   private LogValidator logValidator;
-  private DoctoralCenterRepository doctoralCenterRepository;
   private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
@@ -56,7 +55,6 @@ public final class LogController extends BaseController {
       DoctoralCenterRepository doctoralCenterRepository) {
     this.logService = logService;
     this.logValidator = logValidator;
-    this.doctoralCenterRepository = doctoralCenterRepository;
     this.logMapper = logMapper;
   }
 

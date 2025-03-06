@@ -19,5 +19,6 @@ public interface PhdMapper {
   @Mapping(target = "faculty", ignore = true)
   @Mapping(target = "report", ignore = true)
   @Mapping(target = "pictureBlob", ignore = true)
+  @Mapping(target = "toEntity", ignore = true)
   Phd toEntity(PhdDTO pDto);
 }

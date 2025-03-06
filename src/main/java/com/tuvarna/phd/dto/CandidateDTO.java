@@ -9,6 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 public class CandidateDTO {
+
   @NotNull
   @Schema(title = "name", required = true)
   private String name;
@@ -18,10 +19,30 @@ public class CandidateDTO {
   private String email;
 
   @NotNull
-  @Schema(title = "biography", required = true)
-  private String biography;
+  @Schema(title = "country", required = true)
+  private String country;
 
   @NotNull
-  @Schema(title = "status", required = true)
-  private String status;
+  @Schema(title = "city", required = true)
+  private String city;
+
+  @NotNull
+  @Schema(title = "address", required = true)
+  private String address;
+
+  @NotNull
+  @Schema(title = "biography", required = true)
+  private FileBlobDTO biography;
+
+  @NotNull
+  @Schema(title = "pin", required = true)
+  private String pin;
+
+  @NotNull
+  @Schema(title = "curriculum", required = true)
+  private CurriculumDTO curriculum;
+
+  @NotNull
+  @Schema(title = "faculty", required = true)
+  private String faculty;
 }

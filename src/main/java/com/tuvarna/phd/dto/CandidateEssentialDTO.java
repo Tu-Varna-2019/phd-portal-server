@@ -5,14 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "UserDTO", description = "User DTO")
+@Schema(name = "CandidateEssentialDTO", description = "CandidateEssential DTO")
 @Data
 @AllArgsConstructor
-public class UserDTO {
-
-  @NotNull
-  @Schema(title = "oid", required = true)
-  private String oid;
+public class CandidateEssentialDTO {
 
   @NotNull
   @Schema(title = "name", required = true)
@@ -22,6 +18,7 @@ public class UserDTO {
   @Schema(title = "email", required = true)
   private String email;
 
-  @Schema(title = "group", required = false)
-  private String group;
+  @NotNull
+  @Schema(title = "status", required = true)
+  private String status;
 }

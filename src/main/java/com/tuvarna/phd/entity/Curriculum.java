@@ -14,7 +14,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.sql.Date;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,17 +43,11 @@ public class Curriculum extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String description;
 
-  @Column(nullable = true, unique = false)
-  private Integer orderNum;
-
-  @Column(name = "start_date", nullable = false, unique = false)
-  private Date startDate;
-
-  @Column(name = "end_date", nullable = false, unique = false)
-  private Date endDate;
+  @Column(nullable = false, unique = false)
+  private Long yearPeriod;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "Mode", nullable = false)
+  @JoinColumn(name = "mode", nullable = false)
   private Mode mode;
 
   @ManyToMany
@@ -64,4 +57,8 @@ public class Curriculum extends PanacheEntityBase {
       joinColumns = @JoinColumn(name = "curriculum_id"),
       inverseJoinColumns = @JoinColumn(name = "subject_id"))
   private Set<Subject> subjects;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "faculty", nullable = true)
+  private Faculty faculty;
 }

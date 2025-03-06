@@ -191,4 +191,31 @@ public final class DoctoralCenterAdminController extends BaseController {
 
     return send("authorized users retrieved!", authorizedUsers);
   }
+
+  @GET
+  @Operation(summary = "Doctoral Center roles", description = "Get all doctoral center roles")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "All doc center roles retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving al doc center roles",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/roles")
+  public Response getDoctoralCenterRoles() {
+    LOG.info("Received a request to get all doctoral center roles");
+    List<String> docCenterRoles = this.doctoralCenterAdminService.getDoctoralCenterRoles();
+
+    return send("All doctoral center roles retrieved!", docCenterRoles);
+  }
 }

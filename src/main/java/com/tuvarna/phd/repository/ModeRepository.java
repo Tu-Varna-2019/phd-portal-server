@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ModeRepository implements PanacheRepositoryBase<Mode, Integer> {
 
-  public Mode getByMode(Mode mode) {
+  public Mode getByMode(String mode) {
     return find("mode", mode)
         .firstResultOptional()
         .orElseThrow(() -> new HttpException("Mode: " + mode + " doesn't exist!"));

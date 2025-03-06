@@ -20,6 +20,7 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -79,29 +80,20 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getId(), phd.getOid(), phd.getName(), phd.getEmail(), "phd");
+      UserDTO user = new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), "phd");
       authenticatedUsers.add(user);
     }
 
     for (Committee commitee : committees) {
       UserDTO user =
-          new UserDTO(
-              commitee.getId(),
-              commitee.getOid(),
-              commitee.getName(),
-              commitee.getEmail(),
-              "committee");
+          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
       authenticatedUsers.add(user);
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
       UserDTO user =
           new UserDTO(
-              dCenter.getId(),
-              dCenter.getOid(),
-              dCenter.getName(),
-              dCenter.getEmail(),
-              dCenter.getRole().getRole());
+              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
       authenticatedUsers.add(user);
     }
 
@@ -155,5 +147,19 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
         "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
 
     LOG.info("IsAllowed has been successfully changed!");
+  }
+
+  @Override
+  @Transactional
+  @CacheResult(cacheName = "doc-center-roles-cache")
+  public List<String> getDoctoralCenterRoles() {
+    LOG.info("Received a request to retrieve all doctoral center roles");
+
+    List<String> docCenterRoles =
+        this.databaseModel.selectMapString(
+            "SELECT role FROM doctoralcenterrole", Tuple.tuple(), "role");
+
+    LOG.info("All doc center roles have been retrieved: " + docCenterRoles.toString());
+    return docCenterRoles;
   }
 }

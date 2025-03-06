@@ -10,11 +10,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 public class NotificationClientDTO {
-
-  @NotNull
-  @Schema(title = "id", required = true)
-  private Long id;
-
   @NotNull
   @Schema(title = "title", required = true)
   private String title;
