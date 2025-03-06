@@ -23,6 +23,10 @@ public class CurriculumDTO {
   private String mode;
 
   @NotNull
+  @Schema(title = "faculty", required = true)
+  private String faculty;
+
+  @NotNull
   @Schema(title = "subjects", required = true)
   private List<String> subjects;
 }

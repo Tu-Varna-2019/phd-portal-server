@@ -13,6 +13,8 @@ public sealed interface DoctoralCenterAdminService permits DoctoralCenterAdminSe
 
   List<UnauthorizedUsers> getUnauthorizedUsers();
 
+  List<String> getDoctoralCenterRoles();
+
   List<UserDTO> getAuthorizedUsers();
 
   void deleteAuthorizedUser(String oid, RoleDTO role);
