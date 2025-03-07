@@ -12,6 +12,7 @@ import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
+import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
@@ -20,6 +21,8 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -43,6 +46,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
+  @Inject S3Model s3Model;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -50,6 +54,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   private String clientBaseURL;
 
   @Override
+  @CacheInvalidate(cacheName = "auth-users-cache")
   @Transactional
   public void deleteAuthorizedUser(String oid, RoleDTO role) {
     switch (role.getRole()) {
@@ -62,6 +67,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheResult(cacheName = "unauth-users-cache")
   @Transactional
   public List<UnauthorizedUsers> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -71,6 +77,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheResult(cacheName = "auth-users-cache")
   @Transactional
   public List<UserDTO> getAuthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -80,20 +87,35 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), "phd");
+      UserDTO user =
+          new UserDTO(
+              phd.getOid(),
+              phd.getName(),
+              phd.getEmail(),
+              "phd",
+              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()));
       authenticatedUsers.add(user);
     }
 
     for (Committee commitee : committees) {
       UserDTO user =
-          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
+          new UserDTO(
+              commitee.getOid(),
+              commitee.getName(),
+              commitee.getEmail(),
+              "committee",
+              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()));
       authenticatedUsers.add(user);
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
       UserDTO user =
           new UserDTO(
-              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
+              dCenter.getOid(),
+              dCenter.getName(),
+              dCenter.getEmail(),
+              dCenter.getRole().getRole(),
+              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()));
       authenticatedUsers.add(user);
     }
 
@@ -101,6 +123,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheInvalidate(cacheName = "unauth-users-cache")
+  @CacheInvalidate(cacheName = "auth-users-cache")
   @Transactional
   public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
     LOG.info(
@@ -135,6 +159,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheInvalidate(cacheName = "unauth-users-cache")
   @Transactional
   public void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed) {
     LOG.info(

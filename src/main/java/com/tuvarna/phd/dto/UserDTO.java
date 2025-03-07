@@ -24,4 +24,7 @@ public class UserDTO {
 
   @Schema(title = "group", required = false)
   private String group;
+
+  @Schema(title = "pictureBlob", required = true)
+  private String pictureBlob;
 }

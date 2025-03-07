@@ -93,28 +93,23 @@ public final class AuthServiceImpl implements AuthService {
     switch (group) {
       case "phd" -> {
         Phd phd = this.phdRepository.getByOid(oid);
-        phd.setPictureBlob(this.setPictureBlobBase64(oid, phd.getPicture()));
+        phd.setPictureBlob(this.s3Model.getDataUrlPicture(oid, phd.getPicture()));
         return phd;
       }
       case "committee" -> {
         Committee committee = this.committeeRepository.getByOid(oid);
-        committee.setPictureBlob(this.setPictureBlobBase64(oid, committee.getPicture()));
+        committee.setPictureBlob(this.s3Model.getDataUrlPicture(oid, committee.getPicture()));
         return committee;
       }
       case "doctoralCenter" -> {
         DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
-        doctoralCenter.setPictureBlob(this.setPictureBlobBase64(oid, doctoralCenter.getPicture()));
+        doctoralCenter.setPictureBlob(
+            this.s3Model.getDataUrlPicture(oid, doctoralCenter.getPicture()));
         return doctoralCenter;
       }
       default -> {
         throw new HttpException("Error: Cannot getUser because of non existing group!");
       }
     }
-  }
-
-  private String setPictureBlobBase64(String oid, String picture) {
-    if (picture.isEmpty()) return "";
-
-    return this.s3Model.getDataUrlPicture(oid, picture);
   }
 }

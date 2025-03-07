@@ -6,7 +6,6 @@ import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.service.DoctoralCenterAdminService;
-import com.tuvarna.phd.validator.DoctoralCenterValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -42,15 +41,8 @@ import org.jboss.resteasy.reactive.RestQuery;
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
 public final class DoctoralCenterAdminController extends BaseController {
-  private final DoctoralCenterAdminService doctoralCenterAdminService;
+  @Inject private DoctoralCenterAdminService doctoralCenterAdminService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterAdminController.class);
-
-  @Inject
-  public DoctoralCenterAdminController(
-      DoctoralCenterAdminService doctoralCenterAdminService,
-      DoctoralCenterValidator doctoralCenterValidator) {
-    this.doctoralCenterAdminService = doctoralCenterAdminService;
-  }
 
   @GET
   @Operation(

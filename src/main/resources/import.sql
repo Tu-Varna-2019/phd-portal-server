@@ -55,7 +55,7 @@ INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
     );
 
 -- NOTE: Supervisor
-INSERT INTO "supervisor" ("id", "oid", "name", "email", "title")
+INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
   VALUES
     (
       1,
@@ -207,8 +207,8 @@ INSERT INTO "curriculum_subject" ("curriculum_id", "subject_id")
    (2, 11),
    (2, 12);
 
--- NOTE: PHD
-INSERT INTO "phd" ("id", "oid", "name", "email", "pin", "status")
+-- NOTE: Phd
+INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
   VALUES
     (
       1,
@@ -216,11 +216,12 @@ INSERT INTO "phd" ("id", "oid", "name", "email", "pin", "status")
       'ИЛИЯН КИРИЛОВ КОСТОВ СИ_3 1к',
       's23651224@onlineedu.tu-varna.bg',
       '1111111111',
+      '',
       1
     );
 
 -- NOTE: Committee
-INSERT INTO "committee" ("id", "oid", "name", "email", "role", "faculty")
+INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "faculty")
   VALUES
   (
     1,

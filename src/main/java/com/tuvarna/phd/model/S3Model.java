@@ -29,6 +29,7 @@ public class S3Model {
   @Inject private Logger LOG;
 
   public String getDataUrlPicture(String oid, String picture) {
+    if (picture.isEmpty()) return "";
 
     ResponseBytes<GetObjectResponse> oBytes =
         this.client.getObjectAsBytes(this.buildGetRequest(oid + "/avatar/" + picture));
