@@ -2,6 +2,7 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,7 +57,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Transient private String biographyBlob;
 
   @Column(nullable = false, unique = false)
-  private String status = "waiting";
+  private String status;
 
   @Password
   @Column(nullable = false, unique = true, length = 10)
@@ -72,19 +73,15 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
-  public Candidate(String name, String email, String biography, String status) {
+  public Candidate(String name, String email) {
     this.name = name;
     this.email = email;
-    this.biography = biography;
-    this.status = status;
   }
 
   @Override
   public Candidate toEntity(Row row) {
-    return new Candidate(
-        row.getString("name"),
-        row.getString("email"),
-        row.getString("biography"),
-        row.getString("status"));
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Candidate.class);
   }
 }

@@ -13,7 +13,7 @@ import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
-import io.vertx.mutiny.sqlclient.Tuple;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -53,10 +53,10 @@ public final class CandidateServiceImpl implements CandidateService {
 
     Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
 
-    Mode modeFound = this.modeRepository.getByMode(candidateDTO.getCurriculum().getMode());
+    Mode modeFound = this.modeRepository.getByMode(candidateDTO.getMode());
     candidate.setCurriculum(
         curriculumRepository.getByDescriptionAndModeId(
-            candidateDTO.getCurriculum().getDescription(), modeFound.getId()));
+            candidateDTO.getCurriculum(), modeFound.getId()));
 
     this.candidateRepository.save(candidate);
 
@@ -64,28 +64,14 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
+  @CacheResult(cacheName = "curriculum-cache")
   public List<CurriculumDTO> getCurriculums() {
     LOG.info("Received a service request to retrieve all curriculums");
     List<Curriculum> curriculums = this.curriculumRepository.getAll();
     List<CurriculumDTO> curriculumDTOs = new ArrayList<>();
 
     curriculums.forEach(
-        (curriculum) -> {
-          CurriculumDTO curriculumDTO = this.curriculumMapper.toDto(curriculum);
-          curriculumDTO.setSubjects(
-              this.databaseModel.selectMapString(
-                  """
-                  SELECT s.name
-                  FROM curriculum_subject cs
-                  JOIN subject s
-                  ON (cs.subject_id = s.id)
-                  WHERE cs.curriculum_id = $1
-                  """,
-                  Tuple.of(curriculum.getId()),
-                  "name"));
-
-          curriculumDTOs.add(curriculumDTO);
-        });
+        (curriculum) -> curriculumDTOs.add(this.curriculumMapper.toDto(curriculum)));
 
     LOG.info("All curriculums retrieved!");
     return curriculumDTOs;

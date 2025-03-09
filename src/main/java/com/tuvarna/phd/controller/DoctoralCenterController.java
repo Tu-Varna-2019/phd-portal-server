@@ -1,13 +1,13 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateEssentialDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
+import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -113,9 +113,14 @@ public final class DoctoralCenterController extends BaseController {
                     schema = @Schema(implementation = CandidateDTO.class))),
       })
   @Path("/candidates")
-  public Response getCandidates() {
-    LOG.info("Received a request to retrieve all candidates");
-    List<CandidateEssentialDTO> candidates = this.doctoralCenterService.getCandidates();
+  public Response getCandidates(@NotNull @RestQuery String fields) {
+    if (fields == null || fields.isEmpty()) {
+      LOG.warn("Client requested to retrieve all candidates with empty fields");
+      throw new HttpException("Fields for candidate cannot be empty!");
+    }
+
+    LOG.info("Received a request to retrieve all candidates with fields: " + fields);
+    List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates(fields);
 
     return send("Candidates retrieved!", candidates);
   }

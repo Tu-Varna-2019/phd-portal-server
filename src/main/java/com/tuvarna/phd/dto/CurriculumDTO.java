@@ -11,8 +11,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class CurriculumDTO {
   @NotNull
-  @Schema(title = "description", required = true)
-  private String description;
+  @Schema(title = "name", required = true)
+  private String name;
 
   @NotNull
   @Schema(title = "yearPeriod", required = true)

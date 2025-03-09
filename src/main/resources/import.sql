@@ -62,6 +62,7 @@ INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
       '56ef9437-2706-4d78-9ea5-f6ba18ca1ef7',
       'Поддръжка ТУ Варна',
       't.teacher3@tu-varna.bg',
+      '',
       1
     );
 
@@ -126,10 +127,10 @@ INSERT INTO "mode" ("id", "mode")
     );
 
 -- NOTE: Curriculum
-INSERT INTO "curriculum" ("id", "description", "yearperiod", "mode", "faculty")
+INSERT INTO "curriculum" ("id", "name", "yearperiod", "mode", "faculty")
   VALUES
     (
-      1, 'Automated information processing and management systems', 4, 1, 1
+      1, 'Automated information processing and management systems', 3, 1, 1
     ),
     (
       2, 'Automated information processing and management systems', 4, 2, 1
@@ -228,6 +229,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     '072c2bd9-75cd-49d7-a0d4-80a8494ebc6b',
     'Поддръжка ТУ Варна',
     't.teacher2@tu-varna.bg',
+    '',
     1,
     1
   ),
@@ -236,6 +238,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'f4bcb028-9589-4ecb-ac8b-4846c68ba123',
     'Поддръжка ТУ Варна',
     't.teacher4@tu-varna.bg',
+    '',
     2,
     1
   ),
@@ -244,6 +247,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'bc43721c-c402-4f85-8d48-d40cc16d6ed3',
     'Поддръжка ТУ Варна',
     't.teacher5@tu-varna.bg',
+    '',
     2,
     1
   ),
@@ -252,6 +256,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'a6d47203-6737-4250-b4b7-3ab097f0d298',
     'Поддръжка ТУ Варна',
     't.teacher6@tu-varna.bg',
+    '',
     2,
     1
   );
