@@ -2,6 +2,7 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
+import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Curriculum;
 import com.tuvarna.phd.entity.Mode;
@@ -55,8 +56,7 @@ public final class CandidateServiceImpl implements CandidateService {
 
     Mode modeFound = this.modeRepository.getByMode(candidateDTO.getMode());
     candidate.setCurriculum(
-        curriculumRepository.getByDescriptionAndModeId(
-            candidateDTO.getCurriculum(), modeFound.getId()));
+        curriculumRepository.getByNameAndModeId(candidateDTO.getCurriculum(), modeFound.getId()));
 
     this.candidateRepository.save(candidate);
 
@@ -75,5 +75,22 @@ public final class CandidateServiceImpl implements CandidateService {
 
     LOG.info("All curriculums retrieved!");
     return curriculumDTOs;
+  }
+
+  @Override
+  public List<SubjectDTO> getSubjects(String curriculumName) {
+    List<SubjectDTO> subjects = new ArrayList<>();
+
+    LOG.info("Received a service request to retrieve all subjects");
+    this.curriculumRepository
+        .getByName(curriculumName)
+        .getSubjects()
+        .forEach(
+            (subject) -> {
+              subjects.add(new SubjectDTO(subject.getName()));
+            });
+
+    LOG.info("All subjects retrieved!");
+    return subjects;
   }
 }

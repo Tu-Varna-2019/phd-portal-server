@@ -10,6 +10,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class SubjectDTO {
   @NotNull
-  @Schema(title = "description", required = true)
+  @Schema(title = "name", required = true)
   private String name;
 }

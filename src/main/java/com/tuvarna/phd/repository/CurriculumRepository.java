@@ -17,13 +17,17 @@ public class CurriculumRepository
         .orElseThrow(() -> new HttpException("Curriculum not found with id: " + id));
   }
 
-  public Curriculum getByDescriptionAndModeId(String description, Long modeId) {
-    return find("description = ?1 and mode.mode = ?2", description, modeId)
+  public Curriculum getByName(String name) {
+    return find("name", name)
+        .firstResultOptional()
+        .orElseThrow(() -> new HttpException("Curriculum name is not found: " + name));
+  }
+
+  public Curriculum getByNameAndModeId(String name, Long modeId) {
+    return find("name = ?1 and mode.mode = ?2", name, modeId)
         .firstResultOptional()
         .orElseThrow(
-            () ->
-                new HttpException(
-                    "Curriculum description is not found: " + description + " " + modeId));
+            () -> new HttpException("Curriculum name is not found: " + name + " " + modeId));
   }
 
   @Override

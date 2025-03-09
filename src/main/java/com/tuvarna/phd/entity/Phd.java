@@ -2,6 +2,7 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -93,13 +94,8 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
 
   @Override
   public Phd toEntity(Row row) {
-    return new Phd();
-  }
+    JsonObject jsonObject = row.toJson();
 
-  public Phd(String oid, String name, String email, String pin) {
-    this.oid = oid;
-    this.name = name;
-    this.email = email;
-    this.pin = pin;
+    return jsonObject.mapTo(Phd.class);
   }
 }

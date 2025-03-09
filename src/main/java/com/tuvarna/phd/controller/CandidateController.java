@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
+import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.service.CandidateService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
@@ -18,6 +19,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
@@ -86,7 +88,7 @@ public final class CandidateController extends BaseController {
                     schema = @Schema(implementation = CurriculumDTO.class))),
         @APIResponse(
             responseCode = "400",
-            description = "Error when approving/rejecting phd's candidate",
+            description = "Error in retrieving curriculums",
             content =
                 @Content(
                     mediaType = "application/json",
@@ -98,5 +100,32 @@ public final class CandidateController extends BaseController {
     List<CurriculumDTO> curriculumDTOs = this.candidateService.getCurriculums();
 
     return send("Curriculums retrieved", curriculumDTOs);
+  }
+
+  @GET
+  @Operation(summary = "Get subjects", description = "Get subjects")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Subjects retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SubjectDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving subjects",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SubjectDTO.class))),
+      })
+  @Path("/subjects")
+  public Response getSubjects(@RequestBody String curriculumName) {
+    LOG.info("Received a request to retrieve all subjects from curriculumName: " + curriculumName);
+    List<SubjectDTO> subjectDTOs = this.candidateService.getSubjects(curriculumName);
+
+    return send("Subjects retrieved", subjectDTOs);
   }
 }

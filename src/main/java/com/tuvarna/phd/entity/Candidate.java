@@ -73,11 +73,6 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
-  public Candidate(String name, String email) {
-    this.name = name;
-    this.email = email;
-  }
-
   @Override
   public Candidate toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
