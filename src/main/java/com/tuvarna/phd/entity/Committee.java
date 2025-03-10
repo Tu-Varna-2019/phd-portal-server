@@ -61,6 +61,12 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "role", nullable = false)
   private CommitteeRole role;
 
+  public Committee(String oid, String name, String email) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+  }
+
   @Override
   public Committee toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

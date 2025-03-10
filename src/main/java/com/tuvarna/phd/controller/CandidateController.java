@@ -25,6 +25,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @PermitAll
 @RequestScoped
@@ -122,7 +123,7 @@ public final class CandidateController extends BaseController {
                     schema = @Schema(implementation = SubjectDTO.class))),
       })
   @Path("/subjects")
-  public Response getSubjects(@RequestBody String curriculumName) {
+  public Response getSubjects(@RestQuery String curriculumName) {
     LOG.info("Received a request to retrieve all subjects from curriculumName: " + curriculumName);
     List<SubjectDTO> subjectDTOs = this.candidateService.getSubjects(curriculumName);
 

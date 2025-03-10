@@ -92,6 +92,13 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @JoinColumn(nullable = true)
   private Report report;
 
+  public Phd(String oid, String name, String email, String pin) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.pin = pin;
+  }
+
   @Override
   public Phd toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
