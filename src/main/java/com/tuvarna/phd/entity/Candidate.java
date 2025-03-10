@@ -80,7 +80,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
 
   @Override

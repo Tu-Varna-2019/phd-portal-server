@@ -22,6 +22,8 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -56,6 +58,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
+  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
   public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
     LOG.info(

@@ -3,6 +3,7 @@ package com.tuvarna.phd.controller;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
+import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.service.CandidateService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
@@ -67,12 +68,12 @@ public final class CandidateController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = CandidateDTO.class))),
       })
-  @Path("/register")
-  public Response register(CandidateDTO candidateDTO) {
-    LOG.info("Received a candidate request to register as email: " + candidateDTO.getEmail());
+  @Path("/apply")
+  public Response apply(CandidateDTO candidateDTO) {
+    LOG.info("Received a candidate request to apply as email: " + candidateDTO.getEmail());
 
-    this.candidateService.register(candidateDTO);
-    return send("Registration finished successfully!");
+    this.candidateService.apply(candidateDTO);
+    return send("Candidate application finished successfully!");
   }
 
   @GET
@@ -154,5 +155,59 @@ public final class CandidateController extends BaseController {
     List<CandidateDTO> candidateDTOs = this.candidateService.getContests();
 
     return send("Accepted phd candidates retrieved!", candidateDTOs);
+  }
+
+  @GET
+  @Operation(summary = "Get candidates in review", description = "Get candidates in review")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Candidates in review retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving candidates in review!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+      })
+  @Path("/in-review")
+  public Response getCandidatesInReview() {
+    LOG.info("Received a request to retrieve all candidates that are currently in review");
+    List<CandidateDTO> candidateDTOs = this.candidateService.getCandidatesInReview();
+
+    return send("Accepted phd candidates retrieved!", candidateDTOs);
+  }
+
+  @GET
+  @Operation(summary = "Get faculties", description = "Get faculties")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Faculties retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving faculties",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/faculty")
+  public Response getFaculties() {
+    LOG.info("Received a request to retrieve all faculties");
+    List<Faculty> faculties = this.candidateService.getFaculties();
+
+    return send("Faculties retrieved", faculties);
   }
 }

@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -26,6 +27,7 @@ public class Faculty extends PanacheEntityBase {
   @Id
   @SequenceGenerator(name = "facultySequence", sequenceName = "faculty_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facultySequence")
+  @JsonIgnore
   private Long id;
 
   @Column(nullable = false, unique = true)

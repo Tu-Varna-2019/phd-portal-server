@@ -80,6 +80,10 @@ INSERT INTO "candidatestatus" ("id", "status")
     (
       3,
       'rejected'
+    ),
+    (
+      4,
+      'reviewing'
     );
 
 -- NOTE: Candidate

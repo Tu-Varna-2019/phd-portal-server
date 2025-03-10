@@ -5,6 +5,7 @@ import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Curriculum;
+import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
@@ -39,7 +40,7 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
   @Override
-  public void register(CandidateDTO candidateDTO) {
+  public void apply(CandidateDTO candidateDTO) {
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
 
     if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
@@ -97,7 +98,7 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  @CacheResult(cacheName = "candidate-contest-cache")
+  @CacheResult(cacheName = "candidate-approved-status-cache")
   public List<CandidateDTO> getContests() {
     LOG.info(
         "Received a service request to retrieve all constests for accepted candidates into phd");
@@ -105,13 +106,43 @@ public final class CandidateServiceImpl implements CandidateService {
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
-            "SELECT c.name, c.yearaccepted, f.name AS facultyName FROM candidate c JOIN candidatestatus cs"
-                + " ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE cs.status = 'accepted'",
+            "SELECT c.name, c.yearaccepted, f.name AS facultyName FROM candidate c JOIN"
+                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " cs.status = 'accepted'",
             new Candidate());
 
     candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
     LOG.info("All contests retrieved!");
     return candidateDTOs;
+  }
+
+  @Override
+  @CacheResult(cacheName = "candidate-reviewing-status-cache")
+  public List<CandidateDTO> getCandidatesInReview() {
+    LOG.info("Received a service request to retrieve all candidates that are currently in review");
+
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    List<Candidate> candidates =
+        this.databaseModel.selectMapEntity(
+            "SELECT c.name, f.name AS facultyName FROM candidate c JOIN"
+                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " cs.status = 'reviewing'",
+            new Candidate());
+
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
+
+    LOG.info("All candidates in review retrieved!");
+    return candidateDTOs;
+  }
+
+  @Override
+  @CacheResult(cacheName = "faculty-cache")
+  public List<Faculty> getFaculties() {
+    LOG.info("Received a service request to retrieve all faculties");
+    List<Faculty> faculties = this.facultyRepository.listAll();
+
+    LOG.info("Faculties retrieved");
+    return faculties;
   }
 }
