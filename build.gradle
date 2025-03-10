@@ -34,7 +34,7 @@ dependencies {
 
     implementation 'io.quarkus:quarkus-hibernate-validator'
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    implementation 'io.quarkus:quarkus-mailer:3.19.1'
+    implementation 'io.quarkus:quarkus-mailer:3.19.2'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'
