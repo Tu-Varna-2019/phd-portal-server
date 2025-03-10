@@ -1,6 +1,6 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.CandidateEssentialDTO;
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.UnauthorizedUsers;
@@ -13,7 +13,7 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   List<String> getDoctoralCenterRoles();
 
-  List<CandidateEssentialDTO> getCandidates();
+  List<CandidateDTO> getCandidates(String fields);
 
   void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group);
 

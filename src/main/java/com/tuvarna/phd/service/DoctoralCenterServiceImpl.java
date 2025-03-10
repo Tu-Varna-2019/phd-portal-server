@@ -1,6 +1,6 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.CandidateEssentialDTO;
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.entity.Candidate;
@@ -14,6 +14,7 @@ import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CandidateRepository;
+import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
@@ -21,6 +22,8 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,7 +45,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CommitteeRepository committeeRepository;
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
+  @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject UnauthorizedUsersRepository uRepository;
+
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
@@ -53,6 +58,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
+  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
   public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
     LOG.info(
@@ -62,7 +68,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
     switch (candidateStatusDTO.getStatus()) {
       case "approved" -> {
-        candidate.setStatus("approved");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
 
         LOG.info(
             "Candidate arroved! Now sending email to the candidate personal email about it...");
@@ -98,7 +104,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
 
       case "rejected" -> {
-        candidate.setStatus("rejected");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
 
         this.mailModel.send(
             "Вашата докторантска кандидатура в Ту-Варна",
@@ -114,17 +120,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
-  public List<CandidateEssentialDTO> getCandidates() {
-    LOG.info("Received a service request to retrieve all candidates ");
+  public List<CandidateDTO> getCandidates(String fields) {
+    LOG.info("Received a service request to retrieve all candidates");
 
     List<Candidate> candidates =
-        this.databaseModel.selectMapEntity(
-            "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
+        this.databaseModel.selectMapEntity("SELECT " + fields + " FROM candidate", new Candidate());
 
-    List<CandidateEssentialDTO> candidateDTOs = new ArrayList<>();
-    candidates.forEach(
-        candidate -> candidateDTOs.add(this.candidateMapper.toEssentialDto(candidate)));
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
+    LOG.info("All candidates retrieved!");
     return candidateDTOs;
   }
 

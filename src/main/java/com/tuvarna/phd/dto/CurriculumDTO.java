@@ -1,7 +1,6 @@
 package com.tuvarna.phd.dto;
 
 import io.smallrye.common.constraint.NotNull;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -11,8 +10,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class CurriculumDTO {
   @NotNull
-  @Schema(title = "description", required = true)
-  private String description;
+  @Schema(title = "name", required = true)
+  private String name;
 
   @NotNull
   @Schema(title = "yearPeriod", required = true)
@@ -25,8 +24,4 @@ public class CurriculumDTO {
   @NotNull
   @Schema(title = "faculty", required = true)
   private String faculty;
-
-  @NotNull
-  @Schema(title = "subjects", required = true)
-  private List<String> subjects;
 }

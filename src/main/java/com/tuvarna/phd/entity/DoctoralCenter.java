@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -71,6 +72,8 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
 
   @Override
   public DoctoralCenter toEntity(Row row) {
-    return new DoctoralCenter();
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(DoctoralCenter.class);
   }
 }

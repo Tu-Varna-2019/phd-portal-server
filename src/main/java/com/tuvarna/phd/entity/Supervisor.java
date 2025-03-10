@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +43,11 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
 
   @Column(nullable = false, unique = true)
   private String email;
+
+  @Column(nullable = true, unique = false)
+  private String picture;
+
+  @Transient private String pictureBlob;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "title", nullable = false)

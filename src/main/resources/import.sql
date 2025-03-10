@@ -55,18 +55,39 @@ INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
     );
 
 -- NOTE: Supervisor
-INSERT INTO "supervisor" ("id", "oid", "name", "email", "title")
+INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
   VALUES
     (
       1,
       '56ef9437-2706-4d78-9ea5-f6ba18ca1ef7',
       'Поддръжка ТУ Варна',
       't.teacher3@tu-varna.bg',
+      '',
       1
     );
 
+-- NOTE: Candidate Status
+INSERT INTO "candidatestatus" ("id", "status")
+  VALUES
+    (
+      1,
+      'waiting'
+    ),
+    (
+      2,
+      'accepted'
+    ),
+    (
+      3,
+      'rejected'
+    ),
+    (
+      4,
+      'reviewing'
+    );
+
 -- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "status")
+INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "yearaccepted", "status")
   VALUES
     (
       1,
@@ -77,7 +98,8 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "bi
       'улица Мир 3',
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
       '1111111111',
-      'waiting'
+      2025,
+      1
     );
 
 -- NOTE: Unauthorized Users
@@ -126,10 +148,10 @@ INSERT INTO "mode" ("id", "mode")
     );
 
 -- NOTE: Curriculum
-INSERT INTO "curriculum" ("id", "description", "yearperiod", "mode", "faculty")
+INSERT INTO "curriculum" ("id", "name", "yearperiod", "mode", "faculty")
   VALUES
     (
-      1, 'Automated information processing and management systems', 4, 1, 1
+      1, 'Automated information processing and management systems', 3, 1, 1
     ),
     (
       2, 'Automated information processing and management systems', 4, 2, 1
@@ -207,8 +229,8 @@ INSERT INTO "curriculum_subject" ("curriculum_id", "subject_id")
    (2, 11),
    (2, 12);
 
--- NOTE: PHD
-INSERT INTO "phd" ("id", "oid", "name", "email", "pin", "status")
+-- NOTE: Phd
+INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
   VALUES
     (
       1,
@@ -216,17 +238,19 @@ INSERT INTO "phd" ("id", "oid", "name", "email", "pin", "status")
       'ИЛИЯН КИРИЛОВ КОСТОВ СИ_3 1к',
       's23651224@onlineedu.tu-varna.bg',
       '1111111111',
+      '',
       1
     );
 
 -- NOTE: Committee
-INSERT INTO "committee" ("id", "oid", "name", "email", "role", "faculty")
+INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "faculty")
   VALUES
   (
     1,
     '072c2bd9-75cd-49d7-a0d4-80a8494ebc6b',
     'Поддръжка ТУ Варна',
     't.teacher2@tu-varna.bg',
+    '',
     1,
     1
   ),
@@ -235,6 +259,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "role", "faculty")
     'f4bcb028-9589-4ecb-ac8b-4846c68ba123',
     'Поддръжка ТУ Варна',
     't.teacher4@tu-varna.bg',
+    '',
     2,
     1
   ),
@@ -243,6 +268,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "role", "faculty")
     'bc43721c-c402-4f85-8d48-d40cc16d6ed3',
     'Поддръжка ТУ Варна',
     't.teacher5@tu-varna.bg',
+    '',
     2,
     1
   ),
@@ -251,6 +277,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "role", "faculty")
     'a6d47203-6737-4250-b4b7-3ab097f0d298',
     'Поддръжка ТУ Варна',
     't.teacher6@tu-varna.bg',
+    '',
     2,
     1
   );
