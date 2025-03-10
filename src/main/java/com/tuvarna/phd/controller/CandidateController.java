@@ -19,7 +19,6 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
@@ -128,5 +127,32 @@ public final class CandidateController extends BaseController {
     List<SubjectDTO> subjectDTOs = this.candidateService.getSubjects(curriculumName);
 
     return send("Subjects retrieved", subjectDTOs);
+  }
+
+  @GET
+  @Operation(summary = "Get phd contests", description = "Get phd contests")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Phd contests retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving phd contests",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CandidateDTO.class))),
+      })
+  @Path("/contests")
+  public Response getContests() {
+    LOG.info("Received a request to retrieve all constests for accepted candidates into phd");
+    List<CandidateDTO> candidateDTOs = this.candidateService.getContests();
+
+    return send("Accepted phd candidates retrieved!", candidateDTOs);
   }
 }

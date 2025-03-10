@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
 import io.vertx.core.json.JsonObject;
@@ -39,6 +40,10 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String name;
 
+  @Transient
+  @JsonProperty("facultyname")
+  private String facultyName;
+
   @Column(nullable = false, unique = false)
   private String email;
 
@@ -56,8 +61,13 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
 
   @Transient private String biographyBlob;
 
-  @Column(nullable = false, unique = false)
-  private String status;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "status", nullable = false)
+  private CandidateStatus status;
+
+  @Column(nullable = true, unique = false)
+  @JsonProperty("yearaccepted")
+  private Long yearAccepted;
 
   @Password
   @Column(nullable = false, unique = true, length = 10)

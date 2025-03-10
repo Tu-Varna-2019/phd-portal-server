@@ -66,8 +66,24 @@ INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
       1
     );
 
+-- NOTE: Candidate Status
+INSERT INTO "candidatestatus" ("id", "status")
+  VALUES
+    (
+      1,
+      'waiting'
+    ),
+    (
+      2,
+      'accepted'
+    ),
+    (
+      3,
+      'rejected'
+    );
+
 -- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "status")
+INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "yearaccepted", "status")
   VALUES
     (
       1,
@@ -78,7 +94,8 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "bi
       'улица Мир 3',
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
       '1111111111',
-      'waiting'
+      2025,
+      1
     );
 
 -- NOTE: Unauthorized Users

@@ -11,6 +11,7 @@ import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.CandidateRepository;
+import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
@@ -26,14 +27,16 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject CandidateRepository candidateRepository;
   @Inject CurriculumRepository curriculumRepository;
   @Inject FacultyRepository facultyRepository;
-  @Inject DatabaseModel databaseModel;
   @Inject ModeRepository modeRepository;
+  @Inject CandidateStatusRepository candidateStatusRepository;
+
+  @Inject DatabaseModel databaseModel;
   @Inject IPBlockService ipBlockService;
 
   @Inject CandidateMapper candidateMapper;
   @Inject CurriculumMapper curriculumMapper;
 
-  @Inject private Logger LOG;
+  @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
   @Override
   public void register(CandidateDTO candidateDTO) {
@@ -59,7 +62,6 @@ public final class CandidateServiceImpl implements CandidateService {
         curriculumRepository.getByNameAndModeId(candidateDTO.getCurriculum(), modeFound.getId()));
 
     this.candidateRepository.save(candidate);
-
     LOG.info("Candidate saved!");
   }
 
@@ -92,5 +94,24 @@ public final class CandidateServiceImpl implements CandidateService {
 
     LOG.info("All subjects retrieved!");
     return subjects;
+  }
+
+  @Override
+  @CacheResult(cacheName = "candidate-contest-cache")
+  public List<CandidateDTO> getContests() {
+    LOG.info(
+        "Received a service request to retrieve all constests for accepted candidates into phd");
+
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    List<Candidate> candidates =
+        this.databaseModel.selectMapEntity(
+            "SELECT c.name, c.yearaccepted, f.name AS facultyName FROM candidate c JOIN candidatestatus cs"
+                + " ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE cs.status = 'accepted'",
+            new Candidate());
+
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
+
+    LOG.info("All contests retrieved!");
+    return candidateDTOs;
   }
 }

@@ -47,6 +47,11 @@ public class CandidateDTO {
   private String address;
 
   @NotNull
+  @Schema(title = "yearAccepted", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Long yearAccepted;
+
+  @NotNull
   @Schema(title = "biographyBlob", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String biographyBlob;

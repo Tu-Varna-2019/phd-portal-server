@@ -14,6 +14,7 @@ import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CandidateRepository;
+import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
@@ -42,7 +43,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CommitteeRepository committeeRepository;
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
+  @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject UnauthorizedUsersRepository uRepository;
+
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
@@ -62,7 +65,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
     switch (candidateStatusDTO.getStatus()) {
       case "approved" -> {
-        candidate.setStatus("approved");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
 
         LOG.info(
             "Candidate arroved! Now sending email to the candidate personal email about it...");
@@ -98,7 +101,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
 
       case "rejected" -> {
-        candidate.setStatus("rejected");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
 
         this.mailModel.send(
             "Вашата докторантска кандидатура в Ту-Варна",

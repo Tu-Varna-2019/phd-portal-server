@@ -2,8 +2,8 @@ package com.tuvarna.phd.mapper;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.entity.Candidate;
+import com.tuvarna.phd.entity.CandidateStatus;
 import com.tuvarna.phd.entity.Curriculum;
-import com.tuvarna.phd.entity.Faculty;
 import io.smallrye.common.constraint.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,6 +23,7 @@ public interface CandidateMapper {
   Candidate toEntity(CandidateDTO candidateDTO);
 
   @Mapping(target = "biographyBlob", ignore = true)
+  @Mapping(target = "faculty", source = "facultyName")
   CandidateDTO toDto(Candidate candidate);
 
   @Nullable
@@ -31,7 +32,7 @@ public interface CandidateMapper {
   }
 
   @Nullable
-  default String map(@Nullable Faculty faculty) {
-    return faculty != null ? faculty.getName() : null;
+  default String map(CandidateStatus status) {
+    return status != null ? status.getStatus() : null;
   }
 }
