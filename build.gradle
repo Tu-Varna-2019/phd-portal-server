@@ -18,8 +18,8 @@ dependencies {
     implementation 'io.quarkus:quarkus-smallrye-jwt-build'
 
     // AWS
-    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.2.0'
-    implementation 'software.amazon.awssdk:aws-crt-client:2.30.26'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.3.0'
+    implementation 'software.amazon.awssdk:aws-crt-client:2.30.37'
 
     // Elastisearch
     implementation("io.quarkus:quarkus-elasticsearch-java-client")
@@ -34,7 +34,7 @@ dependencies {
 
     implementation 'io.quarkus:quarkus-hibernate-validator'
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    implementation 'io.quarkus:quarkus-mailer:3.19.1'
+    implementation 'io.quarkus:quarkus-mailer:3.19.2'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'
@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 
     // SQL
-    implementation 'io.quarkus:quarkus-reactive-pg-client:3.19.1'
+    implementation 'io.quarkus:quarkus-reactive-pg-client:3.19.2'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
 
     // Caching
@@ -56,7 +56,7 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.mockito:mockito-core:5.16.0'
-    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.19.1'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.19.2'
 }
 
 group 'com.tuvarna'
