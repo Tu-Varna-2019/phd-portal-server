@@ -10,6 +10,8 @@ public sealed interface CandidateService permits CandidateServiceImpl {
 
   void apply(CandidateDTO candidateDTO);
 
+  void createCurriculum(CurriculumDTO curriculumDTO);
+
   List<Faculty> getFaculties();
 
   List<CurriculumDTO> getCurriculums();

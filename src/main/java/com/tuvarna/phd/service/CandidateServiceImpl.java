@@ -16,11 +16,16 @@ import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
+import com.tuvarna.phd.repository.SubjectRepository;
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -30,6 +35,7 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject FacultyRepository facultyRepository;
   @Inject ModeRepository modeRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
+  @Inject SubjectRepository subjectRepository;
 
   @Inject DatabaseModel databaseModel;
   @Inject IPBlockService ipBlockService;
@@ -64,6 +70,31 @@ public final class CandidateServiceImpl implements CandidateService {
 
     this.candidateRepository.save(candidate);
     LOG.info("Candidate saved!");
+  }
+
+  @Override
+  @Transactional
+  @CacheInvalidate(cacheName = "curriculum-cache")
+  public void createCurriculum(CurriculumDTO curriculumDTO) {
+    Boolean doesCurriculumNameExist =
+        this.databaseModel.selectIfExists(
+            "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)", Tuple.of(curriculumDTO.getName()));
+    if (doesCurriculumNameExist) throw new HttpException("Curriculum name already exists!");
+
+    LOG.info(
+        "Received a service request to create a curriculum with name: " + curriculumDTO.getName());
+
+    Curriculum curriculum = this.curriculumMapper.toEntity(curriculumDTO);
+    curriculum.setMode(this.modeRepository.getByMode(curriculumDTO.getMode()));
+    curriculum.setFaculty(this.facultyRepository.getByName(curriculumDTO.getFaculty()));
+    curriculum.setSubjects(
+        curriculumDTO.getSubjects().stream()
+            .map((subject) -> this.subjectRepository.getByName(subject))
+            .collect(Collectors.toSet()));
+
+    this.curriculumRepository.save(curriculum);
+
+    LOG.info("Curriculum saved!");
   }
 
   @Override

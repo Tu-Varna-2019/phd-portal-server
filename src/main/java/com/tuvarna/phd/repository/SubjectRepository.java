@@ -17,6 +17,12 @@ public class SubjectRepository
         .orElseThrow(() -> new HttpException("Subject not found with id: " + id));
   }
 
+  public Subject getByName(String name) {
+    return find("name", name)
+        .firstResultOptional()
+        .orElseThrow(() -> new HttpException("Subject name is not found: " + name));
+  }
+
   @Override
   public void save(Subject subject) {
     subject.persist();

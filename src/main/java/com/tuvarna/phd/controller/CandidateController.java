@@ -76,6 +76,33 @@ public final class CandidateController extends BaseController {
     return send("Candidate application finished successfully!");
   }
 
+  @POST
+  @Operation(summary = "Create curriculum", description = "Create curriculum")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Curriculum created",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CurriculumDTO.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when creating curriculum!",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CurriculumDTO.class))),
+      })
+  @Path("/curriculum")
+  public Response createCurriculum(CurriculumDTO curriculumDTO) {
+    LOG.info("Received a request to create curriculum with data: " + curriculumDTO.toString());
+
+    this.candidateService.createCurriculum(curriculumDTO);
+    return send("Curriculum with name: " + curriculumDTO.getName() + " is created successfully!");
+  }
+
   @GET
   @Operation(summary = "Get curriculums", description = "Get curriculums")
   @APIResponses(
