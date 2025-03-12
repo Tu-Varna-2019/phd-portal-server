@@ -1,18 +1,17 @@
 package com.tuvarna.phd.repository;
 
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public final class UnauthorizedUsersRepository
-    implements PanacheRepositoryBase<UnauthorizedUsers, Integer>,
-        IUserRepository<UnauthorizedUsers> {
+public final class UnauthorizedRepository
+    implements PanacheRepositoryBase<Unauthorized, Integer>, IUserRepository<Unauthorized> {
 
   @Override
-  public UnauthorizedUsers getById(Long id) {
+  public Unauthorized getById(Long id) {
     return find("id", id)
         .firstResultOptional()
         .orElseThrow(
@@ -21,12 +20,12 @@ public final class UnauthorizedUsersRepository
   }
 
   @Override
-  public UnauthorizedUsers getByOid(String oid) {
+  public Unauthorized getByOid(String oid) {
     return find("oid", oid).firstResultOptional().orElse(null);
   }
 
   @Override
-  public UnauthorizedUsers getByEmail(String email) {
+  public Unauthorized getByEmail(String email) {
     return find("email", email)
         .firstResultOptional()
         .orElseThrow(
@@ -34,7 +33,7 @@ public final class UnauthorizedUsersRepository
   }
 
   @Override
-  public void save(UnauthorizedUsers users) {
+  public void save(Unauthorized users) {
     users.persist();
   }
 
@@ -44,7 +43,7 @@ public final class UnauthorizedUsersRepository
   }
 
   @Override
-  public List<UnauthorizedUsers> getAll() {
+  public List<Unauthorized> getAll() {
     return listAll();
   }
 

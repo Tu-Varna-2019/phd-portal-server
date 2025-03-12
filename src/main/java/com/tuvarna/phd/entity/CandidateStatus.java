@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "candidatestatus")
+@Table(name = "candidate_status")
 public class CandidateStatus extends PanacheEntityBase {
   @Id
   @SequenceGenerator(

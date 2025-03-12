@@ -65,7 +65,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "status", nullable = false)
   private CandidateStatus status;
 
-  @Column(nullable = true, unique = false)
+  @Column(name = "year_accepted", nullable = true, unique = false)
   @JsonProperty("yearaccepted")
   private Long yearAccepted;
 
@@ -76,7 +76,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String pin;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "curriculum", nullable = true)
+  @JoinColumn(name = "curriculum", nullable = false)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)

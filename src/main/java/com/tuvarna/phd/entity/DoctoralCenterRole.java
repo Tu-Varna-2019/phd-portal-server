@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Table(name = "doctoralcenterrole")
+@Table(name = "doctoral_center_role")
 public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Id

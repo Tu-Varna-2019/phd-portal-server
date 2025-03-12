@@ -64,32 +64,32 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   private String pin;
 
   @Column(nullable = true, unique = false)
-  private String dissertationTopic;
+  private String dissertation;
 
-  @Column(nullable = true, unique = false)
+  @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 
-  @Column(nullable = true, unique = false)
-  private Date gradDate;
+  @Column(name = "graduation_date", nullable = true, unique = false)
+  private Date graduationDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status", nullable = false)
   private PhdStatus status;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "curriculum", nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "supervisor", nullable = true)
   private Supervisor supervisor;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "report", nullable = true)
   private Report report;
 
   public Phd(String oid, String name, String email, String pin) {

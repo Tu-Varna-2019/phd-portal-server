@@ -4,7 +4,7 @@ import com.tuvarna.phd.dto.OidDTO;
 import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
 import com.tuvarna.phd.dto.UserDTO;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.service.DoctoralCenterAdminService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -68,7 +68,7 @@ public final class DoctoralCenterAdminController extends BaseController {
   @Path("/unauthorized-users")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users");
-    List<UnauthorizedUsers> unauthorizedUsers =
+    List<Unauthorized> unauthorizedUsers =
         this.doctoralCenterAdminService.getUnauthorizedUsers();
 
     LOG.info("Unauthorized users received! Now sending to client...");

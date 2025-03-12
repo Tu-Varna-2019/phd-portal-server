@@ -12,7 +12,7 @@ INSERT INTO "faculty" ("id", "name")
     );
 
 -- NOTE: SupervisorTitle
-INSERT INTO "supervisortitle" ("id", "title")
+INSERT INTO "supervisor_title" ("id", "title")
   VALUES
     (
      1, 'professor'
@@ -22,7 +22,7 @@ INSERT INTO "supervisortitle" ("id", "title")
     );
 
 -- NOTE: Doc center role
-INSERT INTO "doctoralcenterrole" ("id", "role")
+INSERT INTO "doctoral_center_role" ("id", "role")
   VALUES
     (
      1, 'admin'
@@ -35,7 +35,7 @@ INSERT INTO "doctoralcenterrole" ("id", "role")
     );
 
 -- NOTE: Doc Center
-INSERT INTO "doctoralcenter" ("id", "oid", "name", "email", "picture", "role")
+INSERT INTO "doctoral_center" ("id", "oid", "name", "email", "picture", "role")
   VALUES
     (
       1,
@@ -67,7 +67,7 @@ INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
     );
 
 -- NOTE: Candidate Status
-INSERT INTO "candidatestatus" ("id", "status")
+INSERT INTO "candidate_status" ("id", "status")
   VALUES
     (
       1,
@@ -86,24 +86,8 @@ INSERT INTO "candidatestatus" ("id", "status")
       'reviewing'
     );
 
--- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "yearaccepted", "status")
-  VALUES
-    (
-      1,
-      'Явор Яворов',
-      'ivangeorgiev12133@gmail.com',
-      'България',
-      'Варна',
-      'улица Мир 3',
-      'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
-      '1111111111',
-      2025,
-      1
-    );
-
 -- NOTE: Unauthorized Users
-INSERT INTO "unauthorizedusers" ("id", "oid", "name", "email", "timestamp","isallowed")
+INSERT INTO "unauthorized" ("id", "oid", "name", "email", "timestamp","allowed")
   VALUES
     (
       1,
@@ -115,7 +99,7 @@ INSERT INTO "unauthorizedusers" ("id", "oid", "name", "email", "timestamp","isal
     );
 
 -- NOTE: Phd status
-INSERT INTO "phdstatus" ("id", "status")
+INSERT INTO "phd_status" ("id", "status")
   VALUES
     (
       1, 'enrolled'
@@ -128,7 +112,7 @@ INSERT INTO "phdstatus" ("id", "status")
     );
 
 -- NOTE: Committee role
-INSERT INTO "committeerole" ("id", "role")
+INSERT INTO "committee_role" ("id", "role")
   VALUES
     (
       1, 'chairman'
@@ -138,25 +122,42 @@ INSERT INTO "committeerole" ("id", "role")
     );
 
 -- NOTE: Mode
-INSERT INTO "mode" ("id", "mode")
+INSERT INTO "mode" ("id", "mode", "year_period")
   VALUES
     (
-      1, 'regular'
+      1, 'regular', 3
     ),
     (
-      2, 'part_time'
+      2, 'part_time', 4
     );
 
 -- NOTE: Curriculum
-INSERT INTO "curriculum" ("id", "name", "yearperiod", "mode", "faculty")
+INSERT INTO "curriculum" ("id", "name", "mode", "faculty")
   VALUES
     (
-      1, 'Automated information processing and management systems', 3, 1, 1
+      1, 'Automated information processing and management systems', 1, 1
     ),
     (
-      2, 'Automated information processing and management systems', 4, 2, 1
+      2, 'Automated information processing and management systems', 2, 1
     );
 
+-- NOTE: Candidate
+INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "year_accepted", "status", "curriculum", "faculty")
+  VALUES
+    (
+      1,
+      'Явор Яворов',
+      'ivangeorgiev12133@gmail.com',
+      'България',
+      'Варна',
+      'улица Мир 3',
+      'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
+      '1111111111',
+      2025,
+      1,
+      1,
+      1
+    );
 
 -- NOTE: Subjects
 -- Mandatory

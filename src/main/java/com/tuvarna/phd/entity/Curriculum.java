@@ -45,9 +45,6 @@ public class Curriculum extends PanacheEntityBase {
   @Column(nullable = false, unique = false)
   private String name;
 
-  @Column(nullable = false, unique = false)
-  private Long yearPeriod;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "mode", nullable = false)
   private Mode mode;

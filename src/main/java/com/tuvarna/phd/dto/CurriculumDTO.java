@@ -15,10 +15,6 @@ public class CurriculumDTO {
   private String name;
 
   @NotNull
-  @Schema(title = "yearPeriod", required = true)
-  private Long yearPeriod;
-
-  @NotNull
   @Schema(title = "mode", required = true)
   private String mode;
 

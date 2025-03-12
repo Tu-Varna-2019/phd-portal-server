@@ -7,7 +7,7 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
@@ -20,7 +20,7 @@ import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
-import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import com.tuvarna.phd.repository.UnauthorizedRepository;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
@@ -42,7 +42,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Inject CommitteeRepository committeeRepository;
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
-  @Inject UnauthorizedUsersRepository uRepository;
+  @Inject UnauthorizedRepository uRepository;
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
@@ -69,9 +69,9 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Override
   @CacheResult(cacheName = "unauth-users-cache")
   @Transactional
-  public List<UnauthorizedUsers> getUnauthorizedUsers() {
+  public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
-    List<UnauthorizedUsers> unauthorizedUsers = this.uRepository.getAll();
+    List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
   }
@@ -134,7 +134,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
             + usersDTO.toString());
 
     for (UnauthorizedUsersDTO userDTO : usersDTO) {
-      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
+      Unauthorized user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
         case "expert", "manager", "admin" -> {
           DoctoralCenter dCenter =

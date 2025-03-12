@@ -4,15 +4,15 @@ import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
-import com.tuvarna.phd.mapper.UnauthorizedUsersMapper;
+import com.tuvarna.phd.mapper.UnauthorizedMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.PhdRepository;
-import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.security.UnauthorizedException;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -27,7 +27,7 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class AuthServiceImpl implements AuthService {
 
-  @Inject UnauthorizedUsersMapper mapper;
+  @Inject UnauthorizedMapper mapper;
 
   @Inject DatabaseModel databaseModel;
 
@@ -39,7 +39,7 @@ public final class AuthServiceImpl implements AuthService {
 
   @Inject PhdRepository phdRepository;
 
-  @Inject UnauthorizedUsersRepository unauthorizedUsersRepository;
+  @Inject UnauthorizedRepository unauthorizedUsersRepository;
 
   @ConfigProperty(name = "user.groups")
   List<String> groups;
@@ -66,8 +66,8 @@ public final class AuthServiceImpl implements AuthService {
   public void addToUnauthorizedTable(String oid, String name, String email, String group) {
     LOG.info("User: " + email + " is not present in any of the tables. Adding him now...");
 
-    UnauthorizedUsers users =
-        new UnauthorizedUsers(oid, name, email, new Timestamp(System.currentTimeMillis()));
+    Unauthorized users =
+        new Unauthorized(oid, name, email, new Timestamp(System.currentTimeMillis()));
     this.unauthorizedUsersRepository.save(users);
 
     throw new UnauthorizedException(

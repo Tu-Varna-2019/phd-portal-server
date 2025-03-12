@@ -25,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 // @UserDefinition
-@Table(name = "doctoralcenter")
+@Table(name = "doctoral_center")
 public non-sealed class DoctoralCenter extends PanacheEntityBase
     implements IUserEntity<DoctoralCenter> {
 

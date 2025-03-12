@@ -1,17 +1,17 @@
 package com.tuvarna.phd.mapper;
 
 import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "cdi")
-public interface UnauthorizedUsersMapper {
-  UnauthorizedUsersMapper uMapper = Mappers.getMapper(UnauthorizedUsersMapper.class);
+public interface UnauthorizedMapper {
+  UnauthorizedMapper uMapper = Mappers.getMapper(UnauthorizedMapper.class);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
-  @Mapping(target = "isAllowed", ignore = true)
-  UnauthorizedUsers toEntity(UnauthorizedUsersDTO users);
+  @Mapping(target = "allowed", ignore = true)
+  Unauthorized toEntity(UnauthorizedUsersDTO users);
 }

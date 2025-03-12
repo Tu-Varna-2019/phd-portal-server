@@ -8,6 +8,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.util.Date;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -27,7 +29,7 @@ public final class IPBlockServiceImpl implements IPBlockService {
             "Client with ip: "
                 + ip.toString()
                 + " is not present in the IPBlock table. Adding him now...");
-        this.ipBlockRepository.save(new IPBlock(ip));
+        this.ipBlockRepository.save(new IPBlock(ip, new Timestamp(new Date().getTime())));
         return false;
       }
 

@@ -39,12 +39,12 @@ public class Report extends PanacheEntityBase {
 
   // NOTE: Тримесечен и годишен
   // Автоматично генерирани след като докторанта е одобрен
-  @Column(nullable = true, unique = false)
+  @Column(name = "start_date", nullable = true, unique = false)
   private Date startDate;
 
-  @Column(nullable = true, unique = false)
+  @Column(name = "end_date", nullable = true, unique = false)
   private Date endDate;
 
-  @Column(nullable = true, unique = false)
-  private Integer orderNum;
+  @Column(name = "order_number", nullable = true, unique = false)
+  private Integer orderNumber;
 }
