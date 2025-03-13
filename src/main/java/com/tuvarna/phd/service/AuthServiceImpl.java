@@ -55,7 +55,8 @@ public final class AuthServiceImpl implements AuthService {
       Boolean isUserFound = this.databaseModel.selectIfExists(statement, Tuple.of(oid));
 
       if (isUserFound) {
-        return group;
+        // NOTE: Exception is doc center
+        return group.replace("_", "-");
       }
     }
 
@@ -101,7 +102,7 @@ public final class AuthServiceImpl implements AuthService {
         committee.setPictureBlob(this.s3Model.getDataUrlPicture(oid, committee.getPicture()));
         return committee;
       }
-      case "doctoralCenter" -> {
+      case "doctoral-center" -> {
         DoctoralCenter doctoralCenter = this.doctoralCenterRepository.getByOid(oid);
         doctoralCenter.setPictureBlob(
             this.s3Model.getDataUrlPicture(oid, doctoralCenter.getPicture()));

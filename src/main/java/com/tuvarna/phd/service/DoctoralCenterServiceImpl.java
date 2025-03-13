@@ -83,7 +83,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
         List<String> adminEmails =
             this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoralcenter d JOIN doctoralcenterrole dc ON(d.role ="
+                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
                     + " dc.id) WHERE dc.role = $1",
                 Tuple.of("admin"),
                 "email");
