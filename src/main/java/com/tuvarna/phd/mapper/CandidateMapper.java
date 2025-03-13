@@ -24,6 +24,7 @@ public interface CandidateMapper {
 
   @Mapping(target = "biographyBlob", ignore = true)
   @Mapping(target = "faculty", source = "facultyName")
+  @Mapping(target = "status", source = "statusName")
   CandidateDTO toDto(Candidate candidate);
 
   @Nullable

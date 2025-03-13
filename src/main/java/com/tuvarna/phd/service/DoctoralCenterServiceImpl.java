@@ -22,7 +22,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
-
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -31,6 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -122,10 +122,21 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Override
   public List<CandidateDTO> getCandidates(String fields) {
     LOG.info("Received a service request to retrieve all candidates");
+    List<String> fieldsList = Arrays.asList(fields.split(","));
 
-    List<Candidate> candidates =
-        this.databaseModel.selectMapEntity("SELECT " + fields + " FROM candidate", new Candidate());
+    fieldsList.replaceAll(
+        (field) -> {
+          String fieldStripped = field.strip();
+          if (fieldStripped.equals("status")) return "s." + fieldStripped + " AS statusname ";
+          else return "c." + fieldStripped + " ";
+        });
 
+    String statement =
+        "SELECT "
+            + String.join(",", fieldsList)
+            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id)";
+
+    List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
