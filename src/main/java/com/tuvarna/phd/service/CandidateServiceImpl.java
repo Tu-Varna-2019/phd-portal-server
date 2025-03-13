@@ -87,6 +87,7 @@ public final class CandidateServiceImpl implements CandidateService {
     Curriculum curriculum = this.curriculumMapper.toEntity(curriculumDTO);
     curriculum.setMode(this.modeRepository.getByMode(curriculumDTO.getMode()));
     curriculum.setFaculty(this.facultyRepository.getByName(curriculumDTO.getFaculty()));
+
     curriculum.setSubjects(
         curriculumDTO.getSubjects().stream()
             .map((subject) -> this.subjectRepository.getByName(subject))
