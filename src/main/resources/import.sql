@@ -38,7 +38,7 @@ INSERT INTO "doctoral_center_role" ("id", "role")
 INSERT INTO "doctoral_center" ("id", "oid", "name", "email", "picture", "role")
   VALUES
     (
-      1,
+      nextval('doctoralCenter_id_seq'),
       'de6b478e-e4e4-422d-88fb-293fe69c6519',
       'Администратор',
       's19621609@onlineedu.tu-varna.bg',
@@ -46,7 +46,7 @@ INSERT INTO "doctoral_center" ("id", "oid", "name", "email", "picture", "role")
       1
     ),
     (
-      2,
+      nextval('doctoralCenter_id_seq'),
       '3d68809d-d92e-4a07-ac1e-30e5f2fe2a22',
       'Поддръжка ТУ Варна',
       't.teacher1@tu-varna.bg',

@@ -2,7 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
@@ -170,18 +170,18 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when setting a group for a unauthorized users!",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
       })
   @Path("/unauthorized-users/group")
   public Response setRoleForUnauthorizedUsers(
-      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
+      List<UnauthorizedDTO> usersDTO, @RestQuery String group) {
 
     LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
     this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);

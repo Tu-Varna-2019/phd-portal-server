@@ -84,7 +84,7 @@ public final class LogController extends BaseController {
             + " and role: "
             + role);
 
-    String userGroup = group.equals("doctoralCenter") ? role : group;
+    String userGroup = group.equals("doctoral-center") ? role : group;
 
     this.logValidator.validateGroupExists(userGroup);
     this.logValidator.validateLevel(sendLogDTO.getLevel());

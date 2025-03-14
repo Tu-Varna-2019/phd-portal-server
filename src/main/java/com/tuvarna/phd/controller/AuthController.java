@@ -1,6 +1,6 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.IUserEntity;
 import com.tuvarna.phd.service.AuthService;
 import io.smallrye.mutiny.tuples.Tuple2;
@@ -54,14 +54,14 @@ public final class AuthController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
         @APIResponse(
             responseCode = "401",
             description = "User is not present and therefore not allowed!",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
       })
   @Path("/login")
   public Response login() {

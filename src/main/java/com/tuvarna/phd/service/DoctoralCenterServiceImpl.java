@@ -2,7 +2,7 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.Phd;
@@ -155,14 +155,14 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
+  public void setUnauthorizedUserGroup(List<UnauthorizedDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
             + group
             + "for unauthorized user: "
             + usersDTO.toString());
 
-    for (UnauthorizedUsersDTO userDTO : usersDTO) {
+    for (UnauthorizedDTO userDTO : usersDTO) {
 
       Unauthorized user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
