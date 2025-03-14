@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -24,6 +25,7 @@ import lombok.Setter;
 public class DoctoralCenterRole extends PanacheEntityBase {
 
   @Id
+  @JsonIgnore
   @SequenceGenerator(
       name = "doctoralCenterRoleSequence",
       sequenceName = "doctoralCenterRole_id_seq",

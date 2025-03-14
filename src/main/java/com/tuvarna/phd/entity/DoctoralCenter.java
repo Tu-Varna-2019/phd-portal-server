@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
@@ -30,6 +31,7 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
     implements IUserEntity<DoctoralCenter> {
 
   @Id
+  @JsonIgnore
   @SequenceGenerator(
       name = "doctoralCenterSequence",
       sequenceName = "doctoralCenter_id_seq",

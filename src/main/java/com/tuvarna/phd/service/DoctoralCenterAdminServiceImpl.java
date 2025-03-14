@@ -182,7 +182,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
 
     List<String> docCenterRoles =
         this.databaseModel.selectMapString(
-            "SELECT role FROM doctoralcenterrole", Tuple.tuple(), "role");
+            "SELECT role FROM doctoral_center_role", Tuple.tuple(), "role");
 
     LOG.info("All doc center roles have been retrieved: " + docCenterRoles.toString());
     return docCenterRoles;
