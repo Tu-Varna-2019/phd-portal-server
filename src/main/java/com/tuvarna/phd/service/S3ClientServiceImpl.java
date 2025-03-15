@@ -5,6 +5,7 @@ import com.tuvarna.phd.dto.FileBlobDTO;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.S3Model;
+import io.quarkus.cache.CacheInvalidate;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -26,7 +27,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
 
     String statement =
         switch (group) {
-          case "phd", "committee", "doctoralCenter" -> {
+          case "phd", "committee", "doctoral-center" -> {
             yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
           }
           default -> {
@@ -48,6 +49,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
   }
 
   @Override
+  @CacheInvalidate(cacheName = "auth-users-cache")
   public void upload(BlobDataDTO file, String oid, String type) {
     LOG.info(
         "Received a service request to upload file: "

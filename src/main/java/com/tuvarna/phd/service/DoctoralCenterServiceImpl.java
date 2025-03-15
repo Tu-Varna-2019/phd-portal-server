@@ -1,26 +1,28 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.CandidateEssentialDTO;
+import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.Supervisor;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CandidateRepository;
+import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
-import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import com.tuvarna.phd.repository.UnauthorizedRepository;
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -28,6 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -42,7 +45,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CommitteeRepository committeeRepository;
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
-  @Inject UnauthorizedUsersRepository uRepository;
+  @Inject CandidateStatusRepository candidateStatusRepository;
+  @Inject UnauthorizedRepository uRepository;
+
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
@@ -53,6 +58,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
+  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
   public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
     LOG.info(
@@ -62,7 +68,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
     switch (candidateStatusDTO.getStatus()) {
       case "approved" -> {
-        candidate.setStatus("approved");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
 
         LOG.info(
             "Candidate arroved! Now sending email to the candidate personal email about it...");
@@ -77,7 +83,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
         List<String> adminEmails =
             this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoralcenter d JOIN doctoralcenterrole dc ON(d.role ="
+                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
                     + " dc.id) WHERE dc.role = $1",
                 Tuple.of("admin"),
                 "email");
@@ -98,7 +104,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
 
       case "rejected" -> {
-        candidate.setStatus("rejected");
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
 
         this.mailModel.send(
             "Вашата докторантска кандидатура в Ту-Варна",
@@ -114,41 +120,51 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
-  public List<CandidateEssentialDTO> getCandidates() {
-    LOG.info("Received a service request to retrieve all candidates ");
+  public List<CandidateDTO> getCandidates(String fields) {
+    LOG.info("Received a service request to retrieve all candidates");
+    List<String> fieldsList = Arrays.asList(fields.split(","));
 
-    List<Candidate> candidates =
-        this.databaseModel.selectMapEntity(
-            "SELECT name, email, biography, status FROM candidate", Tuple.of(""), new Candidate());
+    fieldsList.replaceAll(
+        (field) -> {
+          String fieldStripped = field.strip();
+          if (fieldStripped.equals("status")) return "s." + fieldStripped + " AS statusname ";
+          else return "c." + fieldStripped + " ";
+        });
 
-    List<CandidateEssentialDTO> candidateDTOs = new ArrayList<>();
-    candidates.forEach(
-        candidate -> candidateDTOs.add(this.candidateMapper.toEssentialDto(candidate)));
+    String statement =
+        "SELECT "
+            + String.join(",", fieldsList)
+            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id)";
 
+    List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
+    List<CandidateDTO> candidateDTOs = new ArrayList<>();
+    candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
+
+    LOG.info("All candidates retrieved!");
     return candidateDTOs;
   }
 
   @Override
   @Transactional
-  public List<UnauthorizedUsers> getUnauthorizedUsers() {
+  public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
-    List<UnauthorizedUsers> unauthorizedUsers = this.uRepository.getAll();
+    List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
   }
 
   @Override
   @Transactional
-  public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
+  public void setUnauthorizedUserGroup(List<UnauthorizedDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
             + group
             + "for unauthorized user: "
             + usersDTO.toString());
 
-    for (UnauthorizedUsersDTO userDTO : usersDTO) {
+    for (UnauthorizedDTO userDTO : usersDTO) {
 
-      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
+      Unauthorized user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
         // TODO: maybe move this create to separate method in client
         case "phd" -> {

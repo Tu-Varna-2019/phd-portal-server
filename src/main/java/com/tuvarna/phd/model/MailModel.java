@@ -22,7 +22,7 @@ public class MailModel {
     private String path;
 
     TEMPLATES(String path) {
-      this.path = "./templates/" + path;
+      this.path = "./templates/mail/" + path;
     }
 
     String getPath() {

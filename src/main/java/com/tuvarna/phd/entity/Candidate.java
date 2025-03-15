@@ -1,7 +1,9 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +40,13 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String name;
 
+  @Transient
+  @JsonProperty("facultyname")
+  private String facultyName;
+  @Transient
+  @JsonProperty("statusname")
+  private String statusName;
+
   @Column(nullable = false, unique = false)
   private String email;
 
@@ -55,8 +64,13 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
 
   @Transient private String biographyBlob;
 
-  @Column(nullable = false, unique = false)
-  private String status = "waiting";
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "status", nullable = false)
+  private CandidateStatus status;
+
+  @Column(name = "year_accepted", nullable = true, unique = false)
+  @JsonProperty("yearaccepted")
+  private Long yearAccepted;
 
   @Password
   @Column(nullable = false, unique = true, length = 10)
@@ -65,26 +79,17 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String pin;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "curriculum", nullable = true)
+  @JoinColumn(name = "curriculum", nullable = false)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "faculty", nullable = true)
+  @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
-
-  public Candidate(String name, String email, String biography, String status) {
-    this.name = name;
-    this.email = email;
-    this.biography = biography;
-    this.status = status;
-  }
 
   @Override
   public Candidate toEntity(Row row) {
-    return new Candidate(
-        row.getString("name"),
-        row.getString("email"),
-        row.getString("biography"),
-        row.getString("status"));
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Candidate.class);
   }
 }

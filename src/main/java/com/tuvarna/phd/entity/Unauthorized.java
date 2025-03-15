@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,9 +21,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "unauthorizedusers")
-public non-sealed class UnauthorizedUsers extends PanacheEntityBase
-    implements IUserEntity<UnauthorizedUsers> {
+@Table(name = "unauthorized")
+public non-sealed class Unauthorized extends PanacheEntityBase
+    implements IUserEntity<Unauthorized> {
 
   @Id
   @SequenceGenerator(
@@ -32,24 +33,22 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "unauthorizedUsersSequence")
   private Long id;
 
-  @Column( nullable = false, unique = true, updatable = false)
+  @Column(nullable = false, unique = true, updatable = false)
   private String oid;
 
   @Column(nullable = false, unique = false)
   private String name;
 
-  @Column(nullable = false, unique = false)
-  // BUG: switching unique to true gives a stupid error: duplicate key value violates unique
-  // constraint "unauthorizedusers_email_key"
+  @Column(nullable = false, unique = true)
   private String email;
 
   @Column(nullable = false, unique = false)
   private Timestamp timestamp;
 
   @Column(nullable = false, unique = false)
-  private Boolean isAllowed = false;
+  private Boolean allowed = false;
 
-  public UnauthorizedUsers(String oid, String name, String email, Timestamp timestamp) {
+  public Unauthorized(String oid, String name, String email, Timestamp timestamp) {
     this.oid = oid;
     this.name = name;
     this.email = email;
@@ -57,7 +56,9 @@ public non-sealed class UnauthorizedUsers extends PanacheEntityBase
   }
 
   @Override
-  public UnauthorizedUsers toEntity(Row row) {
-    return new UnauthorizedUsers();
+  public Unauthorized toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Unauthorized.class);
   }
 }

@@ -51,7 +51,7 @@ public final class NotificationServiceImpl implements NotificationService {
     String statement =
         switch (group) {
           case "admin" -> {
-            yield "select d.oid from doctoralcenter d join doctoralcenterrole role on d.id=role.id "
+            yield "select d.oid from doctoral_center d join doctoral_center_role role on d.id=role.id "
                 + " where role.role=$1";
           }
           default -> {

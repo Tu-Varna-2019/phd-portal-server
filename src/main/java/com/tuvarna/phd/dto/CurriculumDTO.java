@@ -1,5 +1,6 @@
 package com.tuvarna.phd.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.smallrye.common.constraint.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -11,12 +12,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class CurriculumDTO {
   @NotNull
-  @Schema(title = "description", required = true)
-  private String description;
-
-  @NotNull
-  @Schema(title = "yearPeriod", required = true)
-  private Long yearPeriod;
+  @Schema(title = "name", required = true)
+  private String name;
 
   @NotNull
   @Schema(title = "mode", required = true)
@@ -27,6 +24,7 @@ public class CurriculumDTO {
   private String faculty;
 
   @NotNull
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @Schema(title = "subjects", required = true)
   private List<String> subjects;
 }

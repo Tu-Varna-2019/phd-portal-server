@@ -1,8 +1,6 @@
 package com.tuvarna.phd.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,18 +16,18 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "faculty")
-public class Faculty extends PanacheEntityBase {
-
+@Table(name = "candidate_status")
+public class CandidateStatus extends PanacheEntityBase {
   @Id
-  @SequenceGenerator(name = "facultySequence", sequenceName = "faculty_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facultySequence")
-  @JsonIgnore
+  @SequenceGenerator(
+      name = "candidateStatusSequence",
+      sequenceName = "candidatestatus_id_seq",
+      allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidateStatusSequence")
   private Long id;
 
   @Column(nullable = false, unique = true)
-  private String name;
+  private String status;
 }
