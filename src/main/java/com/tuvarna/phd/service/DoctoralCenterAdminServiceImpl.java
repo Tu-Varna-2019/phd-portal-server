@@ -1,6 +1,5 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Committee;
@@ -21,7 +20,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
-
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -56,13 +54,13 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Override
   @CacheInvalidate(cacheName = "auth-users-cache")
   @Transactional
-  public void deleteAuthorizedUser(String oid, RoleDTO role) {
-    switch (role.getRole()) {
+  public void deleteAuthorizedUser(String oid, String group) {
+    switch (group) {
       case "phd" -> this.phdRepository.deleteByOid(oid);
       case "committee" -> this.committeeRepository.deleteByOid(oid);
-      case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
+      case "doctoral-center" -> this.doctoralCenterRepository.deleteByOid(oid);
 
-      default -> throw new HttpException("Role is incorrect!", 400);
+      default -> throw new HttpException("Group is incorrect!", 400);
     }
   }
 

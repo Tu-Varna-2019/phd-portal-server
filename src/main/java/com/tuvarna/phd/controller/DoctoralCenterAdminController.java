@@ -1,7 +1,6 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.OidDTO;
-import com.tuvarna.phd.dto.RoleDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Unauthorized;
@@ -150,9 +149,9 @@ public final class DoctoralCenterAdminController extends BaseController {
             content = @Content(mediaType = "application/json")),
       })
   @Path("/authorized-users")
-  public Response deleteAuthorizedUser(@RestQuery String oid, RoleDTO role) {
-    LOG.info("Received a request to delete an auth user oid: " + oid + "for role: " + role);
-    this.doctoralCenterAdminService.deleteAuthorizedUser(oid, role);
+  public Response deleteAuthorizedUser(@RestQuery String oid, @RestQuery String group) {
+    LOG.info("Received a request to delete an auth user oid: " + oid + "for group: " + group);
+    this.doctoralCenterAdminService.deleteAuthorizedUser(oid, group);
 
     return send("User: " + oid + " removed!");
   }

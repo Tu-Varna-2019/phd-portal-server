@@ -27,7 +27,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
 
     String statement =
         switch (group) {
-          case "phd", "committee", "doctoralCenter" -> {
+          case "phd", "committee", "doctoral-center" -> {
             yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
           }
           default -> {
