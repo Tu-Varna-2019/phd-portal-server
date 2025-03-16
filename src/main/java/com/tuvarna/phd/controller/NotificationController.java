@@ -37,18 +37,10 @@ import org.jboss.logging.Logger;
     type = SecuritySchemeType.OPENIDCONNECT,
     scheme = "bearer")
 public final class NotificationController extends BaseController {
-
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
-  private final NotificationService notificationService;
-  private final NotificationValidator notificationValidator;
-
-  @Inject
-  public NotificationController(
-      NotificationService notificationService, NotificationValidator notificationValidator) {
-    this.notificationService = notificationService;
-    this.notificationValidator = notificationValidator;
-  }
+  @Inject NotificationService notificationService;
+  @Inject NotificationValidator notificationValidator;
 
   @POST
   @Operation(summary = "Save notification", description = "Save a notification from user action")

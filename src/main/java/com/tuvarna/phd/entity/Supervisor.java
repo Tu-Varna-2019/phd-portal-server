@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,12 +45,17 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
   @Column(nullable = false, unique = true)
   private String email;
 
+  @Column(nullable = false, unique = false)
+  private String picture;
+
+  @Transient private String pictureBlob;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "title", nullable = false)
   private SupervisorTitle title;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
   // TODO: create a functionality where he manually adds diserattions topics
@@ -63,6 +70,8 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
 
   @Override
   public Supervisor toEntity(Row row) {
-    return new Supervisor();
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Supervisor.class);
   }
 }

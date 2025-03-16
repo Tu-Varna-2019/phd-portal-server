@@ -7,7 +7,7 @@ public sealed interface S3ClientService permits S3ClientServiceImpl {
 
   void upload(BlobDataDTO file, String oid, String type);
 
-  void delete(String oid, String group, String type, String filename);
+  void delete(String oid, String type, String filename);
 
   void setPictureByOid(String uniqueFilename, String group, String oid);
 

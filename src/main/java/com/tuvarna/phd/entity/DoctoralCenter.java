@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,11 +26,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 // @UserDefinition
-@Table(name = "doctoralcenter")
+@Table(name = "doctoral_center")
 public non-sealed class DoctoralCenter extends PanacheEntityBase
     implements IUserEntity<DoctoralCenter> {
 
   @Id
+  @JsonIgnore
   @SequenceGenerator(
       name = "doctoralCenterSequence",
       sequenceName = "doctoralCenter_id_seq",
@@ -71,6 +74,8 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
 
   @Override
   public DoctoralCenter toEntity(Row row) {
-    return new DoctoralCenter();
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(DoctoralCenter.class);
   }
 }

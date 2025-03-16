@@ -2,6 +2,7 @@ package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,43 +64,45 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   private String pin;
 
   @Column(nullable = true, unique = false)
-  private String dissertationTopic;
+  private String dissertation;
 
-  @Column(nullable = true, unique = false)
+  @Column(name = "enroll_date", nullable = true, unique = false)
   private Date enrollDate;
 
-  @Column(nullable = true, unique = false)
-  private Date gradDate;
+  @Column(name = "graduation_date", nullable = true, unique = false)
+  private Date graduationDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status", nullable = false)
   private PhdStatus status;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "curriculum", nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "supervisor", nullable = true)
   private Supervisor supervisor;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "report", nullable = true)
   private Report report;
-
-  @Override
-  public Phd toEntity(Row row) {
-    return new Phd();
-  }
 
   public Phd(String oid, String name, String email, String pin) {
     this.oid = oid;
     this.name = name;
     this.email = email;
     this.pin = pin;
+  }
+
+  @Override
+  public Phd toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Phd.class);
   }
 }

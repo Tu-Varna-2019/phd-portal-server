@@ -30,4 +30,7 @@ public class Mode extends PanacheEntityBase {
 
   @Column(nullable = false, unique = true)
   private String mode;
+
+  @Column(name = "year_period", nullable = false, unique = false)
+  private Long yearPeriod;
 }

@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Table(name = "supervisortitle")
+@Table(name = "supervisor_title")
 public class SupervisorTitle extends PanacheEntityBase {
 
   @Id

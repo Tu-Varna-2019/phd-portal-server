@@ -15,6 +15,12 @@ public interface CurriculumMapper {
   @Mapping(target = "subjects", ignore = true)
   CurriculumDTO toDto(Curriculum curriculum);
 
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "faculty", ignore = true)
+  @Mapping(target = "subjects", ignore = true)
+  @Mapping(target = "mode", ignore = true)
+  Curriculum toEntity(CurriculumDTO curriculumDTO);
+
   default String map(Mode mode) {
     return mode.getMode();
   }

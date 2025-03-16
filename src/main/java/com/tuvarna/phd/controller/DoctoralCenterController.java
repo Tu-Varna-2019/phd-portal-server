@@ -1,13 +1,13 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateEssentialDTO;
 import com.tuvarna.phd.dto.CandidateStatusDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
 import com.tuvarna.phd.validator.CandidateValidator;
+import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -113,9 +113,14 @@ public final class DoctoralCenterController extends BaseController {
                     schema = @Schema(implementation = CandidateDTO.class))),
       })
   @Path("/candidates")
-  public Response getCandidates() {
-    LOG.info("Received a request to retrieve all candidates");
-    List<CandidateEssentialDTO> candidates = this.doctoralCenterService.getCandidates();
+  public Response getCandidates(@NotNull @RestQuery String fields) {
+    if (fields == null || fields.isEmpty()) {
+      LOG.warn("Client requested to retrieve all candidates with empty fields");
+      throw new HttpException("Fields for candidate cannot be empty!");
+    }
+
+    LOG.info("Received a request to retrieve all candidates with fields: " + fields);
+    List<CandidateDTO> candidates = this.doctoralCenterService.getCandidates(fields);
 
     return send("Candidates retrieved!", candidates);
   }
@@ -132,22 +137,22 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+                    schema = @Schema(implementation = Unauthorized.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when retrieving unauthorized users!",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsers.class))),
+                    schema = @Schema(implementation = Unauthorized.class))),
       })
   @Path("/unauthorized-users")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users that have allowed status");
 
-    List<UnauthorizedUsers> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
+    List<Unauthorized> unauthorizedUsers = this.doctoralCenterService.getUnauthorizedUsers();
 
-    unauthorizedUsers.removeIf((user) -> user.getIsAllowed() == false);
+    unauthorizedUsers.removeIf((user) -> user.getAllowed() == false);
 
     LOG.info("Unauthorized users with allowed status received!");
     return send("Unauthorized users retrieved!", unauthorizedUsers);
@@ -165,18 +170,18 @@ public final class DoctoralCenterController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when setting a group for a unauthorized users!",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = UnauthorizedUsersDTO.class))),
+                    schema = @Schema(implementation = UnauthorizedDTO.class))),
       })
   @Path("/unauthorized-users/group")
   public Response setRoleForUnauthorizedUsers(
-      List<UnauthorizedUsersDTO> usersDTO, @RestQuery String group) {
+      List<UnauthorizedDTO> usersDTO, @RestQuery String group) {
 
     LOG.info("Received a request to set a group for unauthorized users: " + usersDTO.toString());
     this.doctoralCenterService.setUnauthorizedUserGroup(usersDTO, group);

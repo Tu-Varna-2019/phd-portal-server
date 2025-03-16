@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Table(name = "committeerole")
+@Table(name = "committee_role")
 public class CommitteeRole extends PanacheEntityBase {
 
   @Id

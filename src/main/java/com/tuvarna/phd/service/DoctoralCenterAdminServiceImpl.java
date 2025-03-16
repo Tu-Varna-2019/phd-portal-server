@@ -1,17 +1,17 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.dto.RoleDTO;
-import com.tuvarna.phd.dto.UnauthorizedUsersDTO;
+import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.DoctoralCenter;
 import com.tuvarna.phd.entity.DoctoralCenterRole;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.UnauthorizedUsers;
+import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
+import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
@@ -19,7 +19,8 @@ import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
-import com.tuvarna.phd.repository.UnauthorizedUsersRepository;
+import com.tuvarna.phd.repository.UnauthorizedRepository;
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -39,10 +40,11 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Inject CommitteeRepository committeeRepository;
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
-  @Inject UnauthorizedUsersRepository uRepository;
+  @Inject UnauthorizedRepository uRepository;
   @Inject CandidateMapper candidateMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
+  @Inject S3Model s3Model;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -50,27 +52,30 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   private String clientBaseURL;
 
   @Override
+  @CacheInvalidate(cacheName = "auth-users-cache")
   @Transactional
-  public void deleteAuthorizedUser(String oid, RoleDTO role) {
-    switch (role.getRole()) {
+  public void deleteAuthorizedUser(String oid, String group) {
+    switch (group) {
       case "phd" -> this.phdRepository.deleteByOid(oid);
       case "committee" -> this.committeeRepository.deleteByOid(oid);
-      case "doctoralCenter" -> this.doctoralCenterRepository.deleteByOid(oid);
+      case "doctoral-center" -> this.doctoralCenterRepository.deleteByOid(oid);
 
-      default -> throw new HttpException("Role is incorrect!", 400);
+      default -> throw new HttpException("Group is incorrect!", 400);
     }
   }
 
   @Override
+  @CacheResult(cacheName = "unauth-users-cache")
   @Transactional
-  public List<UnauthorizedUsers> getUnauthorizedUsers() {
+  public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
-    List<UnauthorizedUsers> unauthorizedUsers = this.uRepository.getAll();
+    List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
   }
 
   @Override
+  @CacheResult(cacheName = "auth-users-cache")
   @Transactional
   public List<UserDTO> getAuthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -80,20 +85,35 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     List<DoctoralCenter> doctoralCenters = this.doctoralCenterRepository.getAll();
 
     for (Phd phd : phds) {
-      UserDTO user = new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), "phd");
+      UserDTO user =
+          new UserDTO(
+              phd.getOid(),
+              phd.getName(),
+              phd.getEmail(),
+              "phd",
+              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()));
       authenticatedUsers.add(user);
     }
 
     for (Committee commitee : committees) {
       UserDTO user =
-          new UserDTO(commitee.getOid(), commitee.getName(), commitee.getEmail(), "committee");
+          new UserDTO(
+              commitee.getOid(),
+              commitee.getName(),
+              commitee.getEmail(),
+              "committee",
+              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()));
       authenticatedUsers.add(user);
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
       UserDTO user =
           new UserDTO(
-              dCenter.getOid(), dCenter.getName(), dCenter.getEmail(), dCenter.getRole().getRole());
+              dCenter.getOid(),
+              dCenter.getName(),
+              dCenter.getEmail(),
+              dCenter.getRole().getRole(),
+              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()));
       authenticatedUsers.add(user);
     }
 
@@ -101,16 +121,18 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheInvalidate(cacheName = "unauth-users-cache")
+  @CacheInvalidate(cacheName = "auth-users-cache")
   @Transactional
-  public void setUnauthorizedUserGroup(List<UnauthorizedUsersDTO> usersDTO, String group) {
+  public void setUnauthorizedUserGroup(List<UnauthorizedDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
             + group
             + "for unauthorized user: "
             + usersDTO.toString());
 
-    for (UnauthorizedUsersDTO userDTO : usersDTO) {
-      UnauthorizedUsers user = this.uRepository.getByOid(userDTO.getOid());
+    for (UnauthorizedDTO userDTO : usersDTO) {
+      Unauthorized user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
         case "expert", "manager", "admin" -> {
           DoctoralCenter dCenter =
@@ -135,6 +157,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
+  @CacheInvalidate(cacheName = "unauth-users-cache")
   @Transactional
   public void changeUnauthorizedUserIsAllowed(String oid, Boolean isAllowed) {
     LOG.info(
@@ -144,7 +167,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
             + oid);
 
     this.databaseModel.execute(
-        "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
+        "UPDATE unauthorized SET allowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
 
     LOG.info("IsAllowed has been successfully changed!");
   }
@@ -157,7 +180,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
 
     List<String> docCenterRoles =
         this.databaseModel.selectMapString(
-            "SELECT role FROM doctoralcenterrole", Tuple.tuple(), "role");
+            "SELECT role FROM doctoral_center_role", Tuple.tuple(), "role");
 
     LOG.info("All doc center roles have been retrieved: " + docCenterRoles.toString());
     return docCenterRoles;

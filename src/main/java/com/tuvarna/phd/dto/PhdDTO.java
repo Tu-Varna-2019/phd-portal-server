@@ -39,8 +39,8 @@ public class PhdDTO {
   @Schema(title = "pin", required = false)
   private String pin;
 
-  @Schema(title = "dissertation_topic", required = false)
-  private String dissertationTopic;
+  @Schema(title = "dissertation", required = false)
+  private String dissertation;
 
   @Schema(title = "status", required = false)
   private String status;

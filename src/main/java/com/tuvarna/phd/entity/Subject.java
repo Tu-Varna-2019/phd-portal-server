@@ -40,10 +40,10 @@ public class Subject extends PanacheEntityBase {
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
-  private Grade finalGrade;
+  @JoinColumn(name = "grade", nullable = true)
+  private Grade grade;
 
-  @JoinColumn(name = "examdate", nullable = true)
+  @JoinColumn(name = "exam_date", nullable = true)
   private Date examDate;
 
   @ManyToMany(mappedBy = "subjects", fetch = FetchType.EAGER)

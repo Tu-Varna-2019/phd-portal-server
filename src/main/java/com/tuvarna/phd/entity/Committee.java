@@ -1,6 +1,7 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,6 +69,8 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
 
   @Override
   public Committee toEntity(Row row) {
-    return new Committee();
+    JsonObject jsonObject = row.toJson();
+
+    return jsonObject.mapTo(Committee.class);
   }
 }

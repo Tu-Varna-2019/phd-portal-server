@@ -5,6 +5,7 @@ import com.tuvarna.phd.dto.FileBlobDTO;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.S3Model;
+import io.quarkus.cache.CacheInvalidate;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -26,8 +27,8 @@ public final class S3ClientServiceImpl implements S3ClientService {
 
     String statement =
         switch (group) {
-          case "phd", "committee", "doctoralCenter" -> {
-            yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
+          case "phd", "committee", "doctoral-center" -> {
+            yield "UPDATE " + group.replace("-", "_") + " SET picture = $1 WHERE oid = $2";
           }
           default -> {
             throw new HttpException(
@@ -42,12 +43,14 @@ public final class S3ClientServiceImpl implements S3ClientService {
   @Override
   public String getPictureByOid(String group, String oid) {
     LOG.info("Retrieveing picture name for user oid: " + oid);
-    String statement = "SELECT picture FROM " + group.toLowerCase() + " WHERE oid = $1";
+    // FIX: Cookie for doctoral center is with hyphen '-' and the table is with `_`
+    String statement = "SELECT picture FROM " + group.replace("-", "_") + " WHERE oid = $1";
 
     return this.databaseModel.selectString(statement, Tuple.of(oid), "picture");
   }
 
   @Override
+  @CacheInvalidate(cacheName = "auth-users-cache")
   public void upload(BlobDataDTO file, String oid, String type) {
     LOG.info(
         "Received a service request to upload file: "
@@ -72,7 +75,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
   }
 
   @Override
-  public void delete(String oid, String group, String type, String filename) {
+  public void delete(String oid, String type, String filename) {
     LOG.info("Received a service request to delete a file: " + filename);
     this.s3Model.deleteObject(oid + "/" + type + "/" + filename);
     LOG.info("Succeess! File: " + filename + " deleted!");

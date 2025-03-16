@@ -13,7 +13,7 @@ public interface PhdMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "enrollDate", ignore = true)
-  @Mapping(target = "gradDate", ignore = true)
+  @Mapping(target = "graduationDate", ignore = true)
   @Mapping(target = "curriculum", ignore = true)
   @Mapping(target = "supervisor", ignore = true)
   @Mapping(target = "faculty", ignore = true)

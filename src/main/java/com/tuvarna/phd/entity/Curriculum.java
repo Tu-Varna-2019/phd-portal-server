@@ -40,11 +40,10 @@ public class Curriculum extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "curriculumSequence")
   private Long id;
 
+  // NOTE: Cannot make it unique due to requiring yearPeirod to be both 3 and 4 for the 2 type of
+  // modes
   @Column(nullable = false, unique = false)
-  private String description;
-
-  @Column(nullable = false, unique = false)
-  private Long yearPeriod;
+  private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "mode", nullable = false)
