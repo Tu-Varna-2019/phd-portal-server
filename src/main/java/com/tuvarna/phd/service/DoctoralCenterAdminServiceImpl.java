@@ -167,7 +167,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
             + oid);
 
     this.databaseModel.execute(
-        "UPDATE unauthorizedusers SET isallowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
+        "UPDATE unauthorized SET allowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
 
     LOG.info("IsAllowed has been successfully changed!");
   }

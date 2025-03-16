@@ -1,6 +1,5 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.dto.OidDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Unauthorized;
@@ -67,8 +66,7 @@ public final class DoctoralCenterAdminController extends BaseController {
   @Path("/unauthorized-users")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users");
-    List<Unauthorized> unauthorizedUsers =
-        this.doctoralCenterAdminService.getUnauthorizedUsers();
+    List<Unauthorized> unauthorizedUsers = this.doctoralCenterAdminService.getUnauthorizedUsers();
 
     LOG.info("Unauthorized users received! Now sending to client...");
     return send("Unauthorized users retrieved!", unauthorizedUsers);
@@ -127,10 +125,11 @@ public final class DoctoralCenterAdminController extends BaseController {
                     schema = @Schema(implementation = String.class))),
       })
   @Path("/unauthorized-users/is-allowed")
-  public Response seIsAllowedForUnauthorizedUsers(OidDTO oid, @RestQuery Boolean isAllowed) {
+  public Response seIsAllowedForUnauthorizedUsers(
+      @RestQuery String oid, @RestQuery Boolean isAllowed) {
 
     LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
-    this.doctoralCenterAdminService.changeUnauthorizedUserIsAllowed(oid.getOid(), isAllowed);
+    this.doctoralCenterAdminService.changeUnauthorizedUserIsAllowed(oid, isAllowed);
 
     return send("Unauthorized user changed isAllowed to: " + isAllowed);
   }

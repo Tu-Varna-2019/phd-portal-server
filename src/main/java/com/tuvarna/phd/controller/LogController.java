@@ -41,22 +41,11 @@ import org.jboss.resteasy.reactive.RestCookie;
     scheme = "bearer")
 public final class LogController extends BaseController {
 
-  private LogService logService;
-  private LogValidator logValidator;
-  private LogMapper logMapper;
+  @Inject  LogService logService;
+  @Inject  LogValidator logValidator;
+  @Inject private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
-
-  @Inject
-  public LogController(
-      LogService logService,
-      LogValidator logValidator,
-      LogMapper logMapper,
-      DoctoralCenterRepository doctoralCenterRepository) {
-    this.logService = logService;
-    this.logValidator = logValidator;
-    this.logMapper = logMapper;
-  }
 
   @POST
   @Operation(summary = "Save log", description = "Save a log from user action")
@@ -85,7 +74,6 @@ public final class LogController extends BaseController {
             + role);
 
     String userGroup = group.equals("doctoral-center") ? role : group;
-
     this.logValidator.validateGroupExists(userGroup);
     this.logValidator.validateLevel(sendLogDTO.getLevel());
 
