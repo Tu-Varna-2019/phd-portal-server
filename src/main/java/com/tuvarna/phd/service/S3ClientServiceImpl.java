@@ -28,7 +28,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
     String statement =
         switch (group) {
           case "phd", "committee", "doctoral-center" -> {
-            yield "UPDATE " + group.toLowerCase() + " SET picture = $1 WHERE oid = $2";
+            yield "UPDATE " + group.replace("-", "_") + " SET picture = $1 WHERE oid = $2";
           }
           default -> {
             throw new HttpException(
@@ -43,7 +43,8 @@ public final class S3ClientServiceImpl implements S3ClientService {
   @Override
   public String getPictureByOid(String group, String oid) {
     LOG.info("Retrieveing picture name for user oid: " + oid);
-    String statement = "SELECT picture FROM " + group.toLowerCase() + " WHERE oid = $1";
+    // FIX: Cookie for doctoral center is with hyphen '-' and the table is with `_`
+    String statement = "SELECT picture FROM " + group.replace("-", "_") + " WHERE oid = $1";
 
     return this.databaseModel.selectString(statement, Tuple.of(oid), "picture");
   }
@@ -74,7 +75,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
   }
 
   @Override
-  public void delete(String oid, String group, String type, String filename) {
+  public void delete(String oid, String type, String filename) {
     LOG.info("Received a service request to delete a file: " + filename);
     this.s3Model.deleteObject(oid + "/" + type + "/" + filename);
     LOG.info("Succeess! File: " + filename + " deleted!");

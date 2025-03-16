@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
-import com.tuvarna.phd.service.S3ClientService;
 import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.FileBlobDTO;
 import com.tuvarna.phd.dto.FilenameDTO;
+import com.tuvarna.phd.service.S3ClientService;
 import com.tuvarna.phd.validator.S3ClientValidator;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.RequestScoped;
@@ -32,20 +32,14 @@ import org.jboss.resteasy.reactive.RestQuery;
 
 @RequestScoped
 @Path("/file")
-@Tag(name="File endpoint", description = "Endpoint for serving file services")
+@Tag(name = "File endpoint", description = "Endpoint for serving file services")
 @SecurityScheme(securitySchemeName = "Basic Auth", type = SecuritySchemeType.HTTP, scheme = "basic")
 public final class FileController extends BaseController {
 
-  private final S3ClientService s3ClientService;
-  private final S3ClientValidator s3ClientValidator;
+  @Inject S3ClientService s3ClientService;
+  @Inject S3ClientValidator s3ClientValidator;
   @Inject private Logger LOG;
   @Inject JsonWebToken jwt;
-
-  @Inject
-  public FileController(S3ClientService s3ClientService, S3ClientValidator s3ClientValidator) {
-    this.s3ClientService = s3ClientService;
-    this.s3ClientValidator = s3ClientValidator;
-  }
 
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -69,7 +63,6 @@ public final class FileController extends BaseController {
                     schema = @Schema(implementation = BlobDataDTO.class)))
       })
   @Path("/upload")
-
   public Response upload(BlobDataDTO file, @RestQuery String type, @RestCookie String group) {
     this.s3ClientValidator.validateType(type);
     String oid = jwt.getClaim("oid");
@@ -84,11 +77,11 @@ public final class FileController extends BaseController {
     this.s3ClientService.upload(file, oid, type);
     if (type.equals("avatar")) {
       String oldPicture = this.s3ClientService.getPictureByOid(group, oid);
-      if (!oldPicture.isEmpty()) this.s3ClientService.delete(oid, group, type, oldPicture);
+      if (!oldPicture.isEmpty()) this.s3ClientService.delete(oid, type, oldPicture);
       this.s3ClientService.setPictureByOid(file.getUniqueFilename(), group, oid);
     }
 
-    return send("file uploaded!", file.getUniqueFilename(), 201);
+    return send("File uploaded!", file.getUniqueFilename(), 201);
   }
 
   @GET
@@ -163,7 +156,7 @@ public final class FileController extends BaseController {
             + " ,which corresponds to a group: "
             + group);
 
-    this.s3ClientService.delete(oid, group, type, file.getFilename());
+    this.s3ClientService.delete(oid, type, file.getFilename());
 
     if (type.equals("avatar")) {
       this.s3ClientService.setPictureByOid("", group, oid);
