@@ -138,8 +138,8 @@ public final class CandidateServiceImpl implements CandidateService {
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
-            "SELECT c.name, c.yearaccepted, f.name AS facultyName FROM candidate c JOIN"
-                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+            "SELECT c.name, c.year_accepted, f.name AS facultyName FROM candidate c JOIN"
+                + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'accepted'",
             new Candidate());
 
@@ -158,7 +158,7 @@ public final class CandidateServiceImpl implements CandidateService {
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
             "SELECT c.name, f.name AS facultyName FROM candidate c JOIN"
-                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'reviewing'",
             new Candidate());
 
