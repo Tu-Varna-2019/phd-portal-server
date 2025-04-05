@@ -156,11 +156,16 @@ public final class CandidateController extends BaseController {
   public Response getSubjects(
       @RestQuery Optional<String> curriculumName, @RestQuery Optional<String> facultyName) {
     List<SubjectDTO> subjectDTOs = new ArrayList<SubjectDTO>();
-    LOG.info("Received a request to retrieve all subjects from curriculumName: " + curriculumName);
 
-    if (curriculumName.isPresent()) {
+    if (curriculumName.isPresent() && facultyName.isPresent()) {
+      throw new HttpException("Cannot have both curriculum and faculty name at the same time!");
+    } else if (curriculumName.isPresent()) {
+      LOG.info(
+          "Received a request to retrieve all subjects by curriculum name: "
+              + curriculumName.get());
       subjectDTOs = this.candidateService.getSubjectsByCurriculum(curriculumName.get());
     } else if (facultyName.isPresent()) {
+      LOG.info("Received a request to retrieve all subjects by faculty name: " + facultyName.get());
       subjectDTOs = this.candidateService.getSubjectsByFaculty(facultyName.get());
     } else {
       throw new HttpException(
@@ -168,6 +173,7 @@ public final class CandidateController extends BaseController {
     }
     ;
 
+    LOG.info("Subjects retrieved: " + subjectDTOs.toString());
     return send("Subjects retrieved", subjectDTOs);
   }
 
