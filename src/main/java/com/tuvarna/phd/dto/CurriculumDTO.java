@@ -1,6 +1,7 @@
 package com.tuvarna.phd.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.smallrye.common.constraint.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,10 @@ public class CurriculumDTO {
   @NotNull
   @Schema(title = "mode", required = true)
   private String mode;
+
+  @NotNull
+  @Schema(title = "year_period", required = true)
+  private String yearPeriod;
 
   @NotNull
   @Schema(title = "faculty", required = true)
