@@ -2,6 +2,8 @@ package com.tuvarna.phd.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "faculty")
-public class Faculty extends PanacheEntityBase {
+public class Faculty extends PanacheEntityBase implements IEntity<Faculty> {
 
   @Id
   @SequenceGenerator(name = "facultySequence", sequenceName = "faculty_id_seq", allocationSize = 1)
@@ -32,4 +34,10 @@ public class Faculty extends PanacheEntityBase {
 
   @Column(nullable = false, unique = true)
   private String name;
+
+  @Override
+  public Faculty toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Faculty.class);
+  }
 }

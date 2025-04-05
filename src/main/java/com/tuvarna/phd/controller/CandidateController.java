@@ -4,6 +4,7 @@ import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Faculty;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.CandidateService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
@@ -15,7 +16,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -150,9 +153,20 @@ public final class CandidateController extends BaseController {
                     schema = @Schema(implementation = SubjectDTO.class))),
       })
   @Path("/subjects")
-  public Response getSubjects(@RestQuery String curriculumName) {
+  public Response getSubjects(
+      @RestQuery Optional<String> curriculumName, @RestQuery Optional<String> facultyName) {
+    List<SubjectDTO> subjectDTOs = new ArrayList<SubjectDTO>();
     LOG.info("Received a request to retrieve all subjects from curriculumName: " + curriculumName);
-    List<SubjectDTO> subjectDTOs = this.candidateService.getSubjects(curriculumName);
+
+    if (curriculumName.isPresent()) {
+      subjectDTOs = this.candidateService.getSubjectsByCurriculum(curriculumName.get());
+    } else if (facultyName.isPresent()) {
+      subjectDTOs = this.candidateService.getSubjectsByFaculty(facultyName.get());
+    } else {
+      throw new HttpException(
+          "Cannot retrieve subject without provided curriculum or faculty name");
+    }
+    ;
 
     return send("Subjects retrieved", subjectDTOs);
   }

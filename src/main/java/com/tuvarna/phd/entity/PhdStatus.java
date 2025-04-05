@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Cacheable
 @Table(name = "phd_status")
-public class PhdStatus extends PanacheEntityBase {
+public class PhdStatus extends PanacheEntityBase implements IEntity<PhdStatus> {
 
   @Id
   @SequenceGenerator(
@@ -33,4 +35,10 @@ public class PhdStatus extends PanacheEntityBase {
 
   @Column(nullable = false, unique = true)
   private String status;
+
+  @Override
+  public PhdStatus toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(PhdStatus.class);
+  }
 }

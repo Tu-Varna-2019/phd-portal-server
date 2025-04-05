@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "notification")
-public class Notification extends PanacheEntityBase {
+public class Notification extends PanacheEntityBase implements IEntity<Notification> {
 
   @Id
   @SequenceGenerator(
@@ -52,5 +54,11 @@ public class Notification extends PanacheEntityBase {
     this.creation = creation;
     this.severity = severity;
     this.recipient = recipient;
+  }
+
+  @Override
+  public Notification toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Notification.class);
   }
 }

@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "grade")
-public class Grade extends PanacheEntityBase {
+public class Grade extends PanacheEntityBase implements IEntity<Grade> {
 
   @Id
   @SequenceGenerator(name = "gradeSequence", sequenceName = "grade_id_seq", allocationSize = 1)
@@ -46,4 +48,10 @@ public class Grade extends PanacheEntityBase {
 
   @Column(name = "report", nullable = false, unique = false)
   private String report;
+
+  @Override
+  public Grade toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Grade.class);
+  }
 }

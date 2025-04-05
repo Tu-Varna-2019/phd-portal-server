@@ -181,76 +181,6 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "bi
       (SELECT f.id FROM "faculty" f WHERE name = 'Software engineering')
     );
 
--- NOTE: Subjects
--- Mandatory
-INSERT INTO "subject" ("id", "name")
-  VALUES
-    (
-      -- Mandatory
-      1, 'English'
-    ),
-    (
-      2, 'Methods of Research and Development of dissertation'
-    ),
-    (
-      3, 'Block C (PhD minimum)'
-    ),
-    (
-      -- Optional
-      4, 'Cryptography and data protection'
-    ),
-    (
-      5, 'Processing of visual information'
-    ),
-    (
-      6, 'Programming technologies on the Internet'
-    ),
-    (
-      7, 'Multimedia systems and technologies'
-    ),
-    (
-      8, 'Modern Software Technologies'
-    ),
-    (
-      9, 'Programming in Mathlab/ C#/ Java/ Python or other language'
-    ),
-    (
-      10, 'Databases and Information Technology'
-    ),
-    (
-      11, 'Machine learning'
-    ),
-    (
-      12, 'Bioinformatics'
-    );
-
--- NOTE: Curriculum - Subjects
-INSERT INTO "curriculum_subject" ("curriculum_id", "subject_id")
-  VALUES
-   (1, 1),
-   (1, 2),
-   (1, 3),
-   (1, 4),
-   (1, 5),
-   (1, 6),
-   (1, 7),
-   (1, 8),
-   (1, 9),
-   (1, 10),
-   (1, 11),
-   (1, 12),
-   (2, 1),
-   (2, 2),
-   (2, 3),
-   (2, 4),
-   (2, 5),
-   (2, 6),
-   (2, 7),
-   (2, 8),
-   (2, 9),
-   (2, 10),
-   (2, 11),
-   (2, 12);
 
 -- NOTE: Phd
 INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
@@ -310,3 +240,74 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
 --   VALUES
 --   nextval('commission_id_seq'),
 --   {1,2,3,4};
+
+-- NOTE: Subjects
+-- Mandatory
+INSERT INTO "subject" ("id", "name","teacher")
+  VALUES
+    (
+      -- Mandatory
+      1, 'English', 3
+    ),
+    (
+      2, 'Methods of Research and Development of dissertation', 1
+    ),
+    (
+      3, 'Block C (PhD minimum)', 3
+    ),
+    (
+      -- Optional
+      4, 'Cryptography and data protection', 1
+    ),
+    (
+      5, 'Processing of visual information', 3
+    ),
+    (
+      6, 'Programming technologies on the Internet', 2
+    ),
+    (
+      7, 'Multimedia systems and technologies', 2
+    ),
+    (
+      8, 'Modern Software Technologies', 3
+    ),
+    (
+      9, 'Programming in Mathlab/ C#/ Java/ Python or other language', 1
+    ),
+    (
+      10, 'Databases and Information Technology', 2
+    ),
+    (
+      11, 'Machine learning', 3
+    ),
+    (
+      12, 'Bioinformatics', 1
+    );
+
+-- NOTE: Curriculum - Subjects
+INSERT INTO "curriculum_subject" ("curriculum_id", "subject_id")
+  VALUES
+   (1, 1),
+   (1, 2),
+   (1, 3),
+   (1, 4),
+   (1, 5),
+   (1, 6),
+   (1, 7),
+   (1, 8),
+   (1, 9),
+   (1, 10),
+   (1, 11),
+   (1, 12),
+   (2, 1),
+   (2, 2),
+   (2, 3),
+   (2, 4),
+   (2, 5),
+   (2, 6),
+   (2, 7),
+   (2, 8),
+   (2, 9),
+   (2, 10),
+   (2, 11),
+   (2, 12);

@@ -16,7 +16,9 @@ public sealed interface CandidateService permits CandidateServiceImpl {
 
   List<CurriculumDTO> getCurriculums();
 
-  List<SubjectDTO> getSubjects(String curriculumName);
+  List<SubjectDTO> getSubjectsByCurriculum(String curriculumName);
+
+  List<SubjectDTO> getSubjectsByFaculty(String faculty);
 
   List<CandidateDTO> getContests();
 

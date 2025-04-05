@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Cacheable
 @Table(name = "ip_block")
-public class IPBlock extends PanacheEntityBase {
+public class IPBlock extends PanacheEntityBase implements IEntity<IPBlock> {
   @Id
   @SequenceGenerator(name = "ipblockSequence", sequenceName = "ipblock_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ipblockSequence")
@@ -44,5 +46,11 @@ public class IPBlock extends PanacheEntityBase {
     this.ip = ip;
     this.blockTime = blockTime;
     this.blockExpiryTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(1));
+  }
+
+  @Override
+  public IPBlock toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(IPBlock.class);
   }
 }

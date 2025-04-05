@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "commission")
-public class Commission extends PanacheEntityBase {
+public class Commission extends PanacheEntityBase implements IEntity<Commission> {
 
   @Id
   @SequenceGenerator(
@@ -32,4 +34,10 @@ public class Commission extends PanacheEntityBase {
 
   @Column(nullable = false, unique = false)
   private ArrayList<Committee> members;
+
+  @Override
+  public Commission toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Commission.class);
+  }
 }

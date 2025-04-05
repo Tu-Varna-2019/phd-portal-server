@@ -7,9 +7,11 @@ import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Curriculum;
 import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.entity.Mode;
+import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
+import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
@@ -25,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
@@ -42,6 +45,7 @@ public final class CandidateServiceImpl implements CandidateService {
 
   @Inject CandidateMapper candidateMapper;
   @Inject CurriculumMapper curriculumMapper;
+  @Inject SubjectMapper subjectMapper;
 
   @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
@@ -78,7 +82,8 @@ public final class CandidateServiceImpl implements CandidateService {
   public void createCurriculum(CurriculumDTO curriculumDTO) {
     Boolean doesCurriculumNameExist =
         this.databaseModel.selectIfExists(
-            "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)", Tuple.of(curriculumDTO.getName()));
+            "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)",
+            Tuple.of(curriculumDTO.getName()));
     if (doesCurriculumNameExist) throw new HttpException("Curriculum name already exists!");
 
     LOG.info(
@@ -113,10 +118,10 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  public List<SubjectDTO> getSubjects(String curriculumName) {
+  public List<SubjectDTO> getSubjectsByCurriculum(String curriculumName) {
     List<SubjectDTO> subjects = new ArrayList<>();
 
-    LOG.info("Received a service request to retrieve all subjects");
+    LOG.info("Received a service request to retrieve all subjects by curriculum");
     this.curriculumRepository
         .getByName(curriculumName)
         .getSubjects()
@@ -127,6 +132,27 @@ public final class CandidateServiceImpl implements CandidateService {
 
     LOG.info("All subjects retrieved!");
     return subjects;
+  }
+
+  @Override
+  public List<SubjectDTO> getSubjectsByFaculty(String faculty) {
+    /** Filter subjects by faculty name, that's retrieved from the teacher */
+    List<SubjectDTO> subjectsDtos = new ArrayList<>();
+
+    LOG.info("Received a service request to retrieve all subjects by faculty");
+
+    List<Subject> subjects =
+        this.databaseModel.selectMapEntity(
+            "SELECT s.name FROM subject s JOIN"
+                + " committee c ON(s.teacher=c.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " f.name = $1",
+            Optional.of(Tuple.of(faculty)),
+            new Subject());
+
+    subjects.forEach((subject) -> subjectsDtos.add(this.subjectMapper.toDto(subject)));
+
+    LOG.info("All subjects retrieved!");
+    return subjectsDtos;
   }
 
   @Override

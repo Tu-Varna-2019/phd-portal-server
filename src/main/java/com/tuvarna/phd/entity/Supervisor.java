@@ -71,7 +71,6 @@ public non-sealed class Supervisor extends PanacheEntityBase implements IUserEnt
   @Override
   public Supervisor toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
-
     return jsonObject.mapTo(Supervisor.class);
   }
 }

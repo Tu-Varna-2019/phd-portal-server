@@ -58,7 +58,7 @@ public non-sealed class Unauthorized extends PanacheEntityBase
   @Override
   public Unauthorized toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
-
     return jsonObject.mapTo(Unauthorized.class);
   }
+
 }
