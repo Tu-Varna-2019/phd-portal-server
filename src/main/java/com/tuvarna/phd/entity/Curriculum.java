@@ -63,6 +63,9 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
+  @Column(name = "is_public", nullable = false)
+  private Boolean isPublic = true;
+
   @Override
   public Curriculum toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

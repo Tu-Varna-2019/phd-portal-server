@@ -59,6 +59,9 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String address;
 
+  @Column(name="post_code",nullable = false, unique = false)
+  private Long postCode;
+
   @Column(nullable = false, unique = false)
   private String biography;
 
