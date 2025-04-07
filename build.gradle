@@ -19,7 +19,7 @@ dependencies {
 
     // AWS
     implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.4.0'
-    implementation 'software.amazon.awssdk:aws-crt-client:2.31.11'
+    implementation 'software.amazon.awssdk:aws-crt-client:2.31.16'
 
     // Elastisearch
     implementation("io.quarkus:quarkus-elasticsearch-java-client")
