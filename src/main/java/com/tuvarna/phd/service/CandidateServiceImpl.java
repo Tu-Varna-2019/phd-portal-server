@@ -51,6 +51,8 @@ public final class CandidateServiceImpl implements CandidateService {
 
   @Override
   public void apply(CandidateDTO candidateDTO) {
+    // TODO: create global notification to inform all doc center manager/expert about the new
+    // candidate!
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
 
     if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {

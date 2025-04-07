@@ -43,6 +43,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Transient
   @JsonProperty("facultyname")
   private String facultyName;
+
   @Transient
   @JsonProperty("statusname")
   private String statusName;
@@ -59,8 +60,8 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String address;
 
-  @Column(name="post_code",nullable = false, unique = false)
-  private Long postCode;
+  @Column(name = "post_code", nullable = false, unique = false)
+  private String postCode;
 
   @Column(nullable = false, unique = false)
   private String biography;

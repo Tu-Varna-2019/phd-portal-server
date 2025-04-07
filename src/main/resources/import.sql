@@ -147,11 +147,12 @@ INSERT INTO "mode" ("id", "mode", "year_period")
     );
 
 -- NOTE: Curriculum
-INSERT INTO "curriculum" ("id", "name", "mode", "faculty")
+INSERT INTO "curriculum" ("id", "name","is_public", "mode", "faculty")
   VALUES
     (
       1,
       'Automated information processing and management systems',
+      true,
       (SELECT id FROM "mode" WHERE mode = 'regular'),
       (SELECT id FROM "faculty" WHERE name = 'Software engineering')
 
@@ -159,12 +160,13 @@ INSERT INTO "curriculum" ("id", "name", "mode", "faculty")
     (
       2,
       'Automated information processing and management systems',
+      true,
       (SELECT id FROM "mode" WHERE mode = 'part_time'),
       (SELECT id FROM "faculty" WHERE name = 'Software engineering')
     );
 
 -- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "biography", "pin", "year_accepted", "status", "curriculum", "faculty")
+INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "post_code", "biography", "pin", "year_accepted", "status", "curriculum", "faculty")
   VALUES
     (
       nextval('candidate_id_seq'),
@@ -173,6 +175,7 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city","address", "bi
       'България',
       'Варна',
       'улица Мир 3',
+      '9000',
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
       '1111111111',
       2025,

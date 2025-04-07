@@ -64,7 +64,7 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
   private Faculty faculty;
 
   @Column(name = "is_public", nullable = false)
-  private Boolean isPublic = true;
+  private Boolean isPublic;
 
   @Override
   public Curriculum toEntity(Row row) {
