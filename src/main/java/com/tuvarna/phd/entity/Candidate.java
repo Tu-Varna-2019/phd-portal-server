@@ -97,3 +97,4 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
     return jsonObject.mapTo(Candidate.class);
   }
 }
+

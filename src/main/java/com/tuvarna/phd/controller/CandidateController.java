@@ -1,5 +1,6 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -28,6 +29,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @PermitAll
@@ -42,12 +44,41 @@ import org.jboss.resteasy.reactive.RestQuery;
     scheme = "bearer")
 public final class CandidateController extends BaseController {
 
-  private final CandidateService candidateService;
+  @Inject CandidateService candidateService;
   @Inject private Logger LOG = Logger.getLogger(CandidateController.class);
 
-  @Inject
-  public CandidateController(CandidateService candidateService) {
-    this.candidateService = candidateService;
+  @POST
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Upload a file", description = "Upload a biography file to s3")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Success",
+            content =
+                @Content(
+                    mediaType = "multipart/form-data",
+                    schema = @Schema(implementation = BlobDataDTO.class))),
+        @APIResponse(
+            responseCode = "404",
+            description = "file not found",
+            content =
+                @Content(
+                    mediaType = "multipart/form-data",
+                    schema = @Schema(implementation = BlobDataDTO.class)))
+      })
+  @Path("/upload")
+  public Response upload(BlobDataDTO file, @RestCookie String candidateName) {
+    LOG.info(
+        "Received a controller request to upload a file for candidate name: "
+            + candidateName
+            + " with filename: "
+            + file.getFilename());
+
+    this.candidateService.uploadBiography(file, candidateName);
+
+    return send("File uploaded!", file.getFilename(), 201);
   }
 
   @POST

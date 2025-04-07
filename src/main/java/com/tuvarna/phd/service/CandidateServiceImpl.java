@@ -1,5 +1,6 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -13,11 +14,13 @@ import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
 import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
+import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
+import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
@@ -34,11 +37,14 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class CandidateServiceImpl implements CandidateService {
   @Inject CandidateRepository candidateRepository;
+  @Inject PhdRepository phdRepository;
   @Inject CurriculumRepository curriculumRepository;
   @Inject FacultyRepository facultyRepository;
   @Inject ModeRepository modeRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject SubjectRepository subjectRepository;
+
+  @Inject S3Model s3Model;
 
   @Inject DatabaseModel databaseModel;
   @Inject IPBlockService ipBlockService;
@@ -58,9 +64,10 @@ public final class CandidateServiceImpl implements CandidateService {
     if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
       LOG.error("Candidate email: " + candidateDTO.getEmail() + " aleady exists!");
       throw new HttpException("Error, email already exists!");
-    }
-
-    if (this.ipBlockService.isClientIPBlocked()) {
+    } else if (this.phdRepository.getByEmail(candidateDTO.getEmail()) != null) {
+      LOG.error("Phd email: " + candidateDTO.getEmail() + " aleady exists for that candidate!");
+      throw new HttpException("Error, email already exists for phd!");
+    } else if (this.ipBlockService.isClientIPBlocked()) {
       throw new HttpException("Error, client is ip blocked!", 401);
     }
 
@@ -76,6 +83,20 @@ public final class CandidateServiceImpl implements CandidateService {
 
     this.candidateRepository.save(candidate);
     LOG.info("Candidate saved!");
+  }
+
+  @Override
+  public void uploadBiography(BlobDataDTO file, String candidateName) {
+    LOG.info(
+        "Received a service request to upload a biography file: "
+            + file.getFilename()
+            + " with mimeType: "
+            + file.getMimetype());
+
+    this.s3Model.uploadBlob(
+        "candidates/" + candidateName + "/biography/" + file.getFilename(), file);
+
+    LOG.info("Saving file with name: " + file.getFilename());
   }
 
   @Override
