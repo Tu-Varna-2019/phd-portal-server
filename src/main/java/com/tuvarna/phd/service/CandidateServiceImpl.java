@@ -1,5 +1,6 @@
 package com.tuvarna.phd.service;
 
+import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -7,15 +8,19 @@ import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Curriculum;
 import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.entity.Mode;
+import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
+import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
+import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.ModeRepository;
+import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
@@ -25,36 +30,44 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public final class CandidateServiceImpl implements CandidateService {
   @Inject CandidateRepository candidateRepository;
+  @Inject PhdRepository phdRepository;
   @Inject CurriculumRepository curriculumRepository;
   @Inject FacultyRepository facultyRepository;
   @Inject ModeRepository modeRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject SubjectRepository subjectRepository;
 
+  @Inject S3Model s3Model;
+
   @Inject DatabaseModel databaseModel;
   @Inject IPBlockService ipBlockService;
 
   @Inject CandidateMapper candidateMapper;
   @Inject CurriculumMapper curriculumMapper;
+  @Inject SubjectMapper subjectMapper;
 
   @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
   @Override
   public void apply(CandidateDTO candidateDTO) {
+    // TODO: create global notification to inform all doc center manager/expert about the new
+    // candidate!
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
 
     if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
       LOG.error("Candidate email: " + candidateDTO.getEmail() + " aleady exists!");
       throw new HttpException("Error, email already exists!");
-    }
-
-    if (this.ipBlockService.isClientIPBlocked()) {
+    } else if (this.phdRepository.getByEmail(candidateDTO.getEmail()) != null) {
+      LOG.error("Phd email: " + candidateDTO.getEmail() + " aleady exists for that candidate!");
+      throw new HttpException("Error, email already exists for phd!");
+    } else if (this.ipBlockService.isClientIPBlocked()) {
       throw new HttpException("Error, client is ip blocked!", 401);
     }
 
@@ -73,12 +86,27 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
+  public void uploadBiography(BlobDataDTO file, String candidateName) {
+    LOG.info(
+        "Received a service request to upload a biography file: "
+            + file.getFilename()
+            + " with mimeType: "
+            + file.getMimetype());
+
+    this.s3Model.uploadBlob(
+        "candidates/" + candidateName + "/biography/" + file.getFilename(), file);
+
+    LOG.info("Saving file with name: " + file.getFilename());
+  }
+
+  @Override
   @Transactional
   @CacheInvalidate(cacheName = "curriculum-cache")
   public void createCurriculum(CurriculumDTO curriculumDTO) {
     Boolean doesCurriculumNameExist =
         this.databaseModel.selectIfExists(
-            "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)", Tuple.of(curriculumDTO.getName()));
+            "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)",
+            Tuple.of(curriculumDTO.getName()));
     if (doesCurriculumNameExist) throw new HttpException("Curriculum name already exists!");
 
     LOG.info(
@@ -113,10 +141,10 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  public List<SubjectDTO> getSubjects(String curriculumName) {
+  public List<SubjectDTO> getSubjectsByCurriculum(String curriculumName) {
     List<SubjectDTO> subjects = new ArrayList<>();
 
-    LOG.info("Received a service request to retrieve all subjects");
+    LOG.info("Received a service request to retrieve all subjects by curriculum");
     this.curriculumRepository
         .getByName(curriculumName)
         .getSubjects()
@@ -130,6 +158,27 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
+  public List<SubjectDTO> getSubjectsByFaculty(String faculty) {
+    /** Filter subjects by faculty name, that's retrieved from the teacher */
+    List<SubjectDTO> subjectsDtos = new ArrayList<>();
+
+    LOG.info("Received a service request to retrieve all subjects by faculty");
+
+    List<Subject> subjects =
+        this.databaseModel.selectMapEntity(
+            "SELECT s.name FROM subject s JOIN"
+                + " committee c ON(s.teacher=c.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " f.name = $1",
+            Optional.of(Tuple.of(faculty)),
+            new Subject());
+
+    subjects.forEach((subject) -> subjectsDtos.add(this.subjectMapper.toDto(subject)));
+
+    LOG.info("All subjects retrieved!");
+    return subjectsDtos;
+  }
+
+  @Override
   @CacheResult(cacheName = "candidate-approved-status-cache")
   public List<CandidateDTO> getContests() {
     LOG.info(
@@ -138,8 +187,8 @@ public final class CandidateServiceImpl implements CandidateService {
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
-            "SELECT c.name, c.yearaccepted, f.name AS facultyName FROM candidate c JOIN"
-                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+            "SELECT c.name, c.year_accepted, f.name AS facultyName FROM candidate c JOIN"
+                + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'accepted'",
             new Candidate());
 
@@ -158,7 +207,7 @@ public final class CandidateServiceImpl implements CandidateService {
     List<Candidate> candidates =
         this.databaseModel.selectMapEntity(
             "SELECT c.name, f.name AS facultyName FROM candidate c JOIN"
-                + " candidatestatus cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
+                + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'reviewing'",
             new Candidate());
 

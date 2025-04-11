@@ -70,7 +70,6 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   @Override
   public Committee toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
-
     return jsonObject.mapTo(Committee.class);
   }
 }

@@ -75,7 +75,6 @@ public non-sealed class DoctoralCenter extends PanacheEntityBase
   @Override
   public DoctoralCenter toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
-
     return jsonObject.mapTo(DoctoralCenter.class);
   }
 }

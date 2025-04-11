@@ -16,14 +16,26 @@
     extra-substituters = "https://devenv.cachix.org";
   };
 
-  outputs = inputs@{ nixpkgs, flake-parts, devenv-root, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs @ {
+    nixpkgs,
+    flake-parts,
+    devenv-root,
+    ...
+  }:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       imports = [
         inputs.devenv.flakeModule
       ];
       systems = nixpkgs.lib.systems.flakeExposed;
 
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
+      perSystem = {
+        config,
+        self',
+        inputs',
+        pkgs,
+        system,
+        ...
+      }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
           config.allowUnfree = true;
@@ -57,22 +69,20 @@
             };
           };
 
-
           git-hooks.hooks = {
             # Common
-            markdownlint.enable = true;
-            actionlint =
-              {
-                enable = false;
-                excludes = [ "docker-publish.yaml" ];
-              };
+            commitizen.enable = true;
+
+            actionlint = {
+              enable = false;
+              excludes = ["docker-publish.yaml"];
+            };
             checkmake.enable = true;
           };
 
-          devenv.root =
-            let
-              devenvRootFileContent = builtins.readFile devenv-root.outPath;
-            in
+          devenv.root = let
+            devenvRootFileContent = builtins.readFile devenv-root.outPath;
+          in
             pkgs.lib.mkIf (devenvRootFileContent != "") devenvRootFileContent;
 
           packages = with pkgs; [

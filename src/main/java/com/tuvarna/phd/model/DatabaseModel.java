@@ -1,6 +1,6 @@
 package com.tuvarna.phd.model;
 
-import com.tuvarna.phd.entity.IUserEntity;
+import com.tuvarna.phd.entity.IEntity;
 import com.tuvarna.phd.exception.HttpException;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import org.jboss.logging.Logger;
 
@@ -55,16 +56,16 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public <T extends IUserEntity<T>> List<T> selectMapEntity(
-      String statement, Tuple prepQueries, IUserEntity<T> userEntity) {
+  public <T extends IEntity<T>> List<T> selectMapEntity(
+      String statement, Optional<Tuple> prepQueries, IEntity<T> entity) {
     try {
       return this.client
           .preparedQuery(statement)
-          .execute(prepQueries)
+          .execute(prepQueries.orElse(Tuple.tuple()))
           .map(
               rowSet -> {
                 List<T> rows = new ArrayList<T>();
-                rowSet.forEach(row -> rows.add(userEntity.toEntity(row)));
+                rowSet.forEach(row -> rows.add(entity.toEntity(row)));
 
                 return rows;
               })
@@ -80,12 +81,11 @@ public class DatabaseModel {
               + statement
               + " exception: "
               + exception.getMessage());
-      throw new HttpException("Requested columns don't exist in candidate!", 400);
+      throw new HttpException("Requested columns doesn't exist in candidate!", 400);
     }
   }
 
-  public <T extends IUserEntity<T>> List<T> selectMapEntity(
-      String statement, IUserEntity<T> userEntity) {
+  public <T extends IEntity<T>> List<T> selectMapEntity(String statement, IEntity<T> entity) {
     try {
       return this.client
           .preparedQuery(statement)
@@ -93,7 +93,7 @@ public class DatabaseModel {
           .map(
               rowSet -> {
                 List<T> rows = new ArrayList<T>();
-                rowSet.forEach(row -> rows.add(userEntity.toEntity(row)));
+                rowSet.forEach(row -> rows.add(entity.toEntity(row)));
 
                 return rows;
               })

@@ -1,9 +1,11 @@
 package com.tuvarna.phd.controller;
 
+import com.tuvarna.phd.dto.BlobDataDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Faculty;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.CandidateService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
@@ -15,7 +17,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -25,6 +29,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @PermitAll
@@ -39,12 +44,41 @@ import org.jboss.resteasy.reactive.RestQuery;
     scheme = "bearer")
 public final class CandidateController extends BaseController {
 
-  private final CandidateService candidateService;
+  @Inject CandidateService candidateService;
   @Inject private Logger LOG = Logger.getLogger(CandidateController.class);
 
-  @Inject
-  public CandidateController(CandidateService candidateService) {
-    this.candidateService = candidateService;
+  @POST
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Upload a file", description = "Upload a biography file to s3")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Success",
+            content =
+                @Content(
+                    mediaType = "multipart/form-data",
+                    schema = @Schema(implementation = BlobDataDTO.class))),
+        @APIResponse(
+            responseCode = "404",
+            description = "file not found",
+            content =
+                @Content(
+                    mediaType = "multipart/form-data",
+                    schema = @Schema(implementation = BlobDataDTO.class)))
+      })
+  @Path("/upload")
+  public Response upload(BlobDataDTO file, @RestCookie String candidateName) {
+    LOG.info(
+        "Received a controller request to upload a file for candidate name: "
+            + candidateName
+            + " with filename: "
+            + file.getFilename());
+
+    this.candidateService.uploadBiography(file, candidateName);
+
+    return send("File uploaded!", file.getFilename(), 201);
   }
 
   @POST
@@ -150,10 +184,27 @@ public final class CandidateController extends BaseController {
                     schema = @Schema(implementation = SubjectDTO.class))),
       })
   @Path("/subjects")
-  public Response getSubjects(@RestQuery String curriculumName) {
-    LOG.info("Received a request to retrieve all subjects from curriculumName: " + curriculumName);
-    List<SubjectDTO> subjectDTOs = this.candidateService.getSubjects(curriculumName);
+  public Response getSubjects(
+      @RestQuery Optional<String> curriculumName, @RestQuery Optional<String> facultyName) {
+    List<SubjectDTO> subjectDTOs = new ArrayList<SubjectDTO>();
 
+    if (curriculumName.isPresent() && facultyName.isPresent()) {
+      throw new HttpException("Cannot have both curriculum and faculty name at the same time!");
+    } else if (curriculumName.isPresent()) {
+      LOG.info(
+          "Received a request to retrieve all subjects by curriculum name: "
+              + curriculumName.get());
+      subjectDTOs = this.candidateService.getSubjectsByCurriculum(curriculumName.get());
+    } else if (facultyName.isPresent()) {
+      LOG.info("Received a request to retrieve all subjects by faculty name: " + facultyName.get());
+      subjectDTOs = this.candidateService.getSubjectsByFaculty(facultyName.get());
+    } else {
+      throw new HttpException(
+          "Cannot retrieve subject without provided curriculum or faculty name");
+    }
+    ;
+
+    LOG.info("Subjects retrieved: " + subjectDTOs.toString());
     return send("Subjects retrieved", subjectDTOs);
   }
 

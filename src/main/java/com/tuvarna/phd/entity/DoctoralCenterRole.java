@@ -2,6 +2,8 @@ package com.tuvarna.phd.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Cacheable
 @Table(name = "doctoral_center_role")
-public class DoctoralCenterRole extends PanacheEntityBase {
+public class DoctoralCenterRole extends PanacheEntityBase implements IEntity<DoctoralCenterRole> {
 
   @Id
   @JsonIgnore
@@ -38,5 +40,11 @@ public class DoctoralCenterRole extends PanacheEntityBase {
 
   public DoctoralCenterRole(Long id) {
     this.id = id;
+  }
+
+  @Override
+  public DoctoralCenterRole toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(DoctoralCenterRole.class);
   }
 }

@@ -47,7 +47,6 @@ nb-configuration.xml
 .vscode/
 .devenv
 .direnv
-.envrc
 .quarkus
 logs/*.log*
 .pre-commit-config.yaml

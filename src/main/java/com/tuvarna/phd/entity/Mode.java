@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Cacheable
 @Table(name = "mode")
-public class Mode extends PanacheEntityBase {
+public class Mode extends PanacheEntityBase implements IEntity<Mode> {
 
   @Id
   @SequenceGenerator(name = "modeSequence", sequenceName = "mode_id_seq", allocationSize = 1)
@@ -33,4 +35,10 @@ public class Mode extends PanacheEntityBase {
 
   @Column(name = "year_period", nullable = false, unique = false)
   private Long yearPeriod;
+
+  @Override
+  public Mode toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Mode.class);
+  }
 }

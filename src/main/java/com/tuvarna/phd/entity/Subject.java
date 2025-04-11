@@ -1,6 +1,8 @@
 package com.tuvarna.phd.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.sqlclient.Row;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +31,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "subject")
-public class Subject extends PanacheEntityBase {
+public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 
   @Id
   @SequenceGenerator(name = "subjectSequence", sequenceName = "subject_id_seq", allocationSize = 1)
@@ -53,4 +55,10 @@ public class Subject extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "teacher", nullable = true)
   private Committee teacher;
+
+  @Override
+  public Subject toEntity(Row row) {
+    JsonObject jsonObject = row.toJson();
+    return jsonObject.mapTo(Subject.class);
+  }
 }
