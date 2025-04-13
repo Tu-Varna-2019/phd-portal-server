@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.CandidateApplyDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -28,9 +29,12 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.ClientErrorException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
@@ -56,19 +60,25 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
   @Override
-  public void apply(CandidateDTO candidateDTO) {
+  @Transactional
+  public void apply(CandidateApplyDTO candidateDTO) {
     // TODO: create global notification to inform all doc center manager/expert about the new
     // candidate!
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
+    try {
 
-    if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
-      LOG.error("Candidate email: " + candidateDTO.getEmail() + " aleady exists!");
-      throw new HttpException("Error, email already exists!");
-    } else if (this.phdRepository.getByEmail(candidateDTO.getEmail()) != null) {
-      LOG.error("Phd email: " + candidateDTO.getEmail() + " aleady exists for that candidate!");
-      throw new HttpException("Error, email already exists for phd!");
-    } else if (this.ipBlockService.isClientIPBlocked()) {
-      throw new HttpException("Error, client is ip blocked!", 401);
+      if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
+        LOG.error("Candidate email: " + candidateDTO.getEmail() + " already exists!");
+        throw new ClientErrorException("Error, email already exists!", 400);
+      } else if (this.phdRepository.getByEmail(candidateDTO.getEmail()) != null) {
+        LOG.error("Phd email: " + candidateDTO.getEmail() + " aleady exists for that candidate!");
+        throw new ClientErrorException("Error, email already exists for phd!", 400);
+      } else if (this.ipBlockService.isClientIPBlocked()) {
+        throw new ClientErrorException("Error, client is ip blocked!", 400);
+      }
+
+    } catch (HttpException exception) {
+      LOG.warn("Exception raised for apply: " + exception.getMessage());
     }
 
     LOG.info(
@@ -77,9 +87,27 @@ public final class CandidateServiceImpl implements CandidateService {
 
     Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
 
-    Mode modeFound = this.modeRepository.getByMode(candidateDTO.getMode());
-    candidate.setCurriculum(
-        curriculumRepository.getByNameAndModeId(candidateDTO.getCurriculum(), modeFound.getId()));
+    try {
+      Curriculum curriculum =
+          this.curriculumRepository.getByName(candidateDTO.getCurriculum().getName());
+      candidate.setCurriculum(curriculum);
+    } catch (HttpException exception) {
+      LOG.info("Curriculum doesn't exist. Creating now for candidate: " + candidateDTO.getEmail());
+
+      Curriculum curriculum = this.curriculumMapper.toEntity(candidateDTO.getCurriculum());
+      Mode mode = this.modeRepository.getByMode(candidateDTO.getCurriculum().getMode());
+      Set<Subject> subjects = new HashSet<Subject>();
+      for (String subjectDTO : candidateDTO.getCurriculum().getSubjects()) {
+        subjects.add(this.subjectRepository.getByName(subjectDTO));
+      }
+
+      curriculum.setIsPublic(false);
+      curriculum.setMode(mode);
+      curriculum.setSubjects(subjects);
+      this.curriculumRepository.save(curriculum);
+      LOG.info("Curriculum created!");
+      candidate.setCurriculum(curriculum);
+    }
 
     this.candidateRepository.save(candidate);
     LOG.info("Candidate saved!");

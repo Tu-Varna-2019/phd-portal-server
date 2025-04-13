@@ -80,6 +80,16 @@
             checkmake.enable = true;
           };
 
+          aws-vault = {
+            enable = true;
+            profile = "alien-s3";
+            awscliWrapper.enable = true;
+          };
+          env = {
+            AWS_DEFAULT_PROFILE = "alien-s3";
+            AWS_DEFAULT_REGION = "eu-west-1";
+          };
+
           devenv.root = let
             devenvRootFileContent = builtins.readFile devenv-root.outPath;
           in
@@ -87,6 +97,7 @@
 
           packages = with pkgs; [
             quarkus
+            aws-vault
           ];
         };
       };
