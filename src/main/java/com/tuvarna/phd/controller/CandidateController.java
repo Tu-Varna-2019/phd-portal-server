@@ -105,7 +105,7 @@ public final class CandidateController extends BaseController {
       })
   @Path("/apply")
   public Response apply(CandidateApplyDTO candidateDTO) {
-    LOG.info("Received a candidate request to apply as email: " + candidateDTO.getEmail());
+    LOG.info("Received a candidate request to apply with application: " + candidateDTO.toString());
 
     this.candidateService.apply(candidateDTO);
     return send("Candidate application finished successfully!");
