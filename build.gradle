@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'io.quarkus'
     id "org.sonarqube" version "6.1.0.5360"
-    id "io.freefair.lombok"  version "8.13"
+    id "io.freefair.lombok"  version "8.13.1"
 }
 
 repositories {
@@ -19,7 +19,7 @@ dependencies {
 
     // AWS
     implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.4.0'
-    implementation 'software.amazon.awssdk:aws-crt-client:2.31.16'
+    implementation 'software.amazon.awssdk:aws-crt-client:2.31.21'
 
     // Elastisearch
     implementation("io.quarkus:quarkus-elasticsearch-java-client")
@@ -34,7 +34,7 @@ dependencies {
 
     implementation 'io.quarkus:quarkus-hibernate-validator'
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    implementation 'io.quarkus:quarkus-mailer:3.21.0'
+    implementation 'io.quarkus:quarkus-mailer:3.21.2'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'
@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 
     // SQL
-    implementation 'io.quarkus:quarkus-reactive-pg-client:3.21.1'
+    implementation 'io.quarkus:quarkus-reactive-pg-client:3.21.2'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
 
     // Caching
@@ -56,7 +56,7 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.mockito:mockito-core:5.17.0'
-    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.21.0'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.21.2'
 }
 
 group 'com.tuvarna'
