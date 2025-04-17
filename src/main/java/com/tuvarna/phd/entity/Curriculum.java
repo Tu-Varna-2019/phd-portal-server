@@ -51,6 +51,11 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
   @JoinColumn(name = "mode", nullable = false)
   private Mode mode;
 
+  public Curriculum setMode(Mode mode) {
+    this.mode = mode;
+    return this;
+  }
+
   @ManyToMany
   @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
   @JoinTable(
@@ -59,12 +64,22 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
       inverseJoinColumns = @JoinColumn(name = "subject_id"))
   private Set<Subject> subjects;
 
+  public Curriculum setSubjects(Set<Subject> subjects) {
+    this.subjects = subjects;
+    return this;
+  }
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
   @Column(name = "is_public", nullable = false)
   private Boolean isPublic;
+
+  public Curriculum setIsPublic(Boolean isPublic) {
+    this.isPublic = isPublic;
+    return this;
+  }
 
   @Override
   public Curriculum toEntity(Row row) {

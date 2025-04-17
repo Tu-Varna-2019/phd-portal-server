@@ -36,6 +36,7 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ServerErrorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,16 +70,17 @@ public final class CandidateServiceImpl implements CandidateService {
   @Override
   @Transactional
   public void apply(CandidateApplyDTO candidateDTO) {
-    // TODO: create global notification to inform all doc center manager/expert about the new
-    // candidate!
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
+
     this.checkIfCandidateEmailIsPresent(candidateDTO.getEmail());
 
-    Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
-    candidate.setFaculty(this.facultyRepository.getByName(candidateDTO.getFaculty()));
-    candidate.setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
-    this.registerCandidate(candidate, candidateDTO.getCurriculum());
+    Candidate candidate =
+        this.candidateMapper
+            .toEntity(candidateDTO)
+            .setFaculty(this.facultyRepository.getByName(candidateDTO.getFaculty()))
+            .setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
 
+    this.registerCandidate(candidate, candidateDTO.getCurriculum());
     this.sendCandidateApplyEmails(candidateDTO.getEmail());
   }
 
@@ -88,20 +90,19 @@ public final class CandidateServiceImpl implements CandidateService {
       candidate.setCurriculum(curriculum);
     } catch (HttpException exception) {
       LOG.info("Curriculum doesn't exist. Creating now for candidate: " + candidate.getEmail());
-
       Curriculum curriculum = this.curriculumMapper.toEntity(curriculumCreateDTO);
+
       Mode mode = this.modeRepository.getByMode(curriculumCreateDTO.getMode());
       Set<Subject> subjects = new HashSet<Subject>();
       for (String subjectDTO : curriculumCreateDTO.getSubjects()) {
         subjects.add(this.subjectRepository.getByName(subjectDTO));
       }
 
-      curriculum.setIsPublic(false);
-      curriculum.setMode(mode);
-      curriculum.setSubjects(subjects);
-      // this.curriculumRepository.save(curriculum);
+      curriculum.setIsPublic(false).setMode(mode).setSubjects(subjects);
+      this.curriculumRepository.save(curriculum);
+
       LOG.info("Curriculum created!");
-      // candidate.setCurriculum(curriculum);
+      candidate.setCurriculum(curriculum);
     }
 
     this.candidateRepository.save(candidate);
@@ -109,19 +110,23 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   private void checkIfCandidateEmailIsPresent(String candidateEmail) {
-    try {
-      if (this.candidateRepository.getByEmail(candidateEmail) != null) {
-        LOG.error("Candidate email: " + candidateEmail + " already exists!");
-        throw new ClientErrorException("Error, email already exists!", 400);
-      } else if (this.phdRepository.getByEmail(candidateEmail) != null) {
-        LOG.error("Phd email: " + candidateEmail + " aleady exists for that candidate!");
-        throw new ClientErrorException("Error, email already exists for phd!", 400);
-      } else if (this.ipBlockService.isClientIPBlocked()) {
-        throw new ClientErrorException("Error, client is ip blocked!", 400);
-      }
+    Arrays.asList("phd", "candidate")
+        .forEach(
+            (user) -> {
+              String statement = ("SELECT EXISTS (SELECT 1 FROM " + user + " WHERE email = $1)");
+              Boolean isEmailFound =
+                  this.databaseModel.selectIfExists(statement, Tuple.of(candidateEmail));
 
-    } catch (HttpException exception) {
-      LOG.warn("Exception raised for apply: " + exception.getMessage());
+              if (isEmailFound) {
+                LOG.error(
+                    "Candidate email: " + candidateEmail + " already exists for table " + user);
+                throw new ClientErrorException("Error, email already exists!", 400);
+              }
+            });
+
+    if (this.ipBlockService.isClientIPBlocked()) {
+      LOG.error("Error, client is ip blocked!");
+      throw new ClientErrorException("Error, client is ip blocked!", 400);
     }
 
     LOG.info(
@@ -131,25 +136,25 @@ public final class CandidateServiceImpl implements CandidateService {
 
   private void sendCandidateApplyEmails(String candidateEmail) {
     LOG.info("Now sending email for the doc centers to review the candidate's application...");
-    List<String> docCenterEmails =
-        this.databaseModel.selectMapString(
+
+    this.databaseModel
+        .selectMapString(
             "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
                 + " dc.id) WHERE dc.role = 'manager' OR dc.role = 'admin'",
-            "email");
-
-    docCenterEmails.forEach(
-        email -> {
-          try {
-            this.mailModel.send(
-                "Кандидат " + candidateEmail,
-                TEMPLATES.CANDIDATE_APPLY,
-                email,
-                Map.of("$CANDIDATE", candidateEmail));
-          } catch (IOException exception) {
-            LOG.error("Error in sending email to the doc centers: " + exception);
-            throw new ServerErrorException("Error in sending email to the doc centers!", 500);
-          }
-        });
+            "email")
+        .forEach(
+            email -> {
+              try {
+                this.mailModel.send(
+                    "Кандидат " + candidateEmail,
+                    TEMPLATES.CANDIDATE_APPLY,
+                    email,
+                    Map.of("$CANDIDATE", candidateEmail));
+              } catch (IOException exception) {
+                LOG.error("Error in sending email to the doc centers: " + exception);
+                throw new ServerErrorException("Error in sending email to the doc centers!", 500);
+              }
+            });
 
     LOG.info("Now sending the confirmation email to the candidate...");
     try {
