@@ -56,6 +56,20 @@ public class DatabaseModel {
         .indefinitely();
   }
 
+  public List<String> selectMapString(String statement, String rowString) {
+    return this.client
+        .preparedQuery(statement)
+        .execute()
+        .map(
+            rowSet -> {
+              List<String> rowsString = new ArrayList<String>();
+              rowSet.forEach(row -> rowsString.add(row.getString(rowString)));
+              return rowsString;
+            })
+        .await()
+        .indefinitely();
+  }
+
   public <T extends IEntity<T>> List<T> selectMapEntity(
       String statement, Optional<Tuple> prepQueries, IEntity<T> entity) {
     try {

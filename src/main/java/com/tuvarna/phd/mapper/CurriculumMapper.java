@@ -1,5 +1,6 @@
 package com.tuvarna.phd.mapper;
 
+import com.tuvarna.phd.dto.CurriculumCreateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.entity.Curriculum;
 import org.mapstruct.Mapper;
@@ -21,4 +22,10 @@ public interface CurriculumMapper {
   @Mapping(target = "subjects", ignore = true)
   @Mapping(target = "mode", ignore = true)
   Curriculum toEntity(CurriculumDTO curriculumDTO);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "subjects", ignore = true)
+  @Mapping(target = "mode", ignore = true)
+  @Mapping(target = "faculty.name", source = "faculty")
+  Curriculum toEntity(CurriculumCreateDTO curriculumDTO);
 }

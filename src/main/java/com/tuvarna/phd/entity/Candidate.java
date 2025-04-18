@@ -83,12 +83,22 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String pin;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "curriculum", nullable = false)
+  @JoinColumn(name = "curriculum", nullable = true)
   private Curriculum curriculum;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
+
+  public Candidate setFaculty(Faculty faculty) {
+    this.faculty = faculty;
+    return this;
+  }
+
+  public Candidate setStatus(CandidateStatus status) {
+    this.status = status;
+    return this;
+  }
 
   @Override
   public Candidate toEntity(Row row) {
@@ -97,4 +107,3 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
     return jsonObject.mapTo(Candidate.class);
   }
 }
-

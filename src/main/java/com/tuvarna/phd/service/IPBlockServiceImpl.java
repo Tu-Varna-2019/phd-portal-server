@@ -15,7 +15,7 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public final class IPBlockServiceImpl implements IPBlockService {
   @Inject IPBlockRepository ipBlockRepository;
-  @Inject private Logger LOG;
+  @Inject private Logger LOG = Logger.getLogger(IPBlockServiceImpl.class);
   @Inject RoutingContext ipContext;
 
   @Override
@@ -33,11 +33,9 @@ public final class IPBlockServiceImpl implements IPBlockService {
         return false;
       }
 
-      LOG.warn(
-          "Client with ip: "
-              + ip.toString()
-              + " is present in the ipBlock table! Blocking him now...");
+      LOG.warn("Client with ip: " + ip.toString() + " is present in the ipBlock table!");
       return true;
+
     } catch (UnknownHostException exception) {
       LOG.error("Error in retrieving the client ip: " + exception);
       return false;
