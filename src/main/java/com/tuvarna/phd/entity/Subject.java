@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -30,6 +31,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "subject")
 public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 

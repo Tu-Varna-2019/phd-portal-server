@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.CandidateApplyDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public sealed interface CandidateService permits CandidateServiceImpl {
 
-  void apply(CandidateDTO candidateDTO);
+  void apply(CandidateApplyDTO candidateDTO);
 
   void createCurriculum(CurriculumDTO curriculumDTO);
 
@@ -26,4 +27,6 @@ public sealed interface CandidateService permits CandidateServiceImpl {
   List<CandidateDTO> getCandidatesInReview();
 
   void uploadBiography(BlobDataDTO file, String candidateName);
+
+  void sendCandidateApplyEmails(String candidateEmail);
 }

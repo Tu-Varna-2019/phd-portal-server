@@ -1,7 +1,9 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.CandidateApplyDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CurriculumCreateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Candidate;
@@ -14,6 +16,8 @@ import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CurriculumMapper;
 import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
+import com.tuvarna.phd.model.MailModel;
+import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.model.S3Model;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
@@ -28,9 +32,17 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.ServerErrorException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 
@@ -45,6 +57,7 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject SubjectRepository subjectRepository;
 
   @Inject S3Model s3Model;
+  @Inject MailModel mailModel;
 
   @Inject DatabaseModel databaseModel;
   @Inject IPBlockService ipBlockService;
@@ -56,33 +69,104 @@ public final class CandidateServiceImpl implements CandidateService {
   @Inject private Logger LOG = Logger.getLogger(CandidateServiceImpl.class);
 
   @Override
-  public void apply(CandidateDTO candidateDTO) {
-    // TODO: create global notification to inform all doc center manager/expert about the new
-    // candidate!
+  @Transactional
+  public void apply(CandidateApplyDTO candidateDTO) {
     LOG.info("Recevived a service request to register a new candidate: " + candidateDTO.toString());
 
-    if (this.candidateRepository.getByEmail(candidateDTO.getEmail()) != null) {
-      LOG.error("Candidate email: " + candidateDTO.getEmail() + " aleady exists!");
-      throw new HttpException("Error, email already exists!");
-    } else if (this.phdRepository.getByEmail(candidateDTO.getEmail()) != null) {
-      LOG.error("Phd email: " + candidateDTO.getEmail() + " aleady exists for that candidate!");
-      throw new HttpException("Error, email already exists for phd!");
-    } else if (this.ipBlockService.isClientIPBlocked()) {
-      throw new HttpException("Error, client is ip blocked!", 401);
+    this.checkIfCandidateEmailIsPresent(candidateDTO.getEmail());
+
+    Candidate candidate =
+        this.candidateMapper
+            .toEntity(candidateDTO)
+            .setFaculty(this.facultyRepository.getByName(candidateDTO.getFaculty()))
+            .setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
+
+    this.registerCandidate(candidate, candidateDTO.getCurriculum());
+  }
+
+  public void registerCandidate(Candidate candidate, CurriculumCreateDTO curriculumCreateDTO) {
+    try {
+      Curriculum curriculum = this.curriculumRepository.getByName(curriculumCreateDTO.getName());
+      candidate.setCurriculum(curriculum);
+    } catch (HttpException exception) {
+      LOG.info("Curriculum doesn't exist. Creating now for candidate: " + candidate.getEmail());
+      Curriculum curriculum = this.curriculumMapper.toEntity(curriculumCreateDTO);
+
+      Mode mode = this.modeRepository.getByMode(curriculumCreateDTO.getMode());
+      Faculty faculty = this.facultyRepository.getByName(curriculumCreateDTO.getFaculty());
+      Set<Subject> subjects = new HashSet<Subject>();
+      for (String subjectDTO : curriculumCreateDTO.getSubjects()) {
+        subjects.add(this.subjectRepository.getByName(subjectDTO));
+      }
+      curriculum.setIsPublic(false).setMode(mode).setSubjects(subjects).setFaculty(faculty);
+
+      this.curriculumRepository.save(curriculum);
+      LOG.info("Curriculum created!");
+      candidate.setCurriculum(curriculum);
+    }
+
+    this.candidateRepository.save(candidate);
+    LOG.info("Candidate saved!");
+  }
+
+  public void checkIfCandidateEmailIsPresent(String candidateEmail) {
+    Arrays.asList("phd", "candidate")
+        .forEach(
+            (user) -> {
+              String statement = ("SELECT EXISTS (SELECT 1 FROM " + user + " WHERE email = $1)");
+              Boolean isEmailFound =
+                  this.databaseModel.selectIfExists(statement, Tuple.of(candidateEmail));
+
+              if (isEmailFound) {
+                LOG.error(
+                    "Candidate email: " + candidateEmail + " already exists for table " + user);
+                throw new BadRequestException("Error, email already exists!");
+              }
+            });
+
+    if (this.ipBlockService.isClientIPBlocked()) {
+      LOG.error("Error, client is ip blocked!");
+      throw new ForbiddenException("Error, client is ip blocked!");
     }
 
     LOG.info(
         "Good, candidate's email dosen't exist in the table neither he is ip blocked. Now"
             + " registering him...");
+  }
 
-    Candidate candidate = this.candidateMapper.toEntity(candidateDTO);
+  @Override
+  public void sendCandidateApplyEmails(String candidateEmail) {
+    LOG.info("Now sending email for the doc centers to review the candidate's application...");
 
-    Mode modeFound = this.modeRepository.getByMode(candidateDTO.getMode());
-    candidate.setCurriculum(
-        curriculumRepository.getByNameAndModeId(candidateDTO.getCurriculum(), modeFound.getId()));
+    this.databaseModel
+        .selectMapString(
+            "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
+                + " dc.id) WHERE dc.role = 'manager' OR dc.role = 'admin'",
+            "email")
+        .forEach(
+            email -> {
+              try {
+                this.mailModel.send(
+                    "Кандидат " + candidateEmail,
+                    TEMPLATES.CANDIDATE_APPLY,
+                    email,
+                    Map.of("$CANDIDATE", candidateEmail));
+              } catch (IOException exception) {
+                LOG.error("Error in sending email to the doc centers: " + exception);
+                throw new ServerErrorException("Error in sending email to the doc centers!", 500);
+              }
+            });
 
-    this.candidateRepository.save(candidate);
-    LOG.info("Candidate saved!");
+    LOG.info("Now sending the confirmation email to the candidate...");
+    try {
+      this.mailModel.send(
+          "Вашата кандидатура беше изпратена успешно!",
+          TEMPLATES.CANDIDATE_APPLY_CONFIRMATION,
+          candidateEmail);
+    } catch (IOException exception) {
+      LOG.error("Error in sending email to the candidate: " + exception);
+      throw new ServerErrorException("Error in sending email to the candidate!", 500);
+    }
   }
 
   @Override
