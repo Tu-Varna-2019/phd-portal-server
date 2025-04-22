@@ -1,6 +1,7 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.BlobDataDTO;
+import com.tuvarna.phd.dto.CandidateApplyDTO;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
@@ -69,14 +70,14 @@ public final class CandidateController extends BaseController {
                     schema = @Schema(implementation = BlobDataDTO.class)))
       })
   @Path("/upload")
-  public Response upload(BlobDataDTO file, @RestCookie String candidateName) {
+  public Response upload(BlobDataDTO file, @RestCookie String candidate) {
     LOG.info(
         "Received a controller request to upload a file for candidate name: "
-            + candidateName
+            + candidate
             + " with filename: "
             + file.getFilename());
 
-    this.candidateService.uploadBiography(file, candidateName);
+    this.candidateService.uploadBiography(file, candidate);
 
     return send("File uploaded!", file.getFilename(), 201);
   }
@@ -93,48 +94,24 @@ public final class CandidateController extends BaseController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateDTO.class))),
+                    schema = @Schema(implementation = CandidateApplyDTO.class))),
         @APIResponse(
             responseCode = "400",
             description = "Error when registering to phd as a candidate",
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateDTO.class))),
+                    schema = @Schema(implementation = CandidateApplyDTO.class))),
       })
   @Path("/apply")
-  public Response apply(CandidateDTO candidateDTO) {
-    LOG.info("Received a candidate request to apply as email: " + candidateDTO.getEmail());
+  public Response apply(CandidateApplyDTO candidateDTO) {
+    LOG.info("Received a candidate request to apply with application: " + candidateDTO.toString());
 
     this.candidateService.apply(candidateDTO);
+    this.candidateService.sendCandidateApplyEmails(candidateDTO.getEmail());
+
+    LOG.info("Candidate application finished successfully!");
     return send("Candidate application finished successfully!");
-  }
-
-  @POST
-  @Operation(summary = "Create curriculum", description = "Create curriculum")
-  @APIResponses(
-      value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "Curriculum created",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = CurriculumDTO.class))),
-        @APIResponse(
-            responseCode = "400",
-            description = "Error when creating curriculum!",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = CurriculumDTO.class))),
-      })
-  @Path("/curriculum")
-  public Response createCurriculum(CurriculumDTO curriculumDTO) {
-    LOG.info("Received a request to create curriculum with data: " + curriculumDTO.toString());
-
-    this.candidateService.createCurriculum(curriculumDTO);
-    return send("Curriculum with name: " + curriculumDTO.getName() + " is created successfully!");
   }
 
   @GET

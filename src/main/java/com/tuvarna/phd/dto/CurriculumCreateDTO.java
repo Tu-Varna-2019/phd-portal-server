@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "CurriculumDTO", description = "Curriculum DTO")
+@Schema(name = "CurriculumCreateDTO", description = "Curriculum DTO")
 @Data
 @AllArgsConstructor
-public class CurriculumDTO {
+public class CurriculumCreateDTO {
   @NotNull
   @Schema(title = "name", required = true)
   private String name;
@@ -18,10 +18,6 @@ public class CurriculumDTO {
   @NotNull
   @Schema(title = "mode", required = true)
   private String mode;
-
-  @NotNull
-  @Schema(title = "year_period", required = true)
-  private String yearPeriod;
 
   @NotNull
   @Schema(title = "faculty", required = true)

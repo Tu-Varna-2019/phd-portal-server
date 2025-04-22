@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Schema(name = "CandidateDTO", description = "Candidate DTO")
+@Schema(name = "CandidateApplyDTO", description = "Candidate apply DTO")
 @Data
 @AllArgsConstructor
-public class CandidateDTO {
+public class CandidateApplyDTO {
 
   @NotNull
   @Schema(title = "name", required = false)
@@ -43,18 +43,23 @@ public class CandidateDTO {
   private String address;
 
   @NotNull
+  @Schema(title = "biography", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String biography;
+
+  @NotNull
   @Schema(title = "yearAccepted", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Long yearAccepted;
 
   @NotNull
-  @Schema(title = "biography", required = false)
+  @Schema(title = "post_code", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String biography;
+  private Long postCode;
 
   @Nullable
   @Schema(title = "curriculum", required = false)
-  private String curriculum;
+  private CurriculumCreateDTO curriculum;
 
   @NotNull
   @Schema(title = "faculty", required = false)

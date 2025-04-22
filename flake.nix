@@ -53,14 +53,16 @@
           # NOTE: use devenv up to run the service
           services = {
             postgres = {
-              enable = false;
-              initialDatabases.phd.name = {
-                name = "phd";
-                user = "phd";
-                pass = "phd";
-                listen_addresses = "127.0.0.1";
-                port = 5432;
-              };
+              enable = true;
+              listen_addresses = "127.0.0.1";
+              port = 5432;
+              initialDatabases = [
+                {
+                  name = "phd";
+                  user = "phd";
+                  pass = "phd";
+                }
+              ];
             };
             elasticsearch = {
               enable = true;
@@ -80,6 +82,16 @@
             checkmake.enable = true;
           };
 
+          aws-vault = {
+            enable = true;
+            profile = "alien-s3";
+            awscliWrapper.enable = true;
+          };
+          env = {
+            AWS_DEFAULT_PROFILE = "alien-s3";
+            AWS_DEFAULT_REGION = "eu-west-1";
+          };
+
           devenv.root = let
             devenvRootFileContent = builtins.readFile devenv-root.outPath;
           in
@@ -87,6 +99,7 @@
 
           packages = with pkgs; [
             quarkus
+            aws-vault
           ];
         };
       };
