@@ -2,10 +2,11 @@ package com.tuvarna.phd.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuvarna.phd.controller.ControllerResponse;
-import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -17,12 +18,12 @@ import org.jboss.logging.Logger;
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
   @Inject ObjectMapper objectMapper;
-  @Inject private Logger log;
+  @Inject private final Logger LOG = Logger.getLogger(ControllerExceptionMapper.class);
 
   @Override
   public Response toResponse(Exception exception) {
     Response response = mapExceptionToResponse(exception);
-    log.error("Exception: " + exception.getClass() + " with message: " + exception.getMessage());
+    LOG.error("Exception: " + exception.getClass() + " Message: " + exception.getMessage());
 
     return Response.fromResponse(response).type(MediaType.APPLICATION_JSON).build();
   }
@@ -36,12 +37,23 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
       case ForbiddenException e -> {
         yield Response.status(403)
-            .entity(new ControllerResponse("You are not permitted to do this operation"))
+            .entity(
+                new ControllerResponse(
+                    e.getMessage().isEmpty()
+                        ? "You are not permitted to do this operation"
+                        : e.getMessage()))
             .build();
       }
 
       case UnauthorizedException e -> {
-        yield Response.status(401).entity(new ControllerResponse("Unauthorized!")).build();
+        yield Response.status(401)
+            .entity(
+                new ControllerResponse(e.getMessage().isEmpty() ? "Unauthorized!" : e.getMessage()))
+            .build();
+      }
+
+      case BadRequestException e -> {
+        yield Response.status(400).entity(e.getMessage()).build();
       }
 
       default -> {

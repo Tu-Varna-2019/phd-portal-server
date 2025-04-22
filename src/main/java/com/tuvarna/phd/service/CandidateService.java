@@ -27,4 +27,6 @@ public sealed interface CandidateService permits CandidateServiceImpl {
   List<CandidateDTO> getCandidatesInReview();
 
   void uploadBiography(BlobDataDTO file, String candidateName);
+
+  void sendCandidateApplyEmails(String candidateEmail);
 }

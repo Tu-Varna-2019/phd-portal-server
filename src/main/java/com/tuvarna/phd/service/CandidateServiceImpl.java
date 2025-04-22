@@ -32,7 +32,8 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.ServerErrorException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,10 +82,9 @@ public final class CandidateServiceImpl implements CandidateService {
             .setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
 
     this.registerCandidate(candidate, candidateDTO.getCurriculum());
-    this.sendCandidateApplyEmails(candidateDTO.getEmail());
   }
 
-  private void registerCandidate(Candidate candidate, CurriculumCreateDTO curriculumCreateDTO) {
+  public void registerCandidate(Candidate candidate, CurriculumCreateDTO curriculumCreateDTO) {
     try {
       Curriculum curriculum = this.curriculumRepository.getByName(curriculumCreateDTO.getName());
       candidate.setCurriculum(curriculum);
@@ -93,14 +93,14 @@ public final class CandidateServiceImpl implements CandidateService {
       Curriculum curriculum = this.curriculumMapper.toEntity(curriculumCreateDTO);
 
       Mode mode = this.modeRepository.getByMode(curriculumCreateDTO.getMode());
+      Faculty faculty = this.facultyRepository.getByName(curriculumCreateDTO.getFaculty());
       Set<Subject> subjects = new HashSet<Subject>();
       for (String subjectDTO : curriculumCreateDTO.getSubjects()) {
         subjects.add(this.subjectRepository.getByName(subjectDTO));
       }
+      curriculum.setIsPublic(false).setMode(mode).setSubjects(subjects).setFaculty(faculty);
 
-      curriculum.setIsPublic(false).setMode(mode).setSubjects(subjects);
       this.curriculumRepository.save(curriculum);
-
       LOG.info("Curriculum created!");
       candidate.setCurriculum(curriculum);
     }
@@ -109,7 +109,7 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Candidate saved!");
   }
 
-  private void checkIfCandidateEmailIsPresent(String candidateEmail) {
+  public void checkIfCandidateEmailIsPresent(String candidateEmail) {
     Arrays.asList("phd", "candidate")
         .forEach(
             (user) -> {
@@ -120,13 +120,13 @@ public final class CandidateServiceImpl implements CandidateService {
               if (isEmailFound) {
                 LOG.error(
                     "Candidate email: " + candidateEmail + " already exists for table " + user);
-                throw new ClientErrorException("Error, email already exists!", 400);
+                throw new BadRequestException("Error, email already exists!");
               }
             });
 
     if (this.ipBlockService.isClientIPBlocked()) {
       LOG.error("Error, client is ip blocked!");
-      throw new ClientErrorException("Error, client is ip blocked!", 400);
+      throw new ForbiddenException("Error, client is ip blocked!");
     }
 
     LOG.info(
@@ -134,7 +134,8 @@ public final class CandidateServiceImpl implements CandidateService {
             + " registering him...");
   }
 
-  private void sendCandidateApplyEmails(String candidateEmail) {
+  @Override
+  public void sendCandidateApplyEmails(String candidateEmail) {
     LOG.info("Now sending email for the doc centers to review the candidate's application...");
 
     this.databaseModel

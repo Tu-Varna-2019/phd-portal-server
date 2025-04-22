@@ -108,6 +108,9 @@ public final class CandidateController extends BaseController {
     LOG.info("Received a candidate request to apply with application: " + candidateDTO.toString());
 
     this.candidateService.apply(candidateDTO);
+    this.candidateService.sendCandidateApplyEmails(candidateDTO.getEmail());
+
+    LOG.info("Candidate application finished successfully!");
     return send("Candidate application finished successfully!");
   }
 
