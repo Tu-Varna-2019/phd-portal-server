@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 
     // SQL
-    implementation 'io.quarkus:quarkus-reactive-pg-client:3.21.3'
+    implementation 'io.quarkus:quarkus-reactive-pg-client:3.22.0'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
 
     // Caching
