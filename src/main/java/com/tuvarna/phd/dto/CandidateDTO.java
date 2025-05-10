@@ -43,6 +43,11 @@ public class CandidateDTO {
   private String address;
 
   @NotNull
+  @Schema(title = "post_code", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String postCode;
+
+  @NotNull
   @Schema(title = "yearAccepted", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Long yearAccepted;
@@ -54,6 +59,7 @@ public class CandidateDTO {
 
   @Nullable
   @Schema(title = "curriculum", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String curriculum;
 
   @NotNull

@@ -127,14 +127,19 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     fieldsList.replaceAll(
         (field) -> {
           String fieldStripped = field.strip();
-          if (fieldStripped.equals("status")) return "s." + fieldStripped + " AS statusname ";
-          else return "c." + fieldStripped + " ";
+          return switch (fieldStripped) {
+            case "status" -> "s." + fieldStripped + " AS statusname ";
+            case "faculty" -> "f.name AS facultyname ";
+            case "curriculum" -> "cu.name AS curriculumname ";
+            default -> "c." + fieldStripped + " ";
+          };
         });
 
     String statement =
         "SELECT "
             + String.join(",", fieldsList)
-            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id)";
+            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id) JOIN faculty f ON"
+            + " (c.faculty=f.id) JOIN curriculum cu ON (c.curriculum=cu.id)";
 
     List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
