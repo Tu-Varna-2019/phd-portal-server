@@ -31,6 +31,7 @@ public interface CandidateMapper {
 
   @Mapping(target = "faculty", source = "facultyName")
   @Mapping(target = "status", source = "statusName")
+  @Mapping(target = "curriculum", source = "curriculumName")
   CandidateDTO toDto(Candidate candidate);
 
   @Nullable

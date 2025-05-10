@@ -236,7 +236,7 @@ public final class CandidateController extends BaseController {
     LOG.info("Received a request to retrieve all candidates that are currently in review");
     List<CandidateDTO> candidateDTOs = this.candidateService.getCandidatesInReview();
 
-    return send("Accepted phd candidates retrieved!", candidateDTOs);
+    return send("Candidates in review retrieved!", candidateDTOs);
   }
 
   @GET
