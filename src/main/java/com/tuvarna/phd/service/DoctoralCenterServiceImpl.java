@@ -128,7 +128,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         (field) -> {
           String fieldStripped = field.strip();
           return switch (fieldStripped) {
-            case "status" -> "s." + fieldStripped + " AS statusname ";
+            case "status" -> "s.status AS statusname ";
             case "faculty" -> "f.name AS facultyname ";
             case "curriculum" -> "cu.name AS curriculumname ";
             default -> "c." + fieldStripped + " ";
