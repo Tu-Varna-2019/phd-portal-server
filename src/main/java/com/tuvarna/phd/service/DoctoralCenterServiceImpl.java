@@ -1,7 +1,6 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
@@ -22,7 +21,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
-import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -58,15 +56,12 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
-  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
-  public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
-    LOG.info(
-        "Service received a request to update status for candidate: "
-            + candidateStatusDTO.toString());
-    Candidate candidate = this.candidateRepository.getByEmail(candidateStatusDTO.getEmail());
+  public void finalReview(String email, String status) throws IOException {
+    LOG.info("Service received a request to update status for candidate: " + email);
+    Candidate candidate = this.candidateRepository.getByEmail(email);
 
-    switch (candidateStatusDTO.getStatus()) {
+    switch (status) {
       case "approved" -> {
         candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
 
@@ -76,7 +71,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         this.mailModel.send(
             "Вашата кандидатура е одобрена!",
             TEMPLATES.ACCEPTED,
-            candidateStatusDTO.getEmail(),
+            email,
             Map.of("$APP_URL", clientBaseURL));
 
         LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
@@ -89,13 +84,71 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
                 "email");
 
         adminEmails.forEach(
-            email -> {
+            adminEmail -> {
               try {
                 this.mailModel.send(
-                    "Заявка за създаване на докторант " + candidateStatusDTO.getEmail(),
+                    "Заявка за създаване на докторант " + email,
                     TEMPLATES.CREATE_USER,
+                    adminEmail,
+                    Map.of("$PHD_USER", email));
+              } catch (IOException exception) {
+                LOG.error("Error in sending email to the admins: " + exception);
+                throw new HttpException("Error in sending email to the admins!");
+              }
+            });
+      }
+
+      case "rejected" -> {
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
+        this.mailModel.send(
+            "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
+      }
+
+      default ->
+          throw new HttpException(
+              "Status is invalid: " + status + " .Valid statuses are: accepted, rejected");
+    }
+  }
+
+  @Override
+  @Transactional
+  public void review(String email, String status) throws IOException {
+    LOG.info(
+        "Service received a request to update status for candidate: "
+            + email
+            + " in order for the first draft of exams...");
+    Candidate candidate = this.candidateRepository.getByEmail(email);
+
+    switch (status) {
+      case "approved" -> {
+        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
+
+        LOG.info(
+            "Candidate arroved! Now sending email to the candidate personal email about it...");
+
+        this.mailModel.send(
+            "Вашата кандидатура е одобрена за изпит!",
+            TEMPLATES.EXAM_CANDIDATE,
+            email,
+            Map.of("$APP_URL", clientBaseURL));
+
+        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
+
+        List<String> docEmails =
+            this.databaseModel.selectMapString(
+                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
+                    + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
+                Tuple.of("expert", "manager"),
+                "email");
+
+        docEmails.forEach(
+            docEmail -> {
+              try {
+                this.mailModel.send(
+                    "Известие за кандидат е приет за изпит: " + email,
+                    TEMPLATES.NOTIFY_EXAM_CANDIDATE,
                     email,
-                    Map.of("$PHD_USER", candidateStatusDTO.getEmail()));
+                    Map.of("$CANDIDATE", email));
               } catch (IOException exception) {
                 LOG.error("Error in sending email to the admins: " + exception);
                 throw new HttpException("Error in sending email to the admins!");
@@ -107,15 +160,11 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
 
         this.mailModel.send(
-            "Вашата докторантска кандидатура в Ту-Варна",
-            TEMPLATES.REJECTED,
-            candidateStatusDTO.getEmail());
+            "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
       }
       default ->
           throw new HttpException(
-              "Status is invalid: "
-                  + candidateStatusDTO.getStatus()
-                  + " .Valid statuses are: accepted, declined");
+              "Status is invalid: " + status + " .Valid statuses are: accepted, rejected");
     }
   }
 

@@ -1,7 +1,6 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Unauthorized;
 import java.io.IOException;
@@ -9,7 +8,9 @@ import java.util.List;
 
 public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
 
-  void review(CandidateStatusDTO candidateStatusDTO) throws IOException;
+  void review(String email, String status) throws IOException;
+
+  void finalReview(String email, String status) throws IOException;
 
   List<String> getDoctoralCenterRoles();
 

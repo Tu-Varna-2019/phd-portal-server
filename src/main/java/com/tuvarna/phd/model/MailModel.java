@@ -18,6 +18,8 @@ public class MailModel {
     ACCEPTED("phd_accepted.html"),
     REJECTED("phd_rejected.html"),
     CREATE_USER("create_new_phd_user.html"),
+    EXAM_CANDIDATE("exam_candidate.html"),
+    NOTIFY_EXAM_CANDIDATE("notify_exam_candidate.html"),
     CANDIDATE_APPLY("candidate_apply.html"),
     CANDIDATE_APPLY_CONFIRMATION("candidate_apply_confirmation.html");
 
