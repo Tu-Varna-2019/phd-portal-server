@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.util.Arrays;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -90,5 +91,21 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
   public Curriculum toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Curriculum.class);
+  }
+
+  @Override
+  public String toString() {
+    return "Id: "
+        + this.id
+        + " Name: "
+        + this.name
+        + " Mode: "
+        + this.mode.getMode()
+        + " isPublic: "
+        + this.isPublic
+        + " Faculty: "
+        + this.faculty
+        + " Subjects: "
+        + Arrays.toString(this.subjects.toArray());
   }
 }

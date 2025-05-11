@@ -215,12 +215,14 @@ public final class CandidateServiceImpl implements CandidateService {
   public List<CurriculumDTO> getCurriculums() {
     LOG.info("Received a service request to retrieve all curriculums");
     List<Curriculum> curriculums = this.curriculumRepository.getAll();
+    curriculums.stream().filter((curriculum) -> curriculum.getIsPublic().equals(true));
+
     List<CurriculumDTO> curriculumDTOs = new ArrayList<>();
 
     curriculums.forEach(
         (curriculum) -> curriculumDTOs.add(this.curriculumMapper.toDto(curriculum)));
 
-    LOG.info("All curriculums retrieved!");
+    LOG.info("All curriculums retrieved: " + curriculums.toString());
     return curriculumDTOs;
   }
 
