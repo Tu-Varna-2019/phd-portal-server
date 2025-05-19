@@ -8,9 +8,7 @@ import java.util.List;
 
 public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl {
 
-  void review(String email, String status) throws IOException;
-
-  void finalReview(String email, String status) throws IOException;
+  void review(String email, String status, Integer examStep) throws IOException;
 
   List<String> getDoctoralCenterRoles();
 

@@ -70,46 +70,18 @@ public final class DoctoralCenterController extends BaseController {
             description = "Error when approving/rejecting candidate",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/candidate/{email}/application/{status}")
-  public Response review(@PathParam("email") String email, @PathParam("status") String status) {
+  @Path("/candidate/{email}/application/{status}/exam-step/{exam_step}")
+  public Response review(
+      @PathParam("email") String email,
+      @PathParam("status") String status,
+      @PathParam("exam_step") String examStep) {
     this.candidateValidator.validateStatusExists(status);
+    this.candidateValidator.validateExamStep(examStep);
 
     LOG.info("Received a request to " + status + " candidate: " + email);
 
     try {
       this.doctoralCenterService.review(email, status);
-    } catch (IOException exception) {
-      LOG.error("Error in reading mail template: " + exception);
-      throw new HttpException("Error in sending email. Please try again later!");
-    }
-
-    return send("Candidate's applicaton is changed to: " + status);
-  }
-
-  @POST
-  @Operation(
-      summary = "Candidate final exam evaluation",
-      description = "Approve or reject candidate final exams")
-  @APIResponses(
-      value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "Candidate approved to Phd!",
-            content = @Content(mediaType = "application/json")),
-        @APIResponse(
-            responseCode = "400",
-            description = "Error when approving/rejecting candidate application to Phd!",
-            content = @Content(mediaType = "application/json")),
-      })
-  @Path("/candidate/{email}/application/final/{status}")
-  public Response finalReview(
-      @PathParam("email") String email, @PathParam("status") String status) {
-    this.candidateValidator.validateStatusExists(status);
-
-    LOG.info("Received a request to " + status + " candidate: " + email);
-
-    try {
-      this.doctoralCenterService.finalReview(email, status);
     } catch (IOException exception) {
       LOG.error("Error in reading mail template: " + exception);
       throw new HttpException("Error in sending email. Please try again later!");

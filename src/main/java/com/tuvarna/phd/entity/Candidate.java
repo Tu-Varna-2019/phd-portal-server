@@ -77,6 +77,10 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "status", nullable = false)
   private CandidateStatus status;
 
+  @Column(name = "exam_step", nullable = false, unique = false, length = 1)
+  @JsonProperty("exam_step")
+  private Integer examStep;
+
   @Column(name = "year_accepted", nullable = true, unique = false)
   @JsonProperty("yearaccepted")
   private Long yearAccepted;

@@ -17,6 +17,7 @@ import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
+import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
@@ -44,6 +45,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
+  @Inject GradeRepository gradeRepository;
   @Inject UnauthorizedRepository uRepository;
 
   @Inject CandidateMapper candidateMapper;
@@ -57,114 +59,106 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void finalReview(String email, String status) throws IOException {
-    LOG.info("Service received a request to update status for candidate: " + email);
-    Candidate candidate = this.candidateRepository.getByEmail(email);
+  public void review(String email, String status, Integer examStep) throws IOException {
+    String candidateEmailTitle, docCenterEmailTitle = "";
+    TEMPLATES candidateEmailTemplate, docCenterEmailTemplate = null;
 
-    switch (status) {
-      case "approved" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
-
-        LOG.info(
-            "Candidate arroved! Now sending email to the candidate personal email about it...");
-
-        this.mailModel.send(
-            "Вашата кандидатура е одобрена!",
-            TEMPLATES.ACCEPTED,
-            email,
-            Map.of("$APP_URL", clientBaseURL));
-
-        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
-
-        List<String> adminEmails =
-            this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
-                    + " dc.id) WHERE dc.role = $1",
-                Tuple.of("admin"),
-                "email");
-
-        adminEmails.forEach(
-            adminEmail -> {
-              try {
-                this.mailModel.send(
-                    "Заявка за създаване на докторант " + email,
-                    TEMPLATES.CREATE_USER,
-                    adminEmail,
-                    Map.of("$PHD_USER", email));
-              } catch (IOException exception) {
-                LOG.error("Error in sending email to the admins: " + exception);
-                throw new HttpException("Error in sending email to the admins!");
-              }
-            });
-      }
-
-      case "rejected" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
-        this.mailModel.send(
-            "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
-      }
-
-      default ->
-          throw new HttpException(
-              "Status is invalid: " + status + " .Valid statuses are: accepted, rejected");
-    }
-  }
-
-  @Override
-  @Transactional
-  public void review(String email, String status) throws IOException {
     LOG.info(
-        "Service received a request to update status for candidate: "
-            + email
-            + " in order for the first draft of exams...");
+        "Service received a request to review candidate: " + email + "for exam step: " + examStep);
+
     Candidate candidate = this.candidateRepository.getByEmail(email);
+    candidate.setStatus(this.candidateStatusRepository.getByStatus(status));
+    candidate.setExamStep(candidate.getExamStep() + 1);
 
-    switch (status) {
-      case "approved" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
+    Tuple docRoles = examStep == 3 ? Tuple.of("admin", " ") : Tuple.of("expert", "manager");
+    List<String> docEmails =
+        this.databaseModel.selectMapString(
+            "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
+                + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
+            docRoles,
+            "email");
 
-        LOG.info(
-            "Candidate arroved! Now sending email to the candidate personal email about it...");
+    switch (examStep) {
+      case 1 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to the first draft of exams! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        this.mailModel.send(
-            "Вашата кандидатура е одобрена за изпит!",
-            TEMPLATES.EXAM_CANDIDATE,
-            email,
-            Map.of("$APP_URL", clientBaseURL));
+            candidateEmailTitle = "Вашата кандидатура е одобрена за изпит 1!";
+            candidateEmailTemplate = TEMPLATES.FIRST_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Известие за кандидат е приет за изпит: " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE;
+          }
 
-        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
+      }
+      case 2 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to the second draft of exams! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        List<String> docEmails =
-            this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
-                    + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
-                Tuple.of("expert", "manager"),
-                "email");
+            candidateEmailTitle = "Вие минахте успешно първият изпит";
+            candidateEmailTemplate = TEMPLATES.SECOND_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Известие за кандидат приет за втори изпит: " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE;
+          }
 
-        docEmails.forEach(
-            docEmail -> {
-              try {
-                this.mailModel.send(
-                    "Известие за кандидат е приет за изпит: " + email,
-                    TEMPLATES.NOTIFY_EXAM_CANDIDATE,
-                    email,
-                    Map.of("$CANDIDATE", email));
-              } catch (IOException exception) {
-                LOG.error("Error in sending email to the admins: " + exception);
-                throw new HttpException("Error in sending email to the admins!");
-              }
-            });
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
       }
 
-      case "rejected" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
+      case 3 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to become phd! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        this.mailModel.send(
-            "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
+            candidateEmailTitle = "Вие минахте успешно изпитите";
+            candidateEmailTemplate = TEMPLATES.THIRD_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Заявка за създаване на докторант " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE;
+          }
+
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
       }
-      default ->
-          throw new HttpException(
-              "Status is invalid: " + status + " .Valid statuses are: accepted, rejected");
+    }
+
+    if (status.equals("approved")) {
+      this.mailModel.send(
+          candidateEmailTitle, candidateEmailTemplate, email, Map.of("$APP_URL", clientBaseURL));
+
+      LOG.info(
+          "Now sending email for the doc center personnel to let the candidate into the"
+              + " mandatory exams...");
+
+      docEmails.forEach(
+          docEmail -> {
+            try {
+              this.mailModel.send(
+                  docCenterEmailTitle, docCenterEmailTemplate, email, Map.of("$CANDIDATE", email));
+            } catch (IOException exception) {
+              LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+              throw new HttpException("Error in sending email to the doc center pesonnel!");
+            }
+          });
+    } else if (status.equals("rejected")) {
+      this.mailModel.send("Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
     }
   }
 
