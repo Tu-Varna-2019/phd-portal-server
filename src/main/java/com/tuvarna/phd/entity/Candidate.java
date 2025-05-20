@@ -45,6 +45,10 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String facultyName;
 
   @Transient
+  @JsonProperty("curriculumname")
+  private String curriculumName;
+
+  @Transient
   @JsonProperty("statusname")
   private String statusName;
 
@@ -61,6 +65,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String address;
 
   @Column(name = "post_code", nullable = false, unique = false)
+  @JsonProperty("post_code")
   private String postCode;
 
   @Column(nullable = false, unique = false)
@@ -71,6 +76,10 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status", nullable = false)
   private CandidateStatus status;
+
+  @Column(name = "exam_step", nullable = false, unique = false, length = 1)
+  @JsonProperty("exam_step")
+  private Integer examStep;
 
   @Column(name = "year_accepted", nullable = true, unique = false)
   @JsonProperty("yearaccepted")

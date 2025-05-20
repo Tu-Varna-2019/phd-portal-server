@@ -4,7 +4,6 @@ import com.tuvarna.phd.dto.LogDTO;
 import com.tuvarna.phd.dto.UserPrincipalDTO;
 import com.tuvarna.phd.dto.sendLogDTO;
 import com.tuvarna.phd.mapper.LogMapper;
-import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.service.LogService;
 import com.tuvarna.phd.validator.LogValidator;
 import jakarta.enterprise.context.RequestScoped;
@@ -41,8 +40,8 @@ import org.jboss.resteasy.reactive.RestCookie;
     scheme = "bearer")
 public final class LogController extends BaseController {
 
-  @Inject  LogService logService;
-  @Inject  LogValidator logValidator;
+  @Inject LogService logService;
+  @Inject LogValidator logValidator;
   @Inject private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;

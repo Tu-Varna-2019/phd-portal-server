@@ -22,7 +22,6 @@ public class NotificationValidator {
   public void validateScopesExists(NotificationDTO notificationDTO) throws HttpException {
     try {
       VALID_SCOPES scope = VALID_SCOPES.valueOf(notificationDTO.getScope());
-      System.out.println(notificationDTO.toString());
 
       if (scope.equals(VALID_SCOPES.single) && notificationDTO.getRecipients() == null)
         throw new HttpException("Single scope cannot be with emty recipients!");

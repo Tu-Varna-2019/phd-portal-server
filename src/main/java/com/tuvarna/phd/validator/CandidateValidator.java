@@ -19,4 +19,10 @@ public class CandidateValidator {
     }
     ;
   }
+
+  public void validateExamStep(Integer examStep) {
+    if (examStep < 1 && examStep > 3)
+      throw new HttpException("Exam step: " + examStep + " is invalid! Valid steps are 1-3");
+  }
+  ;
 }

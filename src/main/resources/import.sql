@@ -83,7 +83,7 @@ INSERT INTO "candidate_status" ("id", "status")
     ),
     (
       nextval('candidatestatus_id_seq'),
-      'accepted'
+      'approved'
     ),
     (
       nextval('candidatestatus_id_seq'),
@@ -166,7 +166,7 @@ INSERT INTO "curriculum" ("id", "name","is_public", "mode", "faculty")
     );
 
 -- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "post_code", "biography", "pin", "year_accepted", "status", "curriculum", "faculty")
+INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "post_code", "biography", "pin", "year_accepted", "status","exam_step", "curriculum", "faculty")
   VALUES
     (
       nextval('candidate_id_seq'),
@@ -180,6 +180,7 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "p
       '1111111111',
       2025,
       (SELECT cs.id FROM "candidate_status" cs WHERE status = 'waiting'),
+      1,
       (SELECT c.id FROM "curriculum" c JOIN mode m ON (c.mode=m.id) WHERE c.name = 'Automated information processing and management systems' AND m.mode = 'regular' ),
       (SELECT f.id FROM "faculty" f WHERE name = 'Software engineering')
     );

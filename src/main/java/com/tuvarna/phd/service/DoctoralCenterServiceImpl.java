@@ -1,7 +1,6 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
@@ -18,11 +17,11 @@ import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
+import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
-import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -46,6 +45,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
+  @Inject GradeRepository gradeRepository;
   @Inject UnauthorizedRepository uRepository;
 
   @Inject CandidateMapper candidateMapper;
@@ -58,64 +58,107 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
-  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
-  public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
+  public void review(String email, String status, Integer examStep) throws IOException {
+    String candidateEmailTitle, docCenterEmailTitle = "";
+    TEMPLATES candidateEmailTemplate, docCenterEmailTemplate = null;
+
     LOG.info(
-        "Service received a request to update status for candidate: "
-            + candidateStatusDTO.toString());
-    Candidate candidate = this.candidateRepository.getByEmail(candidateStatusDTO.getEmail());
+        "Service received a request to review candidate: " + email + "for exam step: " + examStep);
 
-    switch (candidateStatusDTO.getStatus()) {
-      case "approved" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
+    Candidate candidate = this.candidateRepository.getByEmail(email);
+    candidate.setStatus(this.candidateStatusRepository.getByStatus(status));
+    candidate.setExamStep(candidate.getExamStep() + 1);
 
-        LOG.info(
-            "Candidate arroved! Now sending email to the candidate personal email about it...");
+    Tuple docRoles = examStep == 3 ? Tuple.of("admin", " ") : Tuple.of("expert", "manager");
+    List<String> docEmails =
+        this.databaseModel.selectMapString(
+            "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
+                + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
+            docRoles,
+            "email");
 
-        this.mailModel.send(
-            "Вашата кандидатура е одобрена!",
-            TEMPLATES.ACCEPTED,
-            candidateStatusDTO.getEmail(),
-            Map.of("$APP_URL", clientBaseURL));
+    switch (examStep) {
+      case 1 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to the first draft of exams! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
+            candidateEmailTitle = "Вашата кандидатура е одобрена за изпит 1!";
+            candidateEmailTemplate = TEMPLATES.FIRST_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Известие за кандидат е приет за изпит: " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE;
+          }
 
-        List<String> adminEmails =
-            this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
-                    + " dc.id) WHERE dc.role = $1",
-                Tuple.of("admin"),
-                "email");
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
+      }
+      case 2 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to the second draft of exams! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        adminEmails.forEach(
-            email -> {
-              try {
-                this.mailModel.send(
-                    "Заявка за създаване на докторант " + candidateStatusDTO.getEmail(),
-                    TEMPLATES.CREATE_USER,
-                    email,
-                    Map.of("$PHD_USER", candidateStatusDTO.getEmail()));
-              } catch (IOException exception) {
-                LOG.error("Error in sending email to the admins: " + exception);
-                throw new HttpException("Error in sending email to the admins!");
-              }
-            });
+            candidateEmailTitle = "Вие минахте успешно първият изпит";
+            candidateEmailTemplate = TEMPLATES.SECOND_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Известие за кандидат приет за втори изпит: " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE;
+          }
+
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
       }
 
-      case "rejected" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
+      case 3 -> {
+        switch (status) {
+          case "approved" -> {
+            LOG.info(
+                "Candidate approved to go to become phd! Now sending email to the"
+                    + " candidate personal email about it...");
 
-        this.mailModel.send(
-            "Вашата докторантска кандидатура в Ту-Варна",
-            TEMPLATES.REJECTED,
-            candidateStatusDTO.getEmail());
+            candidateEmailTitle = "Вие минахте успешно изпитите";
+            candidateEmailTemplate = TEMPLATES.THIRD_EXAM_CANDIDATE;
+            docCenterEmailTitle = "Заявка за създаване на докторант " + email;
+            docCenterEmailTemplate = TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE;
+          }
+
+          case "rejected" -> {
+            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
+            candidateEmailTemplate = TEMPLATES.REJECTED;
+          }
+        }
       }
-      default ->
-          throw new HttpException(
-              "Status is invalid: "
-                  + candidateStatusDTO.getStatus()
-                  + " .Valid statuses are: accepted, declined");
+    }
+
+    if (status.equals("approved")) {
+      this.mailModel.send(
+          candidateEmailTitle, candidateEmailTemplate, email, Map.of("$APP_URL", clientBaseURL));
+
+      LOG.info(
+          "Now sending email for the doc center personnel to let the candidate into the"
+              + " mandatory exams...");
+
+      docEmails.forEach(
+          docEmail -> {
+            try {
+              this.mailModel.send(
+                  docCenterEmailTitle, docCenterEmailTemplate, email, Map.of("$CANDIDATE", email));
+            } catch (IOException exception) {
+              LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+              throw new HttpException("Error in sending email to the doc center pesonnel!");
+            }
+          });
+    } else if (status.equals("rejected")) {
+      this.mailModel.send("Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
     }
   }
 
@@ -127,14 +170,19 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     fieldsList.replaceAll(
         (field) -> {
           String fieldStripped = field.strip();
-          if (fieldStripped.equals("status")) return "s." + fieldStripped + " AS statusname ";
-          else return "c." + fieldStripped + " ";
+          return switch (fieldStripped) {
+            case "status" -> "s.status AS statusname ";
+            case "faculty" -> "f.name AS facultyname ";
+            case "curriculum" -> "cu.name AS curriculumname ";
+            default -> "c." + fieldStripped + " ";
+          };
         });
 
     String statement =
         "SELECT "
             + String.join(",", fieldsList)
-            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id)";
+            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id) JOIN faculty f ON"
+            + " (c.faculty=f.id) JOIN curriculum cu ON (c.curriculum=cu.id)";
 
     List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
