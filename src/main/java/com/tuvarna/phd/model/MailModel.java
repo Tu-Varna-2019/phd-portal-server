@@ -15,6 +15,7 @@ public class MailModel {
   @Inject private ReactiveMailer mailer;
 
   public enum TEMPLATES {
+    ERROR("error.html"),
     REJECTED("candidate_rejected.html"),
     CREATE_USER("create_new_phd_user.html"),
     CANDIDATE_APPLY("candidate_apply.html"),

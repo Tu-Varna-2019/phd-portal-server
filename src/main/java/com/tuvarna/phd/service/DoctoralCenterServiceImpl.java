@@ -9,6 +9,7 @@ import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
@@ -49,6 +50,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject UnauthorizedRepository uRepository;
 
   @Inject CandidateMapper candidateMapper;
+  @Inject PhdMapper phdMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
 
@@ -59,17 +61,83 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public void review(String email, String status, Integer examStep) throws IOException {
-    String candidateEmailTitle, docCenterEmailTitle = "";
-    TEMPLATES candidateEmailTemplate, docCenterEmailTemplate = null;
-
-    LOG.info(
-        "Service received a request to review candidate: " + email + "for exam step: " + examStep);
+  public void review(String email, String status) throws IOException {
+    LOG.info("Service received a request to review candidate: " + email);
 
     Candidate candidate = this.candidateRepository.getByEmail(email);
     candidate.setStatus(this.candidateStatusRepository.getByStatus(status));
     candidate.setExamStep(candidate.getExamStep() + 1);
 
+    switch (candidate.getExamStep()) {
+      case 1 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to go to the first draft of exams! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          candidate.setExamStep(candidate.getExamStep() + 1);
+          this.candidateRepository.save(candidate);
+          sendMailApproved(
+              1,
+              email,
+              "Вашата кандидатура е одобрена за изпит 1!",
+              TEMPLATES.FIRST_EXAM_CANDIDATE,
+              "Известие за кандидат е приет за изпит: " + email,
+              TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE);
+        } else {
+          sendMailRejected(candidate);
+        }
+      }
+      case 2 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to go to the second draft of exams! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          candidate.setExamStep(candidate.getExamStep() + 1);
+          this.candidateRepository.save(candidate);
+          sendMailApproved(
+              1,
+              email,
+              "Вие минахте успешно първият изпит",
+              TEMPLATES.SECOND_EXAM_CANDIDATE,
+              "Известие за кандидат приет за втори изпит: " + email,
+              TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE);
+        } else {
+          sendMailRejected(candidate);
+        }
+      }
+
+      case 3 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to go to become phd! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          sendMailApproved(
+              1,
+              email,
+              "Вие минахте успешно изпитите",
+              TEMPLATES.THIRD_EXAM_CANDIDATE,
+              "Заявка за създаване на докторант " + email,
+              TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE);
+
+          Phd phd = this.phdMapper.toEntity(candidate);
+          this.phdRepository.save(phd);
+        } else {
+          sendMailRejected(candidate);
+        }
+      }
+    }
+  }
+
+  private void sendMailApproved(
+      Integer examStep,
+      String candidateEmail,
+      String candidateTitle,
+      TEMPLATES candidateTemplate,
+      String docTitle,
+      TEMPLATES docTemplate) {
     Tuple docRoles = examStep == 3 ? Tuple.of("admin", " ") : Tuple.of("expert", "manager");
     List<String> docEmails =
         this.databaseModel.selectMapString(
@@ -78,87 +146,39 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
             docRoles,
             "email");
 
-    switch (examStep) {
-      case 1 -> {
-        switch (status) {
-          case "approved" -> {
-            LOG.info(
-                "Candidate approved to go to the first draft of exams! Now sending email to the"
-                    + " candidate personal email about it...");
-
-            candidateEmailTitle = "Вашата кандидатура е одобрена за изпит 1!";
-            candidateEmailTemplate = TEMPLATES.FIRST_EXAM_CANDIDATE;
-            docCenterEmailTitle = "Известие за кандидат е приет за изпит: " + email;
-            docCenterEmailTemplate = TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE;
-          }
-
-          case "rejected" -> {
-            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
-            candidateEmailTemplate = TEMPLATES.REJECTED;
-          }
-        }
-      }
-      case 2 -> {
-        switch (status) {
-          case "approved" -> {
-            LOG.info(
-                "Candidate approved to go to the second draft of exams! Now sending email to the"
-                    + " candidate personal email about it...");
-
-            candidateEmailTitle = "Вие минахте успешно първият изпит";
-            candidateEmailTemplate = TEMPLATES.SECOND_EXAM_CANDIDATE;
-            docCenterEmailTitle = "Известие за кандидат приет за втори изпит: " + email;
-            docCenterEmailTemplate = TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE;
-          }
-
-          case "rejected" -> {
-            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
-            candidateEmailTemplate = TEMPLATES.REJECTED;
-          }
-        }
-      }
-
-      case 3 -> {
-        switch (status) {
-          case "approved" -> {
-            LOG.info(
-                "Candidate approved to go to become phd! Now sending email to the"
-                    + " candidate personal email about it...");
-
-            candidateEmailTitle = "Вие минахте успешно изпитите";
-            candidateEmailTemplate = TEMPLATES.THIRD_EXAM_CANDIDATE;
-            docCenterEmailTitle = "Заявка за създаване на докторант " + email;
-            docCenterEmailTemplate = TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE;
-          }
-
-          case "rejected" -> {
-            candidateEmailTitle = "Вашата докторантска кандидатура в Ту-Варна";
-            candidateEmailTemplate = TEMPLATES.REJECTED;
-          }
-        }
-      }
+    try {
+      this.mailModel.send(
+          candidateTitle, candidateTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
+    } catch (IOException exception) {
+      LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+      throw new HttpException("Error in sending email to the candidate!");
     }
 
-    if (status.equals("approved")) {
+    LOG.info(
+        "Now sending email for the doc center personnel to let the candidate into the"
+            + " mandatory exams...");
+
+    docEmails.forEach(
+        docEmail -> {
+          try {
+            this.mailModel.send(
+                docTitle, docTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
+          } catch (IOException exception) {
+            LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+            throw new HttpException("Error in sending email to the doc center pesonnel!");
+          }
+        });
+  }
+
+  private void sendMailRejected(Candidate candidate) {
+    candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
+    this.candidateRepository.save(candidate);
+    try {
       this.mailModel.send(
-          candidateEmailTitle, candidateEmailTemplate, email, Map.of("$APP_URL", clientBaseURL));
-
-      LOG.info(
-          "Now sending email for the doc center personnel to let the candidate into the"
-              + " mandatory exams...");
-
-      docEmails.forEach(
-          docEmail -> {
-            try {
-              this.mailModel.send(
-                  docCenterEmailTitle, docCenterEmailTemplate, email, Map.of("$CANDIDATE", email));
-            } catch (IOException exception) {
-              LOG.error("Error in sending email to the doc center pesonnel: " + exception);
-              throw new HttpException("Error in sending email to the doc center pesonnel!");
-            }
-          });
-    } else if (status.equals("rejected")) {
-      this.mailModel.send("Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, email);
+          "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, candidate.getEmail());
+    } catch (IOException exception) {
+      LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+      throw new HttpException("Error in sending email to the doc center pesonnel!");
     }
   }
 

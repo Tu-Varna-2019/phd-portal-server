@@ -187,7 +187,7 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "p
 
 
 -- NOTE: Phd
-INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
+INSERT INTO "phd" ("id", "oid", "name", "email", "pin","post_code","picture", "status")
   VALUES
     (
        nextval('phd_id_seq'),
@@ -195,6 +195,7 @@ INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
       'ИЛИЯН КИРИЛОВ КОСТОВ СИ_3 1к',
       's23651224@onlineedu.tu-varna.bg',
       '1111111111',
+      '9000',
       '',
       (SELECT id FROM "phd_status" WHERE status = 'enrolled')
     );

@@ -53,7 +53,7 @@
           # NOTE: use devenv up to run the service
           services = {
             postgres = {
-              enable = true;
+              enable = false;
               listen_addresses = "127.0.0.1";
               port = 5432;
               initialDatabases = [

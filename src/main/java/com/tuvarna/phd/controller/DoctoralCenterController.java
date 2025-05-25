@@ -70,13 +70,9 @@ public final class DoctoralCenterController extends BaseController {
             description = "Error when approving/rejecting candidate",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/candidate/{email}/application/{status}/exam-step/{exam_step}")
-  public Response review(
-      @PathParam("email") String email,
-      @PathParam("status") String status,
-      @PathParam("exam_step") String examStep) {
+  @Path("/candidate/{email}/application/{status}")
+  public Response review(@PathParam("email") String email, @PathParam("status") String status) {
     this.candidateValidator.validateStatusExists(status);
-    this.candidateValidator.validateExamStep(examStep);
 
     LOG.info("Received a request to " + status + " candidate: " + email);
 

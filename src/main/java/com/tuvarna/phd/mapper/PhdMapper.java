@@ -1,6 +1,7 @@
 package com.tuvarna.phd.mapper;
 
 import com.tuvarna.phd.dto.PhdDTO;
+import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Phd;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,4 +22,18 @@ public interface PhdMapper {
   @Mapping(target = "pictureBlob", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
   Phd toEntity(PhdDTO pDto);
+
+  default Phd toEntity(Candidate candidate) {
+    return new Phd(
+        "",
+        candidate.getName(),
+        candidate.getEmail(),
+        candidate.getCountry(),
+        candidate.getCity(),
+        candidate.getAddress(),
+        candidate.getPostCode(),
+        candidate.getPin(),
+        candidate.getCurriculum(),
+        candidate.getFaculty());
+  }
 }

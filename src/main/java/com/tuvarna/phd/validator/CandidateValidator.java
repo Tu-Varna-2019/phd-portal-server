@@ -7,6 +7,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class CandidateValidator {
 
   private enum VALID_STASUSES {
+    // NOTE: Will I realaly need approved in the candidateStatus repo, since we'lll already
+    // increment the examPrep to +1 ?
     approved,
     rejected
   }

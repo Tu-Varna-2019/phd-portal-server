@@ -40,18 +40,6 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String name;
 
-  @Transient
-  @JsonProperty("facultyname")
-  private String facultyName;
-
-  @Transient
-  @JsonProperty("curriculumname")
-  private String curriculumName;
-
-  @Transient
-  @JsonProperty("statusname")
-  private String statusName;
-
   @Column(nullable = false, unique = false)
   private String email;
 
@@ -68,10 +56,9 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @JsonProperty("post_code")
   private String postCode;
 
+  // TODO: Do we really need biography for phd ?
   @Column(nullable = false, unique = false)
   private String biography;
-
-  @Transient private String biographyBlob;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status", nullable = false)
@@ -98,6 +85,20 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
+
+  @Transient
+  @JsonProperty("facultyname")
+  private String facultyName;
+
+  @Transient
+  @JsonProperty("curriculumname")
+  private String curriculumName;
+
+  @Transient
+  @JsonProperty("statusname")
+  private String statusName;
+
+  @Transient private String biographyBlob;
 
   public Candidate setFaculty(Faculty faculty) {
     this.faculty = faculty;

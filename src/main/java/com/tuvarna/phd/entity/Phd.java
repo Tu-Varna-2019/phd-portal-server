@@ -57,6 +57,9 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @Column(nullable = true, unique = false)
   private String address;
 
+  @Column(name = "post_code", nullable = false, unique = false)
+  private String postCode;
+
   @Password
   @Column(nullable = false, unique = true, length = 10)
   // TODO: Encrypt this pls
@@ -97,6 +100,30 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
     this.name = name;
     this.email = email;
     this.pin = pin;
+  }
+
+  public Phd(
+      String oid,
+      String name,
+      String email,
+      String country,
+      String city,
+      String address,
+      String postCode,
+      String pin,
+      Curriculum curriculum,
+      Faculty faculty) {
+
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.country = country;
+    this.city = city;
+    this.address = address;
+    this.postCode = postCode;
+    this.pin = pin;
+    this.curriculum = curriculum;
+    this.faculty = faculty;
   }
 
   @Override
