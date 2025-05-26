@@ -63,10 +63,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Transactional
   public void review(String email, String status) throws IOException {
     LOG.info("Service received a request to review candidate: " + email);
-
     Candidate candidate = this.candidateRepository.getByEmail(email);
-    candidate.setStatus(this.candidateStatusRepository.getByStatus(status));
-    candidate.setExamStep(candidate.getExamStep() + 1);
 
     switch (candidate.getExamStep()) {
       case 1 -> {
@@ -77,9 +74,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
           candidate.setExamStep(candidate.getExamStep() + 1);
           this.candidateRepository.save(candidate);
+
           sendMailApproved(
-              1,
-              email,
+              Tuple.of("expert", "manager"),
+              candidate.getEmail(),
               "Вашата кандидатура е одобрена за изпит 1!",
               TEMPLATES.FIRST_EXAM_CANDIDATE,
               "Известие за кандидат е приет за изпит: " + email,
@@ -96,9 +94,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
           candidate.setExamStep(candidate.getExamStep() + 1);
           this.candidateRepository.save(candidate);
+
           sendMailApproved(
-              1,
-              email,
+              Tuple.of("expert", "manager"),
+              candidate.getEmail(),
               "Вие минахте успешно първият изпит",
               TEMPLATES.SECOND_EXAM_CANDIDATE,
               "Известие за кандидат приет за втори изпит: " + email,
@@ -111,11 +110,11 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       case 3 -> {
         if (status.equals("approved")) {
           LOG.info(
-              "Candidate approved to go to become phd! Now sending email to the"
+              "Candidate approved to become phd! Now sending email to the"
                   + " candidate personal email about it...");
 
           sendMailApproved(
-              1,
+              Tuple.of("admin", " "),
               email,
               "Вие минахте успешно изпитите",
               TEMPLATES.THIRD_EXAM_CANDIDATE,
@@ -123,7 +122,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE);
 
           Phd phd = this.phdMapper.toEntity(candidate);
+          phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
           this.phdRepository.save(phd);
+          generateReport(phd);
         } else {
           sendMailRejected(candidate);
         }
@@ -132,25 +133,24 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   private void sendMailApproved(
-      Integer examStep,
+      Tuple notifiedDocRoles,
       String candidateEmail,
       String candidateTitle,
       TEMPLATES candidateTemplate,
       String docTitle,
       TEMPLATES docTemplate) {
-    Tuple docRoles = examStep == 3 ? Tuple.of("admin", " ") : Tuple.of("expert", "manager");
     List<String> docEmails =
         this.databaseModel.selectMapString(
             "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
                 + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
-            docRoles,
+            notifiedDocRoles,
             "email");
 
     try {
       this.mailModel.send(
           candidateTitle, candidateTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
     } catch (IOException exception) {
-      LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+      LOG.error("Error in sending email to the canidate: " + exception);
       throw new HttpException("Error in sending email to the candidate!");
     }
 
@@ -181,6 +181,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       throw new HttpException("Error in sending email to the doc center pesonnel!");
     }
   }
+
+  private void generateReport(Phd phd) {}
 
   @Override
   public List<CandidateDTO> getCandidates(String fields) {
