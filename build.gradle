@@ -18,7 +18,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-smallrye-jwt-build'
 
     // AWS
-    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.5.0'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.7.0'
     implementation 'software.amazon.awssdk:aws-crt-client:2.31.45'
 
     // Elastisearch
