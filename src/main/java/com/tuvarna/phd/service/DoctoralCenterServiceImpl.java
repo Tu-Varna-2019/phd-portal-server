@@ -4,7 +4,9 @@ import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.entity.Phd;
+import com.tuvarna.phd.entity.Report;
 import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
@@ -21,6 +23,7 @@ import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
+import com.tuvarna.phd.repository.ReportRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.cache.CacheResult;
@@ -31,6 +34,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -48,6 +52,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject GradeRepository gradeRepository;
   @Inject UnauthorizedRepository uRepository;
+  @Inject ReportRepository reportRepository;
 
   @Inject CandidateMapper candidateMapper;
   @Inject PhdMapper phdMapper;
@@ -123,7 +128,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
           Phd phd = this.phdMapper.toEntity(candidate);
           phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
-          this.phdRepository.save(phd);
+          this.candidateRepository.deleteById(candidate.getId());
+
           generateReport(phd);
         } else {
           sendMailRejected(candidate);
@@ -182,7 +188,39 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     }
   }
 
-  private void generateReport(Phd phd) {}
+  private void generateReport(Phd phd) {
+    Integer MONTHLY_REPORT_DELAY = 3;
+
+    Date currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
+    phd.setEnrollDate((java.sql.Date) currentDate);
+
+    for (Integer year = 0; year < phd.getCurriculum().getMode().getYearPeriod(); year++) {
+      LOG.info("Now generating the report for year: " + year);
+      for (Integer month = 0; month < MONTHLY_REPORT_DELAY; month++) {
+        currentDate.setMonth(month);
+        // TODO: Verify how to generate the order number
+        // Currently it's unknown to me
+        this.reportRepository.save(
+            new Report(
+                "Индивидуален тримесечен учебен план за подготовка за докоторант",
+                Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
+                currentDate,
+                month + 1));
+        LOG.info("Now generating the report for month: " + month);
+      }
+
+      this.reportRepository.save(
+          new Report(
+              "Индивидуален годишен учебен план за подготовка за докоторант",
+              Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
+              currentDate,
+              4));
+    }
+
+    this.phdRepository.save(phd);
+    LOG.info("Phd report created successfully!");
+  }
 
   @Override
   public List<CandidateDTO> getCandidates(String fields) {

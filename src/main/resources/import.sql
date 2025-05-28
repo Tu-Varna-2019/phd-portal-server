@@ -177,7 +177,7 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "p
       'улица Мир 3',
       '9000',
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
-      '1111111111',
+      '1111111112',
       2025,
       (SELECT cs.id FROM "candidate_status" cs WHERE status = 'waiting'),
       1,
