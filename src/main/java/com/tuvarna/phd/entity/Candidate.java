@@ -12,10 +12,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -99,6 +102,13 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String statusName;
 
   @Transient private String biographyBlob;
+
+  @ManyToMany
+  @JoinTable(
+      name = "candidates_grades",
+      joinColumns = @JoinColumn(name = "candidate_id"),
+      inverseJoinColumns = @JoinColumn(name = "grade_id"))
+  private Set<Grade> grades;
 
   public Candidate setFaculty(Faculty faculty) {
     this.faculty = faculty;

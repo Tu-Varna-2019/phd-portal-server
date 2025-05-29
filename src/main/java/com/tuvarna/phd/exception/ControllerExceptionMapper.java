@@ -18,7 +18,7 @@ import org.jboss.logging.Logger;
 public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
   @Inject ObjectMapper objectMapper;
-  @Inject private final Logger LOG = Logger.getLogger(ControllerExceptionMapper.class);
+  @Inject private Logger LOG = Logger.getLogger(ControllerExceptionMapper.class);
 
   @Override
   public Response toResponse(Exception exception) {

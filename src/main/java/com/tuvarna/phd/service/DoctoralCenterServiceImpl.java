@@ -4,9 +4,11 @@ import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.Report;
+import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
@@ -24,6 +26,7 @@ import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.ReportRepository;
+import com.tuvarna.phd.repository.SubjectRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.cache.CacheResult;
@@ -35,8 +38,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -51,6 +56,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject GradeRepository gradeRepository;
+  @Inject SubjectRepository subjectRepository;
   @Inject UnauthorizedRepository uRepository;
   @Inject ReportRepository reportRepository;
 
@@ -70,6 +76,15 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     LOG.info("Service received a request to review candidate: " + email);
     Candidate candidate = this.candidateRepository.getByEmail(email);
 
+    if (status.equals("approved") && candidate.getStatus().getStatus().equals("rejected")) {
+      LOG.error(
+          "Doctoral center shouldn't be able to change candidate's status to accepted if he's been"
+              + " rejected already!");
+      throw new HttpException(
+          "You are not able to change candidate's status to accepted if he's been"
+              + " rejected already!");
+    }
+
     switch (candidate.getExamStep()) {
       case 1 -> {
         if (status.equals("approved")) {
@@ -77,7 +92,12 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               "Candidate approved to go to the first draft of exams! Now sending email to the"
                   + " candidate personal email about it...");
 
-          candidate.setExamStep(candidate.getExamStep() + 1);
+          candidate.setExamStep(2);
+          Set<Grade> grades =
+              setMandatoryExams(
+                  List.of("English", "Methods of Research and Development of dissertation"));
+
+          candidate.setGrades(grades);
           this.candidateRepository.save(candidate);
 
           sendMailApproved(
@@ -88,6 +108,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               "Известие за кандидат е приет за изпит: " + email,
               TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE);
         } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
           sendMailRejected(candidate);
         }
       }
@@ -97,7 +119,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               "Candidate approved to go to the second draft of exams! Now sending email to the"
                   + " candidate personal email about it...");
 
-          candidate.setExamStep(candidate.getExamStep() + 1);
+          candidate.setExamStep(3);
+          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
+
+          candidate.setGrades(grades);
           this.candidateRepository.save(candidate);
 
           sendMailApproved(
@@ -108,6 +133,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
               "Известие за кандидат приет за втори изпит: " + email,
               TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE);
         } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
           sendMailRejected(candidate);
         }
       }
@@ -132,10 +159,37 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
           generateReport(phd);
         } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
           sendMailRejected(candidate);
         }
       }
     }
+  }
+
+  private Set<Grade> setMandatoryExams(List<String> subjectNames) {
+    Set<Subject> subjects = new HashSet<Subject>();
+    Set<Grade> grades = new HashSet<Grade>();
+
+    subjectNames.forEach(
+        name -> {
+          subjects.add(this.subjectRepository.getByName(name));
+        });
+
+    subjects.forEach(
+        subject -> {
+          Date currentDate = new Date();
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          Grade grade =
+              new Grade(
+                  new java.sql.Date(currentDate.getTime()),
+                  "Задължителен изпит по " + subject.getName(),
+                  subject);
+          grades.add(grade);
+          this.gradeRepository.save(grade);
+        });
+
+    return grades;
   }
 
   private void sendMailApproved(

@@ -11,11 +11,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.sql.Date;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -94,6 +97,13 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "report", nullable = true)
   private Report report;
+
+  @ManyToMany
+  @JoinTable(
+      name = "phd_grades",
+      joinColumns = @JoinColumn(name = "phd_id"),
+      inverseJoinColumns = @JoinColumn(name = "grade_id"))
+  private Set<Grade> grades;
 
   public Phd(String oid, String name, String email, String pin) {
     this.oid = oid;

@@ -41,10 +41,6 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   @Column(nullable = false, unique = true)
   private String name;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "grade", nullable = true)
-  private Grade grade;
-
   @JoinColumn(name = "exam_date", nullable = true)
   private Date examDate;
 

@@ -25,11 +25,15 @@ public interface CurriculumMapper {
   @Mapping(target = "faculty", ignore = true)
   @Mapping(target = "subjects", ignore = true)
   @Mapping(target = "mode", ignore = true)
+  @Mapping(target = "toEntity", ignore = true)
+  @Mapping(target = "isPublic", ignore = true)
   Curriculum toEntity(CurriculumDTO curriculumDTO);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "subjects", ignore = true)
   @Mapping(target = "mode", ignore = true)
+  @Mapping(target = "toEntity", ignore = true)
+  @Mapping(target = "isPublic", ignore = true)
   @Mapping(target = "faculty.name", source = "faculty")
   Curriculum toEntity(CurriculumCreateDTO curriculumDTO);
 

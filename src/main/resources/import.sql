@@ -287,6 +287,10 @@ INSERT INTO "subject" ("id", "name","teacher")
     ),
     (
       12, 'Bioinformatics', 1
+    ),
+    (
+    -- NOTE: Needed for the mandatory exams
+      13, 'Automated information processing and management systems', 2
     );
 
 -- NOTE: Curriculum - Subjects
