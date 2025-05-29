@@ -13,7 +13,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.sql.Date;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,22 +34,33 @@ public class Grade extends PanacheEntityBase implements IEntity<Grade> {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gradeSequence")
   private Long id;
 
-  @Column(nullable = false, unique = false)
+  @Column(nullable = true, unique = false)
   private Double grade;
 
-  @Column(name = "date", nullable = false, unique = false)
-  private Date date;
+  @Column(name = "eval_date", nullable = false, unique = false)
+  private Date evalDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "commision", nullable = true)
+  @JoinColumn(nullable = true)
   private Commission commission;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "phd", nullable = false)
-  private Phd phd;
-
-  @Column(name = "report", nullable = false, unique = false)
+  @Column(nullable = false, unique = false)
   private String report;
+
+  @Column(nullable = true, unique = false)
+  private Set<String> attachments;
+
+  @Transient private Set<String> attachmentsBlob;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(nullable = false)
+  private Subject subject;
+
+  public Grade(Date evalDate, String report, Subject subject) {
+    this.evalDate = evalDate;
+    this.report = report;
+    this.subject = subject;
+  }
 
   @Override
   public Grade toEntity(Row row) {
