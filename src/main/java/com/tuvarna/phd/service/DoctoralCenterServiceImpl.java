@@ -193,28 +193,37 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
     Date currentDate = new Date();
     currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
-    phd.setEnrollDate((java.sql.Date) currentDate);
+    phd.setEnrollDate(new java.sql.Date(currentDate.getTime()));
 
     for (Integer year = 0; year < phd.getCurriculum().getMode().getYearPeriod(); year++) {
       LOG.info("Now generating the report for year: " + year);
-      for (Integer month = 0; month < MONTHLY_REPORT_DELAY; month++) {
-        currentDate.setMonth(month);
+      for (Integer month = 0; month < 9; month += 3) {
         // TODO: Verify how to generate the order number
         // Currently it's unknown to me
+        Date monthDate = new Date();
+        monthDate.setTime(currentDate.getTime());
+        monthDate.setMonth(month + MONTHLY_REPORT_DELAY);
+        monthDate.setYear(currentDate.getYear() + year);
+
         this.reportRepository.save(
             new Report(
                 "Индивидуален тримесечен учебен план за подготовка за докоторант",
                 Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
-                currentDate,
+                monthDate,
                 month + 1));
         LOG.info("Now generating the report for month: " + month);
       }
+
+      Date yearDate = new Date();
+      yearDate.setTime(currentDate.getTime());
+      yearDate.setMonth(11);
+      yearDate.setYear(currentDate.getYear() + year);
 
       this.reportRepository.save(
           new Report(
               "Индивидуален годишен учебен план за подготовка за докоторант",
               Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
-              currentDate,
+              yearDate,
               4));
     }
 
