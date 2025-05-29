@@ -1,15 +1,19 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.Grade;
+import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.entity.Phd;
+import com.tuvarna.phd.entity.Report;
+import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
@@ -18,11 +22,13 @@ import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
+import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
+import com.tuvarna.phd.repository.ReportRepository;
+import com.tuvarna.phd.repository.SubjectRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
-import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -31,8 +37,11 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -46,9 +55,13 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
+  @Inject GradeRepository gradeRepository;
+  @Inject SubjectRepository subjectRepository;
   @Inject UnauthorizedRepository uRepository;
+  @Inject ReportRepository reportRepository;
 
   @Inject CandidateMapper candidateMapper;
+  @Inject PhdMapper phdMapper;
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
 
@@ -58,65 +71,218 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private String clientBaseURL;
 
   @Override
-  @CacheInvalidate(cacheName = "candidate-contest-cache")
   @Transactional
-  public void review(CandidateStatusDTO candidateStatusDTO) throws IOException {
-    LOG.info(
-        "Service received a request to update status for candidate: "
-            + candidateStatusDTO.toString());
-    Candidate candidate = this.candidateRepository.getByEmail(candidateStatusDTO.getEmail());
+  public void review(String email, String status) throws IOException {
+    LOG.info("Service received a request to review candidate: " + email);
+    Candidate candidate = this.candidateRepository.getByEmail(email);
 
-    switch (candidateStatusDTO.getStatus()) {
-      case "approved" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("accepted"));
-
-        LOG.info(
-            "Candidate arroved! Now sending email to the candidate personal email about it...");
-
-        this.mailModel.send(
-            "Вашата кандидатура е одобрена!",
-            TEMPLATES.ACCEPTED,
-            candidateStatusDTO.getEmail(),
-            Map.of("$APP_URL", clientBaseURL));
-
-        LOG.info("Now sending email for the admins to create the phd user to the Azure AD...");
-
-        List<String> adminEmails =
-            this.databaseModel.selectMapString(
-                "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
-                    + " dc.id) WHERE dc.role = $1",
-                Tuple.of("admin"),
-                "email");
-
-        adminEmails.forEach(
-            email -> {
-              try {
-                this.mailModel.send(
-                    "Заявка за създаване на докторант " + candidateStatusDTO.getEmail(),
-                    TEMPLATES.CREATE_USER,
-                    email,
-                    Map.of("$PHD_USER", candidateStatusDTO.getEmail()));
-              } catch (IOException exception) {
-                LOG.error("Error in sending email to the admins: " + exception);
-                throw new HttpException("Error in sending email to the admins!");
-              }
-            });
-      }
-
-      case "rejected" -> {
-        candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
-
-        this.mailModel.send(
-            "Вашата докторантска кандидатура в Ту-Варна",
-            TEMPLATES.REJECTED,
-            candidateStatusDTO.getEmail());
-      }
-      default ->
-          throw new HttpException(
-              "Status is invalid: "
-                  + candidateStatusDTO.getStatus()
-                  + " .Valid statuses are: accepted, declined");
+    if (status.equals("approved") && candidate.getStatus().getStatus().equals("rejected")) {
+      LOG.error(
+          "Doctoral center shouldn't be able to change candidate's status to accepted if he's been"
+              + " rejected already!");
+      throw new HttpException(
+          "You are not able to change candidate's status to accepted if he's been"
+              + " rejected already!");
     }
+
+    switch (candidate.getExamStep()) {
+      case 1 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to go to the first draft of exams! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          candidate.setExamStep(2);
+          Set<Grade> grades =
+              setMandatoryExams(
+                  List.of("English", "Methods of Research and Development of dissertation"));
+
+          candidate.setGrades(grades);
+          this.candidateRepository.save(candidate);
+
+          sendMailApproved(
+              Tuple.of("expert", "manager"),
+              candidate.getEmail(),
+              "Вашата кандидатура е одобрена за изпит 1!",
+              TEMPLATES.FIRST_EXAM_CANDIDATE,
+              "Известие за кандидат е приет за изпит: " + email,
+              TEMPLATES.NOTIFY_FIRST_EXAM_CANDIDATE);
+        } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
+          sendMailRejected(candidate);
+        }
+      }
+      case 2 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to go to the second draft of exams! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          candidate.setExamStep(3);
+          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
+
+          candidate.setGrades(grades);
+          this.candidateRepository.save(candidate);
+
+          sendMailApproved(
+              Tuple.of("expert", "manager"),
+              candidate.getEmail(),
+              "Вие минахте успешно първият изпит",
+              TEMPLATES.SECOND_EXAM_CANDIDATE,
+              "Известие за кандидат приет за втори изпит: " + email,
+              TEMPLATES.NOTIFY_SECOND_EXAM_CANDIDATE);
+        } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
+          sendMailRejected(candidate);
+        }
+      }
+
+      case 3 -> {
+        if (status.equals("approved")) {
+          LOG.info(
+              "Candidate approved to become phd! Now sending email to the"
+                  + " candidate personal email about it...");
+
+          sendMailApproved(
+              Tuple.of("admin", " "),
+              email,
+              "Вие минахте успешно изпитите",
+              TEMPLATES.THIRD_EXAM_CANDIDATE,
+              "Заявка за създаване на докторант " + email,
+              TEMPLATES.NOTIFY_THIRD_EXAM_CANDIDATE);
+
+          Phd phd = this.phdMapper.toEntity(candidate);
+          phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
+          this.candidateRepository.deleteById(candidate.getId());
+
+          generateReport(phd);
+        } else {
+          candidate.setExamStep(1);
+          this.candidateRepository.save(candidate);
+          sendMailRejected(candidate);
+        }
+      }
+    }
+  }
+
+  private Set<Grade> setMandatoryExams(List<String> subjectNames) {
+    Set<Subject> subjects = new HashSet<Subject>();
+    Set<Grade> grades = new HashSet<Grade>();
+
+    subjectNames.forEach(
+        name -> {
+          subjects.add(this.subjectRepository.getByName(name));
+        });
+
+    subjects.forEach(
+        subject -> {
+          Date currentDate = new Date();
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          Grade grade =
+              new Grade(
+                  new java.sql.Date(currentDate.getTime()),
+                  "Задължителен изпит по " + subject.getName(),
+                  subject);
+          grades.add(grade);
+          this.gradeRepository.save(grade);
+        });
+
+    return grades;
+  }
+
+  private void sendMailApproved(
+      Tuple notifiedDocRoles,
+      String candidateEmail,
+      String candidateTitle,
+      TEMPLATES candidateTemplate,
+      String docTitle,
+      TEMPLATES docTemplate) {
+    List<String> docEmails =
+        this.databaseModel.selectMapString(
+            "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
+                + " dc.id) WHERE dc.role = $1 OR dc.role = $2",
+            notifiedDocRoles,
+            "email");
+
+    try {
+      this.mailModel.send(
+          candidateTitle, candidateTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
+    } catch (IOException exception) {
+      LOG.error("Error in sending email to the canidate: " + exception);
+      throw new HttpException("Error in sending email to the candidate!");
+    }
+
+    LOG.info(
+        "Now sending email for the doc center personnel to let the candidate into the"
+            + " mandatory exams...");
+
+    docEmails.forEach(
+        docEmail -> {
+          try {
+            this.mailModel.send(
+                docTitle, docTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
+          } catch (IOException exception) {
+            LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+            throw new HttpException("Error in sending email to the doc center pesonnel!");
+          }
+        });
+  }
+
+  private void sendMailRejected(Candidate candidate) {
+    candidate.setStatus(this.candidateStatusRepository.getByStatus("rejected"));
+    this.candidateRepository.save(candidate);
+    try {
+      this.mailModel.send(
+          "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, candidate.getEmail());
+    } catch (IOException exception) {
+      LOG.error("Error in sending email to the doc center pesonnel: " + exception);
+      throw new HttpException("Error in sending email to the doc center pesonnel!");
+    }
+  }
+
+  private void generateReport(Phd phd) {
+    Integer MONTHLY_REPORT_DELAY = 3;
+
+    Date currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
+    phd.setEnrollDate(new java.sql.Date(currentDate.getTime()));
+
+    for (Integer year = 0; year < phd.getCurriculum().getMode().getYearPeriod(); year++) {
+      LOG.info("Now generating the report for year: " + year);
+      for (Integer month = 0; month < 9; month += 3) {
+        // TODO: Verify how to generate the order number
+        // Currently it's unknown to me
+        Date monthDate = new Date();
+        monthDate.setTime(currentDate.getTime());
+        monthDate.setMonth(month + MONTHLY_REPORT_DELAY);
+        monthDate.setYear(currentDate.getYear() + year);
+
+        this.reportRepository.save(
+            new Report(
+                "Индивидуален тримесечен учебен план за подготовка за докоторант",
+                Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
+                monthDate,
+                month + 1));
+        LOG.info("Now generating the report for month: " + month);
+      }
+
+      Date yearDate = new Date();
+      yearDate.setTime(currentDate.getTime());
+      yearDate.setMonth(11);
+      yearDate.setYear(currentDate.getYear() + year);
+
+      this.reportRepository.save(
+          new Report(
+              "Индивидуален годишен учебен план за подготовка за докоторант",
+              Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
+              yearDate,
+              4));
+    }
+
+    this.phdRepository.save(phd);
+    LOG.info("Phd report created successfully!");
   }
 
   @Override
@@ -127,14 +293,19 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     fieldsList.replaceAll(
         (field) -> {
           String fieldStripped = field.strip();
-          if (fieldStripped.equals("status")) return "s." + fieldStripped + " AS statusname ";
-          else return "c." + fieldStripped + " ";
+          return switch (fieldStripped) {
+            case "status" -> "s.status AS statusname ";
+            case "faculty" -> "f.name AS facultyname ";
+            case "curriculum" -> "cu.name AS curriculumname ";
+            default -> "c." + fieldStripped + " ";
+          };
         });
 
     String statement =
         "SELECT "
             + String.join(",", fieldsList)
-            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id)";
+            + "FROM candidate c JOIN candidate_status s ON (c.status=s.id) JOIN faculty f ON"
+            + " (c.faculty=f.id) JOIN curriculum cu ON (c.curriculum=cu.id)";
 
     List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
     List<CandidateDTO> candidateDTOs = new ArrayList<>();

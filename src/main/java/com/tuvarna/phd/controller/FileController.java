@@ -105,13 +105,11 @@ public final class FileController extends BaseController {
                     schema = @Schema(implementation = BlobDataDTO.class)))
       })
   @Path("/download")
-  public Response download(@RestQuery String type, @RestQuery String filename) {
-    LOG.info("Received a request to download file from type: " + type);
-    String oid = jwt.getClaim("oid");
-    String email = jwt.getClaim("name");
+  public Response download(@RestQuery String key) {
+    LOG.info("Received a request to download object key: " + key);
 
-    String objectKey = oid + "/" + type + "/" + filename;
-    FileBlobDTO fileBlobDTO = this.s3ClientService.download(objectKey);
+    String email = jwt.getClaim("name");
+    FileBlobDTO fileBlobDTO = this.s3ClientService.download(key);
 
     ResponseBuilder response = builder(fileBlobDTO.getData());
     response.header("Content-Disposition", "attachment;filename=" + email);
@@ -119,8 +117,8 @@ public final class FileController extends BaseController {
 
     LOG.info(
         "Downloaded s3 file successfully for filename: "
-            + filename
-            + " . Now sending it back to client...");
+            + email
+            + ". Now sending it back to client...");
 
     return response.build();
   }

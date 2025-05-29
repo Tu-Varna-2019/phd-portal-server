@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,11 @@ import lombok.Setter;
 @Cacheable
 @Table(name = "mode")
 public class Mode extends PanacheEntityBase implements IEntity<Mode> {
+
+  public static Map<String, String> modeBGtoEN =
+      Map.of(
+          "regular", "редовна",
+          "part_time", "задочна");
 
   @Id
   @SequenceGenerator(name = "modeSequence", sequenceName = "mode_id_seq", allocationSize = 1)
