@@ -20,6 +20,12 @@ public interface CandidateMapper {
   @Mapping(target = "biography", ignore = true)
   @Mapping(target = "faculty", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
+  @Mapping(target = "examStep", ignore = true)
+  @Mapping(target = "facultyName", ignore = true)
+  @Mapping(target = "curriculumName", ignore = true)
+  @Mapping(target = "statusName", ignore = true)
+  @Mapping(target = "biographyBlob", ignore = true)
+  @Mapping(target = "grades", ignore = true)
   Candidate toEntity(CandidateDTO candidateDTO);
 
   @Mapping(target = "id", ignore = true)
@@ -27,10 +33,17 @@ public interface CandidateMapper {
   @Mapping(target = "curriculum", ignore = true)
   @Mapping(target = "faculty", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
+  @Mapping(target = "examStep", ignore = true)
+  @Mapping(target = "facultyName", ignore = true)
+  @Mapping(target = "curriculumName", ignore = true)
+  @Mapping(target = "statusName", ignore = true)
+  @Mapping(target = "biographyBlob", ignore = true)
+  @Mapping(target = "grades", ignore = true)
   Candidate toEntity(CandidateApplyDTO candidateDTO);
 
   @Mapping(target = "faculty", source = "facultyName")
   @Mapping(target = "status", source = "statusName")
+  @Mapping(target = "curriculum", source = "curriculumName")
   CandidateDTO toDto(Candidate candidate);
 
   @Nullable

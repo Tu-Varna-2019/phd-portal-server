@@ -1,6 +1,7 @@
 package com.tuvarna.phd.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.Nullable;
 import io.smallrye.common.constraint.NotNull;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,12 @@ public class CandidateDTO {
   private String address;
 
   @NotNull
+  @Schema(title = "post_code", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonProperty("post_code")
+  private String postCode;
+
+  @NotNull
   @Schema(title = "yearAccepted", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Long yearAccepted;
@@ -54,6 +61,7 @@ public class CandidateDTO {
 
   @Nullable
   @Schema(title = "curriculum", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String curriculum;
 
   @NotNull

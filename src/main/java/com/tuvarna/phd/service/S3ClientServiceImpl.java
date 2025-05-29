@@ -66,9 +66,9 @@ public final class S3ClientServiceImpl implements S3ClientService {
   }
 
   @Override
-  public FileBlobDTO download(String objectName) {
-    LOG.info("Received a service request to download an s3 file path: " + objectName);
-    FileBlobDTO fileBlobDTO = this.s3Model.getBlob(objectName);
+  public FileBlobDTO download(String key) {
+    LOG.info("Received a service request to download an s3 file path: " + key);
+    FileBlobDTO fileBlobDTO = this.s3Model.getBlob(key);
     LOG.info("Download success!");
 
     return fileBlobDTO;
