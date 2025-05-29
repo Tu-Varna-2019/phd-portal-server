@@ -8,7 +8,6 @@ import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.NotificationRepository;
-import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -51,9 +50,25 @@ public final class NotificationServiceImpl implements NotificationService {
     String statement =
         switch (group) {
           case "admin" -> {
-            yield "select d.oid from doctoral_center d join doctoral_center_role role on d.id=role.id "
-                + " where role.role=$1";
+            yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
+                      + " (d.id=role.id)  WHERE role.role='admin'";
           }
+
+          case "expert-manager" -> {
+            yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
+                      + " (d.id=role.id) WHERE role.role='expert' OR role.role='manager'";
+          }
+
+          case "expert" -> {
+            yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
+                      + " (d.id=role.id) WHERE role.role='expert'";
+          }
+
+          case "manager" -> {
+            yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
+                      + " (d.id=role.id) WHERE role.role='manager'";
+          }
+
           default -> {
             throw new HttpException(
                 "Notification error: cannot retrieve oids for unknown group: "
@@ -62,7 +77,7 @@ public final class NotificationServiceImpl implements NotificationService {
           }
         };
 
-    return this.databaseModel.selectMapString(statement, Tuple.of(group), "oid");
+    return this.databaseModel.selectMapString(statement, "oid");
   }
 
   @Override

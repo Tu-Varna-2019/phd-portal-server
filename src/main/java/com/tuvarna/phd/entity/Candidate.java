@@ -12,10 +12,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,14 +43,6 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @Column(nullable = false, unique = false)
   private String name;
 
-  @Transient
-  @JsonProperty("facultyname")
-  private String facultyName;
-
-  @Transient
-  @JsonProperty("statusname")
-  private String statusName;
-
   @Column(nullable = false, unique = false)
   private String email;
 
@@ -61,16 +56,20 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   private String address;
 
   @Column(name = "post_code", nullable = false, unique = false)
+  @JsonProperty("post_code")
   private String postCode;
 
+  // TODO: Do we really need biography for phd ?
   @Column(nullable = false, unique = false)
   private String biography;
-
-  @Transient private String biographyBlob;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "status", nullable = false)
   private CandidateStatus status;
+
+  @Column(name = "exam_step", nullable = false, unique = false, length = 1)
+  @JsonProperty("exam_step")
+  private Integer examStep;
 
   @Column(name = "year_accepted", nullable = true, unique = false)
   @JsonProperty("yearaccepted")
@@ -89,6 +88,27 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
+
+  @Transient
+  @JsonProperty("facultyname")
+  private String facultyName;
+
+  @Transient
+  @JsonProperty("curriculumname")
+  private String curriculumName;
+
+  @Transient
+  @JsonProperty("statusname")
+  private String statusName;
+
+  @Transient private String biographyBlob;
+
+  @ManyToMany
+  @JoinTable(
+      name = "candidates_grades",
+      joinColumns = @JoinColumn(name = "candidate_id"),
+      inverseJoinColumns = @JoinColumn(name = "grade_id"))
+  private Set<Grade> grades;
 
   public Candidate setFaculty(Faculty faculty) {
     this.faculty = faculty;

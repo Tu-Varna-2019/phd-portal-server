@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -31,7 +30,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cacheable
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Table(name = "subject")
 public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 
@@ -42,10 +40,6 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 
   @Column(nullable = false, unique = true)
   private String name;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "grade", nullable = true)
-  private Grade grade;
 
   @JoinColumn(name = "exam_date", nullable = true)
   private Date examDate;
@@ -62,5 +56,10 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   public Subject toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Subject.class);
+  }
+
+  @Override
+  public String toString() {
+    return "Name: " + this.name;
   }
 }

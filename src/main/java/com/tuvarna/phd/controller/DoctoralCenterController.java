@@ -1,7 +1,6 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
-import com.tuvarna.phd.dto.CandidateStatusDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
@@ -15,6 +14,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -56,41 +56,34 @@ public final class DoctoralCenterController extends BaseController {
   }
 
   @PATCH
-  @Operation(summary = "Phd's candidate", description = "Approve or reject phd's candidate")
+  @Operation(
+      summary = "Candidate application",
+      description = "Approve or reject candidate for exams")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Phd approved",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateStatusDTO.class))),
+            description = "Candidate approved",
+            content = @Content(mediaType = "application/json")),
         @APIResponse(
             responseCode = "400",
-            description = "Error when approving/rejecting phd's candidate",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = CandidateStatusDTO.class))),
+            description = "Error when approving/rejecting candidate",
+            content = @Content(mediaType = "application/json")),
       })
-  @Path("/candidate/status")
-  public Response updateCandidateStatus(CandidateStatusDTO candidateDTO) {
-    this.candidateValidator.validateStatusExists(candidateDTO.getStatus());
-    LOG.info(
-        "Received a request to change candidate's email: "
-            + candidateDTO.getEmail()
-            + " status to: "
-            + candidateDTO.getStatus());
+  @Path("/candidate/{email}/application/{status}")
+  public Response review(@PathParam("email") String email, @PathParam("status") String status) {
+    this.candidateValidator.validateStatusExists(status);
+
+    LOG.info("Received a request to " + status + " candidate: " + email);
 
     try {
-      this.doctoralCenterService.review(candidateDTO);
+      this.doctoralCenterService.review(email, status);
     } catch (IOException exception) {
       LOG.error("Error in reading mail template: " + exception);
       throw new HttpException("Error in sending email. Please try again later!");
     }
 
-    return send("Candidate status changed to: " + candidateDTO.getStatus());
+    return send("Candidate's applicaton is changed to: " + status);
   }
 
   @GET
