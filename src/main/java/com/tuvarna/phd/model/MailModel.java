@@ -15,11 +15,19 @@ public class MailModel {
   @Inject private ReactiveMailer mailer;
 
   public enum TEMPLATES {
-    ACCEPTED("phd_accepted.html"),
-    REJECTED("phd_rejected.html"),
+    ERROR("error.html"),
+    REJECTED("candidate_rejected.html"),
     CREATE_USER("create_new_phd_user.html"),
     CANDIDATE_APPLY("candidate_apply.html"),
-    CANDIDATE_APPLY_CONFIRMATION("candidate_apply_confirmation.html");
+    CANDIDATE_APPLY_CONFIRMATION("candidate_apply_confirmation.html"),
+
+    FIRST_EXAM_CANDIDATE("first_exam_candidate.html"),
+    SECOND_EXAM_CANDIDATE("second_exam_candidate.html"),
+    THIRD_EXAM_CANDIDATE("first_exam_candidate.html"),
+
+    NOTIFY_FIRST_EXAM_CANDIDATE("notify_first_exam_candidate.html"),
+    NOTIFY_SECOND_EXAM_CANDIDATE("notify_second_exam_candidate.html"),
+    NOTIFY_THIRD_EXAM_CANDIDATE("notify_third_exam_candidate.html");
 
     private String path;
 

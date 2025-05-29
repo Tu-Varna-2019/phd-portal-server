@@ -11,11 +11,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.sql.Date;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,6 +60,9 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @Column(nullable = true, unique = false)
   private String address;
 
+  @Column(name = "post_code", nullable = false, unique = false)
+  private String postCode;
+
   @Password
   @Column(nullable = false, unique = true, length = 10)
   // TODO: Encrypt this pls
@@ -92,11 +98,42 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @JoinColumn(name = "report", nullable = true)
   private Report report;
 
+  @ManyToMany
+  @JoinTable(
+      name = "phd_grades",
+      joinColumns = @JoinColumn(name = "phd_id"),
+      inverseJoinColumns = @JoinColumn(name = "grade_id"))
+  private Set<Grade> grades;
+
   public Phd(String oid, String name, String email, String pin) {
     this.oid = oid;
     this.name = name;
     this.email = email;
     this.pin = pin;
+  }
+
+  public Phd(
+      String oid,
+      String name,
+      String email,
+      String country,
+      String city,
+      String address,
+      String postCode,
+      String pin,
+      Curriculum curriculum,
+      Faculty faculty) {
+
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.country = country;
+    this.city = city;
+    this.address = address;
+    this.postCode = postCode;
+    this.pin = pin;
+    this.curriculum = curriculum;
+    this.faculty = faculty;
   }
 
   @Override

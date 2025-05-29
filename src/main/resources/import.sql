@@ -83,7 +83,7 @@ INSERT INTO "candidate_status" ("id", "status")
     ),
     (
       nextval('candidatestatus_id_seq'),
-      'accepted'
+      'approved'
     ),
     (
       nextval('candidatestatus_id_seq'),
@@ -166,7 +166,7 @@ INSERT INTO "curriculum" ("id", "name","is_public", "mode", "faculty")
     );
 
 -- NOTE: Candidate
-INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "post_code", "biography", "pin", "year_accepted", "status", "curriculum", "faculty")
+INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "post_code", "biography", "pin", "year_accepted", "status","exam_step", "curriculum", "faculty")
   VALUES
     (
       nextval('candidate_id_seq'),
@@ -177,16 +177,17 @@ INSERT INTO "candidate" ("id", "name", "email", "country", "city", "address", "p
       'улица Мир 3',
       '9000',
       'f47b5dccad4bec91c5c8f7dab4145c38056e2a56032c3d9eac0403c31ba0deae',
-      '1111111111',
+      '1111111112',
       2025,
       (SELECT cs.id FROM "candidate_status" cs WHERE status = 'waiting'),
+      1,
       (SELECT c.id FROM "curriculum" c JOIN mode m ON (c.mode=m.id) WHERE c.name = 'Automated information processing and management systems' AND m.mode = 'regular' ),
       (SELECT f.id FROM "faculty" f WHERE name = 'Software engineering')
     );
 
 
 -- NOTE: Phd
-INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
+INSERT INTO "phd" ("id", "oid", "name", "email", "pin","post_code","picture", "status")
   VALUES
     (
        nextval('phd_id_seq'),
@@ -194,6 +195,7 @@ INSERT INTO "phd" ("id", "oid", "name", "email", "pin","picture", "status")
       'ИЛИЯН КИРИЛОВ КОСТОВ СИ_3 1к',
       's23651224@onlineedu.tu-varna.bg',
       '1111111111',
+      '9000',
       '',
       (SELECT id FROM "phd_status" WHERE status = 'enrolled')
     );
@@ -285,6 +287,10 @@ INSERT INTO "subject" ("id", "name","teacher")
     ),
     (
       12, 'Bioinformatics', 1
+    ),
+    (
+    -- NOTE: Needed for the mandatory exams
+      13, 'Automated information processing and management systems', 2
     );
 
 -- NOTE: Curriculum - Subjects
