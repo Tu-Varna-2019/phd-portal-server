@@ -24,6 +24,12 @@ public class CandidateDTO {
   private String email;
 
   @NotNull
+  @Schema(title = "exam_step", required = false)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonProperty("exam_step")
+  private String examStep;
+
+  @NotNull
   @Schema(title = "pin", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String pin;
