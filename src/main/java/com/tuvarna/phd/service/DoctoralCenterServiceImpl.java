@@ -1,6 +1,7 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Commission;
@@ -14,6 +15,7 @@ import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
@@ -63,6 +65,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Inject CandidateMapper candidateMapper;
   @Inject PhdMapper phdMapper;
+  @Inject GradeMapper gradeMapper;
+
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
 
@@ -333,11 +337,18 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public List<Grade> getExams() {
-    LOG.info("Service received to retrieve all exams");
-    List<Grade> grades = this.gradeRepository.getAll();
+  public List<GradeDTO> getExams() {
+    LOG.info("Service received to retrieve all grades");
 
-    return grades;
+    List<GradeDTO> gradeDTOs = new ArrayList<>();
+    this.gradeRepository
+        .getAll()
+        .forEach(
+            grade -> {
+              gradeDTOs.add(this.gradeMapper.toDto(grade));
+            });
+
+    return gradeDTOs;
   }
 
   @Override

@@ -32,6 +32,9 @@ public class Commission extends PanacheEntityBase implements IEntity<Commission>
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commissionSequence")
   private Long id;
 
+  @Column(nullable = false, unique = true)
+  private String name;
+
   @Column(nullable = false, unique = false)
   private ArrayList<Committee> members;
 

@@ -1,9 +1,9 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Commission;
-import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
@@ -212,24 +212,24 @@ public final class DoctoralCenterController extends BaseController {
   }
 
   @GET
-  @Operation(summary = "Get all exams", description = "Get all exams")
+  @Operation(summary = "Get all grades", description = "Get all grades")
   @APIResponses(
       value = {
         @APIResponse(
             responseCode = "200",
-            description = "Exams retrieved",
+            description = "grades retrieved",
             content = @Content(mediaType = "application/json")),
         @APIResponse(
             responseCode = "400",
-            description = "Error when retrieving exams!",
+            description = "Error when retrieving grades!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/exams")
+  @Path("/grades")
   public Response getExams() {
-    LOG.info("Received a controller request to retrieve all exams.");
-    List<Grade> exams = this.doctoralCenterService.getExams();
+    LOG.info("Received a controller request to retrieve all grades.");
+    List<GradeDTO> grades = this.doctoralCenterService.getExams();
 
-    return send("Exams retrieved", exams);
+    return send("grades retrieved", grades);
   }
 
   @GET

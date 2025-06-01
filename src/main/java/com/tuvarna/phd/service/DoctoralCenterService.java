@@ -1,9 +1,9 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Commission;
-import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Unauthorized;
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +20,7 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   List<Unauthorized> getUnauthorizedUsers();
 
-  List<Grade> getExams();
+  List<GradeDTO> getExams();
 
   List<Commission> getCommision();
 }
