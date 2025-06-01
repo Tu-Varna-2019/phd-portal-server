@@ -3,6 +3,7 @@ package com.tuvarna.phd.service;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
+import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Mode;
@@ -245,6 +246,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private void generateReport(Phd phd) {
     Integer MONTHLY_REPORT_DELAY = 3;
 
+    Set<Report> reports = new HashSet<>();
     Date currentDate = new Date();
     currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
     phd.setEnrollDate(new java.sql.Date(currentDate.getTime()));
@@ -259,12 +261,14 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         monthDate.setMonth(month + MONTHLY_REPORT_DELAY);
         monthDate.setYear(currentDate.getYear() + year);
 
-        this.reportRepository.save(
+        Report report =
             new Report(
                 "Индивидуален тримесечен учебен план за подготовка за докоторант",
                 Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
                 monthDate,
-                month + 1));
+                month + 1);
+        this.reportRepository.save(report);
+        reports.add(report);
         LOG.info("Now generating the report for month: " + month);
       }
 
@@ -273,14 +277,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       yearDate.setMonth(11);
       yearDate.setYear(currentDate.getYear() + year);
 
-      this.reportRepository.save(
+      Report report =
           new Report(
               "Индивидуален годишен учебен план за подготовка за докоторант",
               Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
               yearDate,
-              4));
+              4);
+      this.reportRepository.save(report);
+      reports.add(report);
     }
 
+    phd.setReports(reports);
     this.phdRepository.save(phd);
     LOG.info("Phd report created successfully!");
   }
@@ -322,6 +329,22 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
+  }
+
+  @Override
+  @Transactional
+  public List<Grade> getExams() {
+    LOG.info("Service received to retrieve all exams");
+    List<Grade> grades = this.gradeRepository.getAll();
+
+    return grades;
+  }
+
+  @Override
+  @Transactional
+  public List<Commission> getCommision() {
+    LOG.info("Service received to retrieve all commisions");
+    return List.of();
   }
 
   @Override

@@ -94,9 +94,12 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @JoinColumn(name = "faculty", nullable = true)
   private Faculty faculty;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "report", nullable = true)
-  private Report report;
+  @ManyToMany
+  @JoinTable(
+      name = "phd_reports",
+      joinColumns = @JoinColumn(name = "phd_id"),
+      inverseJoinColumns = @JoinColumn(name = "report_id"))
+  private Set<Report> reports;
 
   @ManyToMany
   @JoinTable(

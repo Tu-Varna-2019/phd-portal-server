@@ -2,6 +2,8 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
+import com.tuvarna.phd.entity.Commission;
+import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
@@ -207,5 +209,47 @@ public final class DoctoralCenterController extends BaseController {
     List<String> docCenterRoles = this.doctoralCenterService.getDoctoralCenterRoles();
 
     return send("All doctoral center roles retrieved!", docCenterRoles);
+  }
+
+  @GET
+  @Operation(summary = "Get all exams", description = "Get all exams")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Exams retrieved",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving exams!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/exams")
+  public Response getExams() {
+    LOG.info("Received a controller request to retrieve all exams.");
+    List<Grade> exams = this.doctoralCenterService.getExams();
+
+    return send("Exams retrieved", exams);
+  }
+
+  @GET
+  @Operation(summary = "Get commision", description = "Get commision")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commision retrieved!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving commision!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commision")
+  public Response getCommision() {
+    LOG.info("Received a controller request to retrieve all commisions.");
+    List<Commission> exams = this.doctoralCenterService.getCommision();
+
+    return send("Commision retrieved" + exams);
   }
 }

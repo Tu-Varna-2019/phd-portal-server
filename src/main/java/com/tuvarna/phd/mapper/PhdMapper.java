@@ -18,7 +18,7 @@ public interface PhdMapper {
   @Mapping(target = "curriculum", ignore = true)
   @Mapping(target = "supervisor", ignore = true)
   @Mapping(target = "faculty", ignore = true)
-  @Mapping(target = "report", ignore = true)
+  @Mapping(target = "reports", ignore = true)
   @Mapping(target = "pictureBlob", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
   @Mapping(target = "grades", ignore = true)
