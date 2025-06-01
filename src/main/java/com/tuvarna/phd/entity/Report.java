@@ -27,6 +27,8 @@ import lombok.Setter;
 @Table(name = "report")
 public class Report extends PanacheEntityBase implements IEntity<Report> {
 
+  public static Integer TIME_MONTH_DELAY_CANDIDATE_APPROVAL = 1;
+
   @Id
   @SequenceGenerator(name = "reportSequence", sequenceName = "report_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reportSequence")
@@ -41,11 +43,8 @@ public class Report extends PanacheEntityBase implements IEntity<Report> {
 
   // NOTE: Тримесечен и годишен
   // Автоматично генерирани след като докторанта е одобрен
-  @Column(name = "start_date", nullable = true, unique = false)
-  private Date startDate;
-
-  @Column(name = "end_date", nullable = true, unique = false)
-  private Date endDate;
+  @Column(name = "enrollment_date", nullable = true, unique = false)
+  private Date enrollmentDate;
 
   @Column(name = "order_number", nullable = true, unique = false)
   private Integer orderNumber;
@@ -54,5 +53,12 @@ public class Report extends PanacheEntityBase implements IEntity<Report> {
   public Report toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Report.class);
+  }
+
+  public Report(String name, String conduct, Date enrollmentDate, Integer orderNumber) {
+    this.name = name;
+    this.conduct = conduct;
+    this.enrollmentDate = enrollmentDate;
+    this.orderNumber = orderNumber;
   }
 }
