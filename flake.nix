@@ -92,8 +92,6 @@
           env = {
             AWS_DEFAULT_PROFILE = "tu-varna-phd";
             AWS_DEFAULT_REGION = "eu-west-1";
-            AWS_ACCESS_KEY_ID = lib.readFile ./.access_key_id;
-            AWS_SECRET_ACCESS_KEY = lib.readFile ./.secret_access_key;
           };
 
           devenv.root = let

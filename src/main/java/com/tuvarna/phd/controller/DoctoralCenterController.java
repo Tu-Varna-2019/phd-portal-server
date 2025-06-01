@@ -2,8 +2,8 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.NameDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
-import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.DoctoralCenterService;
@@ -232,6 +232,28 @@ public final class DoctoralCenterController extends BaseController {
     return send("Grades retrieved", grades);
   }
 
+  @PATCH
+  @Operation(summary = "Set commision to a grade", description = "Set commision to a grade")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commision set for grade!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when setting commision to an grade!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grade/{id}/commission/{name}")
+  public Response setCommissionOnGrade(@PathParam("id") Long id, @PathParam("name") String name) {
+    LOG.info("Received a controller request to set commission to grade ");
+    // TODO: Notify committees inside the commission that got assiged to evaluate the exam
+    this.doctoralCenterService.setCommissionOnGrade(id, name);
+
+    return send("Grade updated with commision: " + name + " !");
+  }
+
   @GET
   @Operation(summary = "Get commision", description = "Get commision")
   @APIResponses(
@@ -245,11 +267,11 @@ public final class DoctoralCenterController extends BaseController {
             description = "Error when retrieving commision!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/commision")
+  @Path("/commission")
   public Response getCommision() {
     LOG.info("Received a controller request to retrieve all commisions.");
-    List<Commission> exams = this.doctoralCenterService.getCommision();
+    List<NameDTO> commisions = this.doctoralCenterService.getCommision();
 
-    return send("Commision retrieved" + exams);
+    return send("Commision retrieved", commisions);
   }
 }

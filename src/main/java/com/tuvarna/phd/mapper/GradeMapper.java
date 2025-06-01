@@ -39,6 +39,7 @@ public interface GradeMapper {
               });
 
       return new GradeDTO(
+          grade.getId(),
           grade.getGrade(),
           grade.getEvalDate(),
           new CommisionDTO(commission.get().getName(), committeeDTOs),
@@ -47,6 +48,7 @@ public interface GradeMapper {
           grade.getSubject().getName());
     } else {
       return new GradeDTO(
+          grade.getId(),
           grade.getGrade(),
           grade.getEvalDate(),
           grade.getReport(),

@@ -2,6 +2,8 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.NameDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Commission;
@@ -22,6 +24,7 @@ import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
+import com.tuvarna.phd.repository.CommissionRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
@@ -38,6 +41,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -62,6 +66,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject SubjectRepository subjectRepository;
   @Inject UnauthorizedRepository uRepository;
   @Inject ReportRepository reportRepository;
+  @Inject CommissionRepository commissionRepository;
 
   @Inject CandidateMapper candidateMapper;
   @Inject PhdMapper phdMapper;
@@ -69,6 +74,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
+
+  @Inject NotificationService notificationService;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -353,9 +360,74 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  public List<Commission> getCommision() {
+  public void setCommissionOnGrade(Long id, String name) {
+    LOG.info("Received a service request to set commission: " + name + " to grade id: " + id);
+    Grade grade = this.gradeRepository.getById(id);
+    Commission commission = this.commissionRepository.getByName(name);
+
+    grade.setCommission(commission);
+    this.gradeRepository.save(grade);
+    LOG.info(
+        "Grade is successfully set to the commision! Now notifying the corresponding"
+            + " committees...");
+    notifyCommittees(commission.getMembers(), grade.getEvalDate());
+  }
+
+  private void notifyCommittees(List<Committee> committees, Date evalDate) {
+    List<String> committeeEmails = new ArrayList<>();
+
+    committees.forEach(
+        committee -> {
+          try {
+            // TODO:: Make the title more informative
+            this.mailModel.send(
+                "Вие сте добавен в изпит",
+                TEMPLATES.COMMITTEE_ADDED_TO_EXAM,
+                committee.getEmail(),
+                Map.of("$EVAL_DATE", evalDate.toString()));
+          } catch (IOException exception) {
+            LOG.error(
+                "Error in sending email to committee: "
+                    + committee.getEmail()
+                    + " with exception: "
+                    + exception);
+            throw new HttpException(
+                "Error in sending email to the committee with email: " + committee.getEmail());
+          }
+
+          committeeEmails.add(committee.getEmail());
+        });
+
+    if (!committeeEmails.isEmpty()) {
+      this.notificationService.save(
+          new NotificationDTO(
+              "Вие сте добавен в изпит за оценяване",
+              "Вие сте добавен в изпит за оценяване. Крайна дата: " + evalDate.toString(),
+              "info",
+              new Timestamp(System.currentTimeMillis()),
+              "single",
+              committeeEmails));
+    } else {
+      LOG.warn("No emails to notify. Skipping...");
+    }
+
+    LOG.info("Committees have successfully received emails: " + committeeEmails.toString() + " !");
+  }
+
+  @Override
+  @Transactional
+  public List<NameDTO> getCommision() {
     LOG.info("Service received to retrieve all commisions");
-    return List.of();
+    List<NameDTO> commisionNames = new ArrayList<>();
+
+    this.databaseModel
+        .selectMapString("SELECT name FROM commission", "name")
+        .forEach(
+            (name) -> {
+              commisionNames.add(new NameDTO(name));
+            });
+
+    return commisionNames;
   }
 
   @Override
