@@ -229,7 +229,7 @@ public final class DoctoralCenterController extends BaseController {
     LOG.info("Received a controller request to retrieve all grades.");
     List<GradeDTO> grades = this.doctoralCenterService.getExams();
 
-    return send("grades retrieved", grades);
+    return send("Grades retrieved", grades);
   }
 
   @GET
