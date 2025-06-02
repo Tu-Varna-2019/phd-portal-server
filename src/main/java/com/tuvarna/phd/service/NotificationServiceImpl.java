@@ -30,8 +30,9 @@ public final class NotificationServiceImpl implements NotificationService {
   public void save(NotificationDTO notificationDTO) {
     notificationDTO.setCreation(new Timestamp(new Date().getTime()));
 
-    if (notificationDTO.getScope().equals("group"))
+    if (notificationDTO.getScope().equals("group")) {
       notificationDTO.addRecipients(this.getOidsByGroup(notificationDTO.getGroup()));
+    }
 
     LOG.info("Recipient oids to save: " + notificationDTO.getRecipients());
 
@@ -51,22 +52,22 @@ public final class NotificationServiceImpl implements NotificationService {
         switch (group) {
           case "admin" -> {
             yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
-                      + " (d.id=role.id)  WHERE role.role='admin'";
+                + " (d.id=role.id)  WHERE role.role='admin'";
           }
 
           case "expert-manager" -> {
             yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
-                      + " (d.id=role.id) WHERE role.role='expert' OR role.role='manager'";
+                + " (d.id=role.id) WHERE role.role='expert' OR role.role='manager'";
           }
 
           case "expert" -> {
             yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
-                      + " (d.id=role.id) WHERE role.role='expert'";
+                + " (d.id=role.id) WHERE role.role='expert'";
           }
 
           case "manager" -> {
             yield "SELECT d.oid FROM doctoral_center d JOIN doctoral_center_role role ON"
-                      + " (d.id=role.id) WHERE role.role='manager'";
+                + " (d.id=role.id) WHERE role.role='manager'";
           }
 
           default -> {

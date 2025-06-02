@@ -27,7 +27,9 @@ public class MailModel {
 
     NOTIFY_FIRST_EXAM_CANDIDATE("notify_first_exam_candidate.html"),
     NOTIFY_SECOND_EXAM_CANDIDATE("notify_second_exam_candidate.html"),
-    NOTIFY_THIRD_EXAM_CANDIDATE("notify_third_exam_candidate.html");
+    NOTIFY_THIRD_EXAM_CANDIDATE("notify_third_exam_candidate.html"),
+
+    COMMITTEE_ADDED_TO_EXAM("committee_added_to_exam.html");
 
     private String path;
 

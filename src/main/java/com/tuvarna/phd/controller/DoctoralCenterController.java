@@ -1,6 +1,8 @@
 package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.NameDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
@@ -207,5 +209,69 @@ public final class DoctoralCenterController extends BaseController {
     List<String> docCenterRoles = this.doctoralCenterService.getDoctoralCenterRoles();
 
     return send("All doctoral center roles retrieved!", docCenterRoles);
+  }
+
+  @GET
+  @Operation(summary = "Get all grades", description = "Get all grades")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "grades retrieved",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving grades!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grades")
+  public Response getExams() {
+    LOG.info("Received a controller request to retrieve all grades.");
+    List<GradeDTO> grades = this.doctoralCenterService.getExams();
+
+    return send("Grades retrieved", grades);
+  }
+
+  @PATCH
+  @Operation(summary = "Set commision to a grade", description = "Set commision to a grade")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commision set for grade!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when setting commision to an grade!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grade/{id}/commission/{name}")
+  public Response setCommissionOnGrade(@PathParam("id") Long id, @PathParam("name") String name) {
+    LOG.info("Received a controller request to set commission to grade ");
+    // TODO: Notify committees inside the commission that got assiged to evaluate the exam
+    this.doctoralCenterService.setCommissionOnGrade(id, name);
+
+    return send("Grade updated with commision: " + name + " !");
+  }
+
+  @GET
+  @Operation(summary = "Get commision", description = "Get commision")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commision retrieved!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving commision!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commission")
+  public Response getCommision() {
+    LOG.info("Received a controller request to retrieve all commisions.");
+    List<NameDTO> commisions = this.doctoralCenterService.getCommision();
+
+    return send("Commision retrieved", commisions);
   }
 }

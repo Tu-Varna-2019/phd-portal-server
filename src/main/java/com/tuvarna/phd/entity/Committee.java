@@ -44,7 +44,7 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   private String email;
 
   @Column(nullable = true, unique = false)
-  private String picture = "";
+  private String picture;
 
   @Transient private String pictureBlob;
 
