@@ -3,6 +3,7 @@ package com.tuvarna.phd.mapper;
 import com.tuvarna.phd.dto.CommisionDTO;
 import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Grade;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public interface GradeMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
-  default GradeDTO toDto(Grade grade) {
+  default GradeDTO toDto(Grade grade, UserDTO examinedUser) {
     Optional<Commission> commission = Optional.ofNullable(grade.getCommission());
     List<CommitteeDTO> committeeDTOs = new ArrayList<>();
 
@@ -45,6 +46,7 @@ public interface GradeMapper {
           new CommisionDTO(commission.get().getName(), committeeDTOs),
           grade.getReport(),
           grade.getAttachments(),
+          examinedUser,
           grade.getSubject().getName());
     } else {
       return new GradeDTO(
@@ -53,6 +55,7 @@ public interface GradeMapper {
           grade.getEvalDate(),
           grade.getReport(),
           grade.getAttachments(),
+          examinedUser,
           grade.getSubject().getName());
     }
   }

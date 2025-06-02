@@ -42,6 +42,10 @@ public class GradeDTO {
   private Set<String> attachments;
 
   @Nullable
+  @Schema(title = "evaluatedUser", required = true)
+  private UserDTO evaluatedUser;
+
+  @Nullable
   @Schema(title = "subject", required = true)
   private String subject;
 
@@ -51,12 +55,14 @@ public class GradeDTO {
       Date evalDate,
       String report,
       Set<String> attachments,
+      UserDTO evaluatedUser,
       String subject) {
     this.id = id;
     this.grade = grade;
     this.evalDate = evalDate;
     this.report = report;
     this.attachments = attachments;
+    this.evaluatedUser = evaluatedUser;
     this.subject = subject;
   }
 }

@@ -5,6 +5,7 @@ import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.NameDTO;
 import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
@@ -48,6 +49,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -352,10 +355,67 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         .getAll()
         .forEach(
             grade -> {
-              gradeDTOs.add(this.gradeMapper.toDto(grade));
+              UserDTO userDTO = queryEvaluatedUser(grade.getId());
+              gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
             });
 
     return gradeDTOs;
+  }
+
+  private UserDTO queryEvaluatedUser(Long gradeId) {
+    List<String> evaluatedUserTypes = List.of("phd_grades", "candidates_grades");
+    List<String> evaluatedUserTypeIDs = List.of("phd_id", "candidate_id");
+    List<UserDTO> userDto = new ArrayList<>();
+
+    evaluatedUserTypes.forEach(
+        (userType) -> {
+          String columnName = evaluatedUserTypeIDs.get(evaluatedUserTypes.indexOf(userType));
+          Long columnId;
+
+          try {
+            columnId =
+                this.databaseModel.selectLong(
+                    "SELECT " + columnName + " FROM " + userType + " WHERE grade_id = $1",
+                    Tuple.of(gradeId),
+                    columnName);
+          } catch (NoSuchElementException exception) {
+            columnId = -1L;
+          }
+
+          if (columnId != -1L) {
+            LOG.info(
+                "Good. Evaluated user: " + userType + " is found to grade id: " + gradeId + " !");
+
+            if (userType.equals("phd_grades")) {
+              Phd phd =
+                  this.databaseModel
+                      .selectMapEntity(
+                          "SELECT name, email FROM phd WHERE id = $1",
+                          Optional.of(Tuple.of(columnId)),
+                          new Phd())
+                      .get(0);
+              userDto.add(new UserDTO("", phd.getName(), phd.getEmail(), "phd", ""));
+
+            } else if (userType.equals("candidates_grades")) {
+              Candidate candidate =
+                  this.databaseModel
+                      .selectMapEntity(
+                          "SELECT name, email FROM candidate WHERE id = $1",
+                          Optional.of(Tuple.of(columnId)),
+                          new Candidate())
+                      .get(0);
+              userDto.add(
+                  new UserDTO("", candidate.getName(), candidate.getEmail(), "candidate", ""));
+            }
+          }
+        });
+
+    if (userDto.isEmpty()) {
+      LOG.error("Grade id: " + gradeId + " not found in any of the tables!");
+      throw new HttpException("Grade id: " + gradeId + " not found in any of the tables!");
+    }
+
+    return userDto.get(0);
   }
 
   @Override
