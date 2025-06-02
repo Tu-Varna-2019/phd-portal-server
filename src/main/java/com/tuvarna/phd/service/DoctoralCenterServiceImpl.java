@@ -373,7 +373,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     notifyCommittees(commission.getMembers(), grade.getEvalDate());
   }
 
-  private void notifyCommittees(List<Committee> committees, Date evalDate) {
+  private void notifyCommittees(Set<Committee> committees, Date evalDate) {
     List<String> committeeEmails = new ArrayList<>();
 
     committees.forEach(

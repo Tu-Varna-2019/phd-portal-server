@@ -8,9 +8,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,8 +38,12 @@ public class Commission extends PanacheEntityBase implements IEntity<Commission>
   @Column(nullable = false, unique = true)
   private String name;
 
-  @Column(nullable = false, unique = false)
-  private ArrayList<Committee> members;
+  @ManyToMany
+  @JoinTable(
+      name = "commission_committees",
+      joinColumns = @JoinColumn(name = "commission_id"),
+      inverseJoinColumns = @JoinColumn(name = "committee_id"))
+  private Set<Committee> members;
 
   @Override
   public Commission toEntity(Row row) {
