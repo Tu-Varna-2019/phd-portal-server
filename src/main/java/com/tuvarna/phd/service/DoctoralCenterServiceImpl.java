@@ -1,8 +1,13 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.NameDTO;
+import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.dto.UnauthorizedDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
+import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Mode;
@@ -13,12 +18,14 @@ import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.mapper.PhdMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.model.MailModel.TEMPLATES;
 import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
+import com.tuvarna.phd.repository.CommissionRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
@@ -35,12 +42,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -59,11 +69,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject SubjectRepository subjectRepository;
   @Inject UnauthorizedRepository uRepository;
   @Inject ReportRepository reportRepository;
+  @Inject CommissionRepository commissionRepository;
 
   @Inject CandidateMapper candidateMapper;
   @Inject PhdMapper phdMapper;
+  @Inject GradeMapper gradeMapper;
+
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
+
+  @Inject NotificationService notificationService;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -245,6 +260,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   private void generateReport(Phd phd) {
     Integer MONTHLY_REPORT_DELAY = 3;
 
+    Set<Report> reports = new HashSet<>();
     Date currentDate = new Date();
     currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
     phd.setEnrollDate(new java.sql.Date(currentDate.getTime()));
@@ -259,12 +275,14 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         monthDate.setMonth(month + MONTHLY_REPORT_DELAY);
         monthDate.setYear(currentDate.getYear() + year);
 
-        this.reportRepository.save(
+        Report report =
             new Report(
                 "Индивидуален тримесечен учебен план за подготовка за докоторант",
                 Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
                 monthDate,
-                month + 1));
+                month + 1);
+        this.reportRepository.save(report);
+        reports.add(report);
         LOG.info("Now generating the report for month: " + month);
       }
 
@@ -273,14 +291,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       yearDate.setMonth(11);
       yearDate.setYear(currentDate.getYear() + year);
 
-      this.reportRepository.save(
+      Report report =
           new Report(
               "Индивидуален годишен учебен план за подготовка за докоторант",
               Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
               yearDate,
-              4));
+              4);
+      this.reportRepository.save(report);
+      reports.add(report);
     }
 
+    phd.setReports(reports);
     this.phdRepository.save(phd);
     LOG.info("Phd report created successfully!");
   }
@@ -322,6 +343,151 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
 
     return unauthorizedUsers;
+  }
+
+  @Override
+  @Transactional
+  public List<GradeDTO> getExams() {
+    LOG.info("Service received to retrieve all grades");
+
+    List<GradeDTO> gradeDTOs = new ArrayList<>();
+    this.gradeRepository
+        .getAll()
+        .forEach(
+            grade -> {
+              UserDTO userDTO = queryEvaluatedUser(grade.getId());
+              gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
+            });
+
+    return gradeDTOs;
+  }
+
+  private UserDTO queryEvaluatedUser(Long gradeId) {
+    List<String> evaluatedUserTypes = List.of("phd_grades", "candidates_grades");
+    List<String> evaluatedUserTypeIDs = List.of("phd_id", "candidate_id");
+    List<UserDTO> userDto = new ArrayList<>();
+
+    evaluatedUserTypes.forEach(
+        (userType) -> {
+          String columnName = evaluatedUserTypeIDs.get(evaluatedUserTypes.indexOf(userType));
+          Long columnId;
+
+          try {
+            columnId =
+                this.databaseModel.selectLong(
+                    "SELECT " + columnName + " FROM " + userType + " WHERE grade_id = $1",
+                    Tuple.of(gradeId),
+                    columnName);
+          } catch (NoSuchElementException exception) {
+            columnId = -1L;
+          }
+
+          if (columnId != -1L) {
+            LOG.info(
+                "Good. Evaluated user: " + userType + " is found to grade id: " + gradeId + " !");
+
+            if (userType.equals("phd_grades")) {
+              Phd phd =
+                  this.databaseModel
+                      .selectMapEntity(
+                          "SELECT name, email FROM phd WHERE id = $1",
+                          Optional.of(Tuple.of(columnId)),
+                          new Phd())
+                      .get(0);
+              userDto.add(new UserDTO("", phd.getName(), phd.getEmail(), "phd", ""));
+
+            } else if (userType.equals("candidates_grades")) {
+              Candidate candidate =
+                  this.databaseModel
+                      .selectMapEntity(
+                          "SELECT name, email FROM candidate WHERE id = $1",
+                          Optional.of(Tuple.of(columnId)),
+                          new Candidate())
+                      .get(0);
+              userDto.add(
+                  new UserDTO("", candidate.getName(), candidate.getEmail(), "candidate", ""));
+            }
+          }
+        });
+
+    if (userDto.isEmpty()) {
+      LOG.error("Grade id: " + gradeId + " not found in any of the tables!");
+      throw new HttpException("Grade id: " + gradeId + " not found in any of the tables!");
+    }
+
+    return userDto.get(0);
+  }
+
+  @Override
+  @Transactional
+  public void setCommissionOnGrade(Long id, String name) {
+    LOG.info("Received a service request to set commission: " + name + " to grade id: " + id);
+    Grade grade = this.gradeRepository.getById(id);
+    Commission commission = this.commissionRepository.getByName(name);
+
+    grade.setCommission(commission);
+    this.gradeRepository.save(grade);
+    LOG.info(
+        "Grade is successfully set to the commision! Now notifying the corresponding"
+            + " committees...");
+    notifyCommittees(commission.getMembers(), grade.getEvalDate());
+  }
+
+  private void notifyCommittees(Set<Committee> committees, Date evalDate) {
+    List<String> committeeEmails = new ArrayList<>();
+
+    committees.forEach(
+        committee -> {
+          try {
+            // TODO:: Make the title more informative
+            this.mailModel.send(
+                "Вие сте добавен в изпит",
+                TEMPLATES.COMMITTEE_ADDED_TO_EXAM,
+                committee.getEmail(),
+                Map.of("$EVAL_DATE", evalDate.toString()));
+          } catch (IOException exception) {
+            LOG.error(
+                "Error in sending email to committee: "
+                    + committee.getEmail()
+                    + " with exception: "
+                    + exception);
+            throw new HttpException(
+                "Error in sending email to the committee with email: " + committee.getEmail());
+          }
+
+          committeeEmails.add(committee.getEmail());
+        });
+
+    if (!committeeEmails.isEmpty()) {
+      this.notificationService.save(
+          new NotificationDTO(
+              "Вие сте добавен в изпит за оценяване",
+              "Вие сте добавен в изпит за оценяване. Крайна дата: " + evalDate.toString(),
+              "info",
+              new Timestamp(System.currentTimeMillis()),
+              "single",
+              committeeEmails));
+    } else {
+      LOG.warn("No emails to notify. Skipping...");
+    }
+
+    LOG.info("Committees have successfully received emails: " + committeeEmails.toString() + " !");
+  }
+
+  @Override
+  @Transactional
+  public List<NameDTO> getCommision() {
+    LOG.info("Service received to retrieve all commisions");
+    List<NameDTO> commisionNames = new ArrayList<>();
+
+    this.databaseModel
+        .selectMapString("SELECT name FROM commission", "name")
+        .forEach(
+            (name) -> {
+              commisionNames.add(new NameDTO(name));
+            });
+
+    return commisionNames;
   }
 
   @Override

@@ -33,6 +33,7 @@
         self',
         inputs',
         pkgs,
+        lib,
         system,
         ...
       }: {
@@ -82,13 +83,14 @@
             checkmake.enable = true;
           };
 
+          # NOTE: aws-vauld add tu-varna-phd
           aws-vault = {
             enable = true;
-            profile = "alien-s3";
+            profile = "tu-varna-phd";
             awscliWrapper.enable = true;
           };
           env = {
-            AWS_DEFAULT_PROFILE = "alien-s3";
+            AWS_DEFAULT_PROFILE = "tu-varna-phd";
             AWS_DEFAULT_REGION = "eu-west-1";
           };
 

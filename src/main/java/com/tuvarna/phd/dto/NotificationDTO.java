@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(name = "NotificationDTO", description = "Notification DTO")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class NotificationDTO {
 
@@ -40,6 +42,21 @@ public class NotificationDTO {
   @Nullable
   @Schema(title = "recipients", required = true)
   private List<String> recipients;
+
+  public NotificationDTO(
+      String title,
+      String description,
+      String severity,
+      Timestamp creation,
+      String scope,
+      List<String> recipients) {
+    this.title = title;
+    this.description = description;
+    this.severity = severity;
+    this.creation = creation;
+    this.scope = scope;
+    this.recipients = recipients;
+  }
 
   public void addRecipients(List<String> recipients) {
     if (this.recipients == null) this.recipients = new ArrayList<>(recipients.size());
