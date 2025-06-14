@@ -59,6 +59,10 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
     return jsonObject.mapTo(Subject.class);
   }
 
+  public Subject(String name) {
+    this.name = name;
+  }
+
   @Override
   public String toString() {
     return "Name: " + this.name;
