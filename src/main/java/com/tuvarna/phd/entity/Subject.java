@@ -41,6 +41,7 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   @Column(nullable = false, unique = true)
   private String name;
 
+  // TODO: Can be removed ?
   @JoinColumn(name = "exam_date", nullable = true)
   private Date examDate;
 

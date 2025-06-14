@@ -41,9 +41,14 @@ public class Grade extends PanacheEntityBase implements IEntity<Grade> {
   private Date evalDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = true)
+  @JoinColumn(name = "commision", nullable = true)
   private Commission commission;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "subject", nullable = false)
+  private Subject subject;
+
+  // NOTE: Change this to description ?
   @Column(nullable = false, unique = false)
   private String report;
 
@@ -51,10 +56,6 @@ public class Grade extends PanacheEntityBase implements IEntity<Grade> {
   private Set<String> attachments;
 
   @Transient private Set<String> attachmentsBlob;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
-  private Subject subject;
 
   public Grade(Date evalDate, String report, Subject subject) {
     this.evalDate = evalDate;
