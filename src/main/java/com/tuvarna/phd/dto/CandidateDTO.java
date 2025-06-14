@@ -6,11 +6,13 @@ import com.sun.istack.Nullable;
 import io.smallrye.common.constraint.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(name = "CandidateDTO", description = "Candidate DTO")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CandidateDTO {
 
   @NotNull
