@@ -247,7 +247,7 @@ public final class DoctoralCenterController extends BaseController {
       })
   @Path("/grade/{id}/commission/{name}")
   public Response setCommissionOnGrade(@PathParam("id") Long id, @PathParam("name") String name) {
-    LOG.info("Received a controller request to set commission to grade ");
+    LOG.info("Received a controller request to set commission to grade");
     // TODO: Notify committees inside the commission that got assiged to evaluate the exam
     this.doctoralCenterService.setCommissionOnGrade(id, name);
 
