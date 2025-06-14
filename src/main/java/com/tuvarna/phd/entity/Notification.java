@@ -41,6 +41,7 @@ public class Notification extends PanacheEntityBase implements IEntity<Notificat
   @Column(nullable = false, unique = false)
   private Timestamp creation;
 
+  // TODO: Move this to seperate table
   @Column(nullable = false, unique = false)
   private String severity;
 

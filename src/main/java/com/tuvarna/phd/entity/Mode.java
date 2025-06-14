@@ -42,6 +42,10 @@ public class Mode extends PanacheEntityBase implements IEntity<Mode> {
   @Column(name = "year_period", nullable = false, unique = false)
   private Long yearPeriod;
 
+  public Mode(String mode) {
+    this.mode = mode;
+  }
+
   @Override
   public Mode toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

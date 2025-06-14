@@ -41,6 +41,7 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   @Column(nullable = false, unique = true)
   private String name;
 
+  // TODO: Can be removed ?
   @JoinColumn(name = "exam_date", nullable = true)
   private Date examDate;
 
@@ -56,6 +57,10 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   public Subject toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Subject.class);
+  }
+
+  public Subject(String name) {
+    this.name = name;
   }
 
   @Override

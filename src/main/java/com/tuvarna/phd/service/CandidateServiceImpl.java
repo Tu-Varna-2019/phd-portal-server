@@ -84,6 +84,8 @@ public final class CandidateServiceImpl implements CandidateService {
     this.registerCandidate(candidate, candidateDTO.getCurriculum());
   }
 
+  @Override
+  @Transactional
   public void registerCandidate(Candidate candidate, CurriculumCreateDTO curriculumCreateDTO) {
     try {
       Curriculum curriculum = this.curriculumRepository.getByName(curriculumCreateDTO.getName());
@@ -109,6 +111,8 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Candidate saved!");
   }
 
+  @Override
+  @Transactional
   public void checkIfCandidateEmailIsPresent(String candidateEmail) {
     Arrays.asList("phd", "candidate")
         .forEach(
