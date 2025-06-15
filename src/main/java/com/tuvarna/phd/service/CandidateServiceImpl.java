@@ -279,7 +279,7 @@ public final class CandidateServiceImpl implements CandidateService {
         this.databaseModel.selectMapEntity(
             "SELECT c.name, c.year_accepted, f.name AS facultyName FROM candidate c JOIN"
                 + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
-                + " cs.status = 'accepted'",
+                + " cs.status = 'approved'",
             new Candidate());
 
     candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));

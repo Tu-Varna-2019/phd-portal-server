@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.sql.Date;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,10 +39,6 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 
   @Column(nullable = false, unique = true)
   private String name;
-
-  // TODO: Can be removed ?
-  @JoinColumn(name = "exam_date", nullable = true)
-  private Date examDate;
 
   @ManyToMany(mappedBy = "subjects", fetch = FetchType.EAGER)
   @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
