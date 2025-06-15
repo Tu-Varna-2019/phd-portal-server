@@ -55,10 +55,13 @@ public non-sealed class Unauthorized extends PanacheEntityBase
     this.timestamp = timestamp;
   }
 
+  public Unauthorized(String oid) {
+    this.oid = oid;
+  }
+
   @Override
   public Unauthorized toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Unauthorized.class);
   }
-
 }

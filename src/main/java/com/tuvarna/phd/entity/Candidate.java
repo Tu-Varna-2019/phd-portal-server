@@ -120,6 +120,10 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
     return this;
   }
 
+  public Candidate(String email) {
+    this.email = email;
+  }
+
   @Override
   public Candidate toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

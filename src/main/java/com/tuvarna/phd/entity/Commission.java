@@ -45,6 +45,11 @@ public class Commission extends PanacheEntityBase implements IEntity<Commission>
       inverseJoinColumns = @JoinColumn(name = "committee_id"))
   private Set<Committee> members;
 
+  public Commission(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
   @Override
   public Commission toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

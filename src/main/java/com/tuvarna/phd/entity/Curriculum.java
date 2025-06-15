@@ -108,4 +108,14 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
         + " Subjects: "
         + Arrays.toString(this.subjects.toArray());
   }
+
+  public Curriculum(String name, Mode mode, Set<Subject> subjects) {
+    this.name = name;
+    this.mode = mode;
+    this.subjects = subjects;
+  }
+
+  public Curriculum(String name) {
+    this.name = name;
+  }
 }

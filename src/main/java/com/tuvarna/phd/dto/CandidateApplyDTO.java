@@ -5,11 +5,13 @@ import com.sun.istack.Nullable;
 import io.smallrye.common.constraint.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(name = "CandidateApplyDTO", description = "Candidate apply DTO")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CandidateApplyDTO {
 
   @NotNull
@@ -70,4 +72,31 @@ public class CandidateApplyDTO {
   @Schema(title = "status", required = false)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String status;
+
+  public CandidateApplyDTO(
+      String name,
+      String email,
+      String pin,
+      String country,
+      String city,
+      String address,
+      String biography,
+      Long yearAccepted,
+      Long postCode,
+      String faculty,
+      String status,
+      CurriculumCreateDTO curriculum) {
+    this.name = name;
+    this.email = email;
+    this.pin = pin;
+    this.country = country;
+    this.city = city;
+    this.address = address;
+    this.biography = biography;
+    this.yearAccepted = yearAccepted;
+    this.postCode = postCode;
+    this.faculty = faculty;
+    this.status = status;
+    this.curriculum = curriculum;
+  }
 }
