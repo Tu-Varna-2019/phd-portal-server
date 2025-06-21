@@ -13,7 +13,7 @@ stop:
 	process-compose down
 
 test:
-	quarkus test --verbose
+	quarkus test
 
 build:
 	quarkus build
