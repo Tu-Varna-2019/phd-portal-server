@@ -28,9 +28,9 @@ dependencies {
     implementation("io.quarkus:quarkus-oidc")
 
     // Grafana
-    // implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.44.1'
-    // implementation 'io.quarkus:quarkus-observability-devservices-lgtm'
-    // implementation 'io.quarkus:quarkus-opentelemetry'
+     implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.44.1'
+     implementation 'io.quarkus:quarkus-observability-devservices-lgtm'
+     implementation 'io.quarkus:quarkus-opentelemetry'
 
     implementation 'io.quarkus:quarkus-hibernate-validator'
     implementation 'org.mapstruct:mapstruct:1.6.3'
