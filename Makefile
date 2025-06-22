@@ -2,12 +2,14 @@
 # TARGETS
 ###############
 
-.PHONY: all clean build run test install
-all: run build test
+.PHONY: all clean build services run test install
+all: services run build test
 
 run:
-	devenv up -D
 	quarkus dev -Dquarkus.profile=dev
+
+services:
+	devenv up
 
 stop:
 	process-compose down

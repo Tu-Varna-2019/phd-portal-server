@@ -15,19 +15,19 @@ COPY --chown=${DOCKER_USER}:${DOCKER_USER} gradle.properties /phd-portal-server/
 WORKDIR /phd-portal-server
 
 COPY src /phd-portal-server/src
-RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=dev
+RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=dev -Dquarkus.package.type=uber-jar
 
-LABEL org.opencontainers.image.source=https://codeberg.org/Tu-Varna-2019/phd-portal-server \
-	version="0.1.0-RELEASE" \
+LABEL org.opencontainers.image.source=https://github.com/Tu-Varna-2019/phd-portal-server \
+	version="1.0.0-RELEASE" \
 	description="Masters thesis for developing REST API backend server" \
 	author="Iliyan Kostov" \
 	env="prod"
 
 
 FROM eclipse-temurin:21-jre-noble
+
 WORKDIR /server/
 COPY --from=build /phd-portal-server/build/*.jar /server/app.jar
 
-USER ${DOCKER_USER}
 EXPOSE 8080
 CMD ["java","-jar","/server/app.jar"]
