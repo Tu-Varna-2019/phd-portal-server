@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.quarkus:quarkus-kubernetes-config'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     // JWT
