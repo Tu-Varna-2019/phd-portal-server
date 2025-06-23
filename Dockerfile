@@ -15,7 +15,7 @@ COPY --chown=${DOCKER_USER}:${DOCKER_USER} gradle.properties /phd-portal-server/
 WORKDIR /phd-portal-server
 
 COPY src /phd-portal-server/src
-RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=dev -Dquarkus.package.type=uber-jar
+RUN /phd-portal-server/gradlew clean build -x test -Dquarkus.profile=prod -Dquarkus.package.type=uber-jar
 
 LABEL org.opencontainers.image.source=https://github.com/Tu-Varna-2019/phd-portal-server \
 	version="1.0.0-RELEASE" \
@@ -30,4 +30,4 @@ WORKDIR /server/
 COPY --from=build /phd-portal-server/build/*.jar /server/app.jar
 
 EXPOSE 8080
-CMD ["java","-jar","/server/app.jar"]
+CMD ["java", "-Dquarkus.profile=prod", "-jar", "/server/app.jar"]
