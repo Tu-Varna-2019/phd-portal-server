@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'io.quarkus'
     id "org.sonarqube" version "6.2.0.5505"
-    id "io.freefair.lombok"  version "8.13.1"
+    id "io.freefair.lombok"  version "8.14"
 }
 
 repositories {
@@ -19,8 +19,8 @@ dependencies {
     implementation 'io.quarkus:quarkus-smallrye-jwt-build'
 
     // AWS
-    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.7.0'
-    implementation 'software.amazon.awssdk:aws-crt-client:2.31.59'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.8.0'
+    implementation 'software.amazon.awssdk:aws-crt-client:2.31.68'
 
     // Elastisearch
     implementation("io.quarkus:quarkus-elasticsearch-java-client")
@@ -29,7 +29,7 @@ dependencies {
     implementation("io.quarkus:quarkus-oidc")
 
     // Grafana
-     implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.44.1'
+     implementation 'io.opentelemetry:opentelemetry-exporter-logging:1.51.0'
      implementation 'io.quarkus:quarkus-observability-devservices-lgtm'
      implementation 'io.quarkus:quarkus-opentelemetry'
 
