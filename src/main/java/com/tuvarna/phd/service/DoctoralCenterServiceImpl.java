@@ -130,13 +130,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
       case 2 -> {
         if (status.equals("approved")) {
+          checkIfGradesAreEvaluated(candidate.getGrades(), candidate.getExamStep());
+
           LOG.info(
               "Candidate approved to go to the second draft of exams! Now sending email to the"
                   + " candidate personal email about it...");
 
           candidate.setExamStep(3);
-          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
 
+          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
+          grades.addAll(candidate.getGrades());
           candidate.setGrades(grades);
           this.candidateRepository.save(candidate);
 
@@ -156,6 +159,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
       case 3 -> {
         if (status.equals("approved")) {
+          checkIfGradesAreEvaluated(candidate.getGrades(), candidate.getExamStep());
           LOG.info(
               "Candidate approved to become phd! Now sending email to the"
                   + " candidate personal email about it...");
@@ -178,6 +182,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           this.candidateRepository.save(candidate);
           sendMailRejected(candidate);
         }
+      }
+    }
+  }
+
+  private void checkIfGradesAreEvaluated(Set<Grade> grades, Integer examStep) {
+    for (Grade grade : grades) {
+      if (grade.getGrade() == null) {
+        LOG.error("Cannot move to exam step: " + examStep + " because no grades were evaluated!");
+
+        throw new HttpException(
+            "Cannot move to exam step: " + examStep + " because no grades were evaluated!");
       }
     }
   }
