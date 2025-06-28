@@ -1,13 +1,19 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.repository.CommissionRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
+import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.ReportRepository;
+import com.tuvarna.phd.utils.GradeUtils;
+import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -19,11 +25,16 @@ import org.jboss.logging.Logger;
 public final class CommitteeServiceImpl implements CommitteeService {
   @Inject CommitteeRepository committeeRepository;
   @Inject ReportRepository reportRepository;
+  @Inject GradeRepository gradeRepository;
   @Inject CommissionRepository commissionRepository;
 
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
+
+  @Inject GradeUtils gradeUtils;
+
   @Inject CandidateMapper candidateMapper;
+  @Inject GradeMapper gradeMapper;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -55,5 +66,37 @@ public final class CommitteeServiceImpl implements CommitteeService {
 
     LOG.info("All candidates retrieved!");
     return candidateDTOs;
+  }
+
+  @Override
+  public List<GradeDTO> getExams(String oid) {
+    LOG.info("Service received to retrieve all grades");
+
+    List<Long> commissionIds =
+        this.databaseModel.selectMapLong(
+            "SELECT cm.id FROM commission cm JOIN commission_committees cmc ON"
+                + " (cm.id=cmc.commission_id) JOIN committee c ON (cmc.committee_id=c.id) WHERE"
+                + " c.oid = $1",
+            Tuple.of(oid),
+            "id");
+
+    if (commissionIds.isEmpty()) {
+      LOG.info("Didn't find any commissions. Moving on...");
+      return null;
+    }
+
+    List<GradeDTO> gradeDTOs = new ArrayList<>();
+    this.gradeRepository
+        .getAll()
+        .forEach(
+            grade -> {
+              if (grade.getCommission() != null
+                  && commissionIds.contains(grade.getCommission().getId())) {
+                UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
+                gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
+              }
+            });
+
+    return gradeDTOs;
   }
 }

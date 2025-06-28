@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.sun.istack.NotNull;
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.service.CommitteeService;
 import jakarta.enterprise.context.RequestScoped;
@@ -13,6 +14,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -37,6 +39,7 @@ public final class CommitteeController extends BaseController {
 
   private final CommitteeService committeeService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
+  @Inject JsonWebToken jwt;
 
   @Inject
   public CommitteeController(CommitteeService committeeService) {
@@ -73,5 +76,28 @@ public final class CommitteeController extends BaseController {
     List<CandidateDTO> candidates = this.committeeService.getCandidates(fields);
 
     return send("Candidates retrieved!", candidates);
+  }
+
+  @GET
+  @Operation(summary = "Get all grades", description = "Get all grades")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "grades retrieved",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving grades!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grades")
+  public Response getExams() {
+    LOG.info("Received a controller request to retrieve all grades.");
+
+    String oid = jwt.getClaim("oid");
+    List<GradeDTO> grades = this.committeeService.getExams(oid);
+
+    return send("Grades retrieved", grades);
   }
 }
