@@ -1,10 +1,9 @@
 package com.tuvarna.phd.service;
 
-import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.dto.CandidateDTO;
+import java.util.List;
 
 public sealed interface CommitteeService permits CommitteeServiceImpl {
 
-  // void login(Committee committee);
-
-  void delete(Committee committee);
+  List<CandidateDTO> getCandidates(String fields);
 }
