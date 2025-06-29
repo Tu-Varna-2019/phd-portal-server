@@ -37,6 +37,7 @@ import com.tuvarna.phd.repository.SubjectRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import com.tuvarna.phd.utils.GradeUtils;
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -87,6 +88,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-candidates-cache")
+  @CacheInvalidate(cacheName = "committee-candidates-cache")
   public void review(String email, String status) throws IOException {
     LOG.info("Service received a request to review candidate: " + email);
     Candidate candidate = this.candidateRepository.getByEmail(email);
@@ -322,6 +325,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
+  @CacheResult(cacheName = "doc-center-candidates-cache")
   public List<CandidateDTO> getCandidates(String fields) {
     LOG.info("Received a service request to retrieve all candidates");
     List<String> fieldsList = Arrays.asList(fields.split(","));
@@ -353,6 +357,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-unauth-users-cache")
   public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
     List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
@@ -362,6 +367,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-exams-cache")
   public List<GradeDTO> getExams() {
     LOG.info("Service received to retrieve all grades");
 
@@ -379,6 +385,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-exams-cache")
   public void setCommissionOnGrade(Long id, String name) {
     LOG.info("Received a service request to set commission: " + name + " to grade id: " + id);
     Grade grade = this.gradeRepository.getById(id);
@@ -435,6 +442,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-commission-cache")
   public List<NameDTO> getCommision() {
     LOG.info("Service received to retrieve all commisions");
     List<NameDTO> commisionNames = new ArrayList<>();
@@ -451,6 +459,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-unauth-users-cache")
   public void setUnauthorizedUserGroup(List<UnauthorizedDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "
