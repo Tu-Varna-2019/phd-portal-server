@@ -48,16 +48,14 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
 
   @Transient private String pictureBlob;
 
-  // TODO: Remove this ?
-  // You can't have 1 grade for committee per multiple commisions
   @Column(nullable = true, unique = false)
   private Double grade;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role", nullable = false)
   private CommitteeRole role;
 
