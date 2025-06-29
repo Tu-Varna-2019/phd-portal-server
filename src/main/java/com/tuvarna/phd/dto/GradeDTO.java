@@ -15,10 +15,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class GradeDTO {
 
   @NotNull
-  @Schema(title = "id", required = true)
-  private Long id;
-
-  @NotNull
   @Schema(title = "grade", required = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Double grade;
@@ -50,14 +46,12 @@ public class GradeDTO {
   private String subject;
 
   public GradeDTO(
-      Long id,
       Double grade,
       Date evalDate,
       String report,
       Set<String> attachments,
       UserDTO evaluatedUser,
       String subject) {
-    this.id = id;
     this.grade = grade;
     this.evalDate = evalDate;
     this.report = report;

@@ -96,11 +96,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
               if (grade.getCommission() != null
                   && commissionIds.contains(grade.getCommission().getId())) {
                 UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
-                GradeDTO gradeDTO = this.gradeMapper.toDto(grade, userDTO);
-                // NOTE: not needed for the user
-                gradeDTO.setCommission(null);
-
-                gradeDTOs.add(gradeDTO);
+                gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
               }
             });
 
