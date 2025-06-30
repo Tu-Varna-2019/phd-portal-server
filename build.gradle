@@ -36,7 +36,7 @@ dependencies {
 
     implementation 'io.quarkus:quarkus-hibernate-validator'
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    implementation 'io.quarkus:quarkus-mailer:3.24.0'
+    implementation 'io.quarkus:quarkus-mailer:3.24.1'
     implementation 'io.quarkus:quarkus-security-jpa'
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'org.jboss.logmanager:log4j2-jboss-logmanager'
@@ -44,7 +44,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 
     // SQL
-    implementation 'io.quarkus:quarkus-reactive-pg-client:3.24.0'
+    implementation 'io.quarkus:quarkus-reactive-pg-client:3.24.1'
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
 
     // Caching
@@ -58,7 +58,7 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.mockito:mockito-core:5.18.0'
-    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.24.0'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito:3.24.1'
 }
 
 group 'com.tuvarna'
