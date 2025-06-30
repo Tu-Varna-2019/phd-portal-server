@@ -24,10 +24,30 @@ public class UserDTO {
   @Schema(title = "email", required = true)
   private String email;
 
+  @NotNull
+  @Schema(title = "pin", required = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String pin;
+
   @Schema(title = "group", required = false)
   private String group;
 
   @Schema(title = "pictureBlob", required = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String pictureBlob;
+
+  public UserDTO(String name, String email, String pin, String group) {
+    this.name = name;
+    this.email = email;
+    this.pin = pin;
+    this.group = group;
+  }
+
+  public UserDTO(String oid, String name, String email, String pin, String group) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.pin = pin;
+    this.group = group;
+  }
 }

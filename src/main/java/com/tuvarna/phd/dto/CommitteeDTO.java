@@ -1,5 +1,6 @@
 package com.tuvarna.phd.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.smallrye.common.constraint.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +10,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 public class CommitteeDTO {
-
   @NotNull
   @Schema(title = "oid", required = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String oid;
 
   @NotNull
@@ -23,7 +24,7 @@ public class CommitteeDTO {
   private String picture;
 
   @NotNull
-  @Schema(title = "picture", required = true)
+  @Schema(title = "grade", required = true)
   private Double grade;
 
   @NotNull

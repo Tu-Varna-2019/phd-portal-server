@@ -51,7 +51,8 @@ public class GradeUtils {
                           Optional.of(Tuple.of(columnId)),
                           new Phd())
                       .get(0);
-              userDto.add(new UserDTO("", phd.getName(), phd.getEmail(), "phd", ""));
+              userDto.add(
+                  new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), phd.getPin(), "phd"));
 
             } else if (userType.equals("candidates_grades")) {
               Candidate candidate =
@@ -62,7 +63,8 @@ public class GradeUtils {
                           new Candidate())
                       .get(0);
               userDto.add(
-                  new UserDTO("", candidate.getName(), candidate.getEmail(), "candidate", ""));
+                  new UserDTO(
+                      candidate.getName(), candidate.getEmail(), candidate.getPin(), "candidate"));
             }
           }
         });
