@@ -120,7 +120,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
             + evalUserType
             + "_id = (SELECT pc.id FROM "
             + evalUserType
-            + " pc WHERE pc.pin = $3))",
+            + " pc WHERE pc.pin = $3) LIMIT 1)",
         Tuple.of(
             evaluateGradeDTO.getGrade(), evaluateGradeDTO.getSubject(), evaluateGradeDTO.getPin()));
 

@@ -118,6 +118,8 @@ public final class CommitteeController extends BaseController {
   public Response evaluateGrade(
       EvaluateGradeDTO evaluateGradeDTO, @PathParam("type") String evalUserType) {
     this.committeeValidator.validateEvalUserType(evalUserType);
+    this.committeeValidator.validateGrade(evaluateGradeDTO.getGrade());
+
     LOG.info("Received a controller request to evaluate user type: " + evalUserType);
 
     this.committeeService.evaluateGrade(evaluateGradeDTO, evalUserType);
