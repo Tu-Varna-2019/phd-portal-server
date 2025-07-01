@@ -1,6 +1,8 @@
 package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CommissionDTO;
+import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.EvaluateGradeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UserDTO;
@@ -10,6 +12,7 @@ import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
 import com.tuvarna.phd.repository.CommissionRepository;
+import com.tuvarna.phd.repository.CommitteeGradeRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.ReportRepository;
@@ -23,6 +26,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -31,6 +35,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   @Inject ReportRepository reportRepository;
   @Inject GradeRepository gradeRepository;
   @Inject CommissionRepository commissionRepository;
+  @Inject CommitteeGradeRepository committeeGradeRepository;
 
   @Inject DatabaseModel databaseModel;
   @Inject MailModel mailModel;
@@ -99,7 +104,55 @@ public final class CommitteeServiceImpl implements CommitteeService {
               if (grade.getCommission() != null
                   && commissionIds.contains(grade.getCommission().getId())) {
                 UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
-                gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
+
+                List<CommitteeDTO> committeeDTOs = new ArrayList<>();
+                grade
+                    .getCommission()
+                    .getMembers()
+                    .forEach(
+                        committee -> {
+                          Double committeeGrade = null;
+                          try {
+                            committeeGrade =
+                                this.databaseModel.selectDouble(
+                                    "SELECT cg.grade FROM committee_grade cg WHERE"
+                                        + " cg.committee_id = $1 AND cg.grade_id = $2",
+                                    Tuple.of(committee.getId(), grade.getId()),
+                                    "grade");
+                          } catch (NoSuchElementException exception) {
+                            LOG.warn(
+                                "Committee: "
+                                    + committee.getName()
+                                    + " hasn't evaluated grade with id: "
+                                    + grade.getId()
+                                    + " yet!");
+                          }
+
+                          committeeDTOs.add(
+                              new CommitteeDTO(
+                                  committee.getOid(),
+                                  committee.getName(),
+                                  committee.getPicture(),
+                                  committeeGrade,
+                                  committee.getFaculty().getName(),
+                                  committee.getRole().getRole()));
+                        });
+
+                GradeDTO gradeDTO =
+                    new GradeDTO(
+                        grade.getId(),
+                        grade.getGrade(),
+                        grade.getEvalDate(),
+                        new CommissionDTO(grade.getCommission().getName(), committeeDTOs),
+                        grade.getReport(),
+                        grade.getAttachments(),
+                        userDTO,
+                        grade.getSubject().getName());
+
+                // NOTE: Cannot use gradeMapper because we need to get the commitete grade from the
+                // committee_grade table
+                // this.gradeMapper.toDto(grade, userDTO)
+                gradeDTOs.add(gradeDTO);
               }
             });
 
@@ -123,6 +176,21 @@ public final class CommitteeServiceImpl implements CommitteeService {
             + " pc WHERE pc.pin = $3) LIMIT 1)",
         Tuple.of(
             evaluateGradeDTO.getGrade(), evaluateGradeDTO.getSubject(), evaluateGradeDTO.getPin()));
+
+    LOG.info("Now checking if all committees have evaluated the exam to calculate the medium");
+
+    // this.databaseModel.execute(
+    //     "SELECT EXISTS "
+    //         + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
+    //         + evalUserType
+    //         + "s_grades gg WHERE gg."
+    //         + evalUserType
+    //         + "_id = (SELECT pc.id FROM "
+    //         + evalUserType
+    //         + " pc WHERE pc.pin = $3) LIMIT 1)",
+    //     Tuple.of(
+    //         evaluateGradeDTO.getGrade(), evaluateGradeDTO.getSubject(),
+    // evaluateGradeDTO.getPin()));
 
     LOG.info("Changed grade to user: " + evalUserType);
   }

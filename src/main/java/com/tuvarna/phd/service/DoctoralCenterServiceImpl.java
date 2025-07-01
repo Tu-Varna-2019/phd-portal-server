@@ -89,6 +89,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Override
   @Transactional
   @CacheInvalidate(cacheName = "doc-center-candidates-cache")
+  @CacheInvalidate(cacheName = "doc-center-exams-cache")
   @CacheInvalidate(cacheName = "committee-candidates-cache")
   public void review(String email, String status) throws IOException {
     LOG.info("Service received a request to review candidate: " + email);

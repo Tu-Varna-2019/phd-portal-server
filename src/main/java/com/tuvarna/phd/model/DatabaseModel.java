@@ -52,6 +52,16 @@ public class DatabaseModel {
         .indefinitely();
   }
 
+  public Double selectDouble(String statement, Tuple prepQueries, String rowDouble) {
+    return this.client
+        .preparedQuery(statement)
+        .execute(prepQueries)
+        .onItem()
+        .transform(rowSet -> rowSet.iterator().next().getDouble(rowDouble))
+        .await()
+        .indefinitely();
+  }
+
   public List<Long> selectMapLong(String statement, Tuple prepQueries, String row) {
     return this.client
         .preparedQuery(statement)

@@ -25,6 +25,7 @@ public class CommitteeDTO {
 
   @NotNull
   @Schema(title = "grade", required = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Double grade;
 
   @NotNull
@@ -34,4 +35,12 @@ public class CommitteeDTO {
   @NotNull
   @Schema(title = "role", required = true)
   private String role;
+
+  public CommitteeDTO(String oid, String name, String picture, String faculty, String role) {
+    this.oid = oid;
+    this.name = name;
+    this.picture = picture;
+    this.faculty = faculty;
+    this.role = role;
+  }
 }

@@ -9,7 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Schema(name = "CommisionDTO", description = "Committee DTO")
 @Data
 @AllArgsConstructor
-public class CommisionDTO {
+public class CommissionDTO {
 
   @NotNull
   @Schema(title = "name", required = true)

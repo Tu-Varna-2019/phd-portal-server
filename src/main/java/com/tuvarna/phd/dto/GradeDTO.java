@@ -14,6 +14,12 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @AllArgsConstructor
 public class GradeDTO {
 
+  // NOTE: Needed to get all exams for doc center (in order to set commission)
+  @NotNull
+  @Schema(title = "id", required = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Long gradeId;
+
   @NotNull
   @Schema(title = "grade", required = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,7 +32,7 @@ public class GradeDTO {
   @NotNull
   @Schema(title = "commision", required = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private CommisionDTO commission;
+  private CommissionDTO commission;
 
   @NotNull
   @Schema(title = "report", required = true)
@@ -46,12 +52,14 @@ public class GradeDTO {
   private String subject;
 
   public GradeDTO(
+      Long gradeId,
       Double grade,
       Date evalDate,
       String report,
       Set<String> attachments,
       UserDTO evaluatedUser,
       String subject) {
+    this.gradeId = gradeId;
     this.grade = grade;
     this.evalDate = evalDate;
     this.report = report;
