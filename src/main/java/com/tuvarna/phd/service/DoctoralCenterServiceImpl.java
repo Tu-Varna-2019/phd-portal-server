@@ -36,6 +36,8 @@ import com.tuvarna.phd.repository.ReportRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
 import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
+import com.tuvarna.phd.utils.GradeUtils;
+import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -49,8 +51,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -70,6 +70,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject UnauthorizedRepository uRepository;
   @Inject ReportRepository reportRepository;
   @Inject CommissionRepository commissionRepository;
+  @Inject GradeUtils gradeUtils;
 
   @Inject CandidateMapper candidateMapper;
   @Inject PhdMapper phdMapper;
@@ -87,6 +88,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-candidates-cache")
+  @CacheInvalidate(cacheName = "doc-center-exams-cache")
+  @CacheInvalidate(cacheName = "committee-candidates-cache")
   public void review(String email, String status) throws IOException {
     LOG.info("Service received a request to review candidate: " + email);
     Candidate candidate = this.candidateRepository.getByEmail(email);
@@ -130,13 +134,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       }
       case 2 -> {
         if (status.equals("approved")) {
+          checkIfGradesAreEvaluated(candidate.getGrades(), candidate.getExamStep());
+
           LOG.info(
               "Candidate approved to go to the second draft of exams! Now sending email to the"
                   + " candidate personal email about it...");
 
           candidate.setExamStep(3);
-          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
 
+          Set<Grade> grades = setMandatoryExams(List.of(candidate.getCurriculum().getName()));
+          grades.addAll(candidate.getGrades());
           candidate.setGrades(grades);
           this.candidateRepository.save(candidate);
 
@@ -156,6 +163,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
       case 3 -> {
         if (status.equals("approved")) {
+          checkIfGradesAreEvaluated(candidate.getGrades(), candidate.getExamStep());
           LOG.info(
               "Candidate approved to become phd! Now sending email to the"
                   + " candidate personal email about it...");
@@ -178,6 +186,17 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           this.candidateRepository.save(candidate);
           sendMailRejected(candidate);
         }
+      }
+    }
+  }
+
+  private void checkIfGradesAreEvaluated(Set<Grade> grades, Integer examStep) {
+    for (Grade grade : grades) {
+      if (grade.getGrade() == null) {
+        LOG.error("Cannot move to exam step: " + examStep + " because no grades were evaluated!");
+
+        throw new HttpException(
+            "Cannot move to exam step: " + examStep + " because no grades were evaluated!");
       }
     }
   }
@@ -307,6 +326,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
+  @CacheResult(cacheName = "doc-center-candidates-cache")
   public List<CandidateDTO> getCandidates(String fields) {
     LOG.info("Received a service request to retrieve all candidates");
     List<String> fieldsList = Arrays.asList(fields.split(","));
@@ -338,6 +358,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-unauth-users-cache")
   public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
     List<Unauthorized> unauthorizedUsers = this.uRepository.getAll();
@@ -347,6 +368,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-exams-cache")
   public List<GradeDTO> getExams() {
     LOG.info("Service received to retrieve all grades");
 
@@ -355,71 +377,16 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         .getAll()
         .forEach(
             grade -> {
-              UserDTO userDTO = queryEvaluatedUser(grade.getId());
+              UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
               gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
             });
 
     return gradeDTOs;
   }
 
-  private UserDTO queryEvaluatedUser(Long gradeId) {
-    List<String> evaluatedUserTypes = List.of("phd_grades", "candidates_grades");
-    List<String> evaluatedUserTypeIDs = List.of("phd_id", "candidate_id");
-    List<UserDTO> userDto = new ArrayList<>();
-
-    evaluatedUserTypes.forEach(
-        (userType) -> {
-          String columnName = evaluatedUserTypeIDs.get(evaluatedUserTypes.indexOf(userType));
-          Long columnId;
-
-          try {
-            columnId =
-                this.databaseModel.selectLong(
-                    "SELECT " + columnName + " FROM " + userType + " WHERE grade_id = $1",
-                    Tuple.of(gradeId),
-                    columnName);
-          } catch (NoSuchElementException exception) {
-            columnId = -1L;
-          }
-
-          if (columnId != -1L) {
-            LOG.info(
-                "Good. Evaluated user: " + userType + " is found to grade id: " + gradeId + " !");
-
-            if (userType.equals("phd_grades")) {
-              Phd phd =
-                  this.databaseModel
-                      .selectMapEntity(
-                          "SELECT name, email FROM phd WHERE id = $1",
-                          Optional.of(Tuple.of(columnId)),
-                          new Phd())
-                      .get(0);
-              userDto.add(new UserDTO("", phd.getName(), phd.getEmail(), "phd", ""));
-
-            } else if (userType.equals("candidates_grades")) {
-              Candidate candidate =
-                  this.databaseModel
-                      .selectMapEntity(
-                          "SELECT name, email FROM candidate WHERE id = $1",
-                          Optional.of(Tuple.of(columnId)),
-                          new Candidate())
-                      .get(0);
-              userDto.add(
-                  new UserDTO("", candidate.getName(), candidate.getEmail(), "candidate", ""));
-            }
-          }
-        });
-
-    if (userDto.isEmpty()) {
-      LOG.error("Grade id: " + gradeId + " not found in any of the tables!");
-      throw new HttpException("Grade id: " + gradeId + " not found in any of the tables!");
-    }
-
-    return userDto.get(0);
-  }
-
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-exams-cache")
   public void setCommissionOnGrade(Long id, String name) {
     LOG.info("Received a service request to set commission: " + name + " to grade id: " + id);
     Grade grade = this.gradeRepository.getById(id);
@@ -476,6 +443,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheResult(cacheName = "doc-center-commission-cache")
   public List<NameDTO> getCommision() {
     LOG.info("Service received to retrieve all commisions");
     List<NameDTO> commisionNames = new ArrayList<>();
@@ -492,6 +460,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
+  @CacheInvalidate(cacheName = "doc-center-unauth-users-cache")
   public void setUnauthorizedUserGroup(List<UnauthorizedDTO> usersDTO, String group) {
     LOG.info(
         "Service received a request to set a role: "

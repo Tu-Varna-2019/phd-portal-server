@@ -1,6 +1,6 @@
 package com.tuvarna.phd.mapper;
 
-import com.tuvarna.phd.dto.CommisionDTO;
+import com.tuvarna.phd.dto.CommissionDTO;
 import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UserDTO;
@@ -34,7 +34,6 @@ public interface GradeMapper {
                         committee.getOid(),
                         committee.getName(),
                         committee.getPicture(),
-                        committee.getGrade(),
                         committee.getFaculty().getName(),
                         committee.getRole().getRole()));
               });
@@ -43,7 +42,7 @@ public interface GradeMapper {
           grade.getId(),
           grade.getGrade(),
           grade.getEvalDate(),
-          new CommisionDTO(commission.get().getName(), committeeDTOs),
+          new CommissionDTO(commission.get().getName(), committeeDTOs),
           grade.getReport(),
           grade.getAttachments(),
           examinedUser,

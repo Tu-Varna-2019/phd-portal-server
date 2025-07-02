@@ -70,6 +70,10 @@ public final class NotificationServiceImpl implements NotificationService {
                 + " (d.id=role.id) WHERE role.role='manager'";
           }
 
+          case "committee" -> {
+            yield "SELECT oid FROM committee";
+          }
+
           default -> {
             throw new HttpException(
                 "Notification error: cannot retrieve oids for unknown group: "
