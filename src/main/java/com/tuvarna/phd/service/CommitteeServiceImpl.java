@@ -7,6 +7,9 @@ import com.tuvarna.phd.dto.EvaluateGradeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
+import com.tuvarna.phd.entity.Committee;
+import com.tuvarna.phd.entity.CommitteeGrade;
+import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.model.DatabaseModel;
@@ -162,35 +165,84 @@ public final class CommitteeServiceImpl implements CommitteeService {
   @Override
   @Transactional
   @CacheInvalidate(cacheName = "committee-exams-cache")
-  public void evaluateGrade(EvaluateGradeDTO evaluateGradeDTO, String evalUserType) {
+  public void evaluateGrade(EvaluateGradeDTO evaluateGradeDTO, String evalUserType, String oid) {
     LOG.info("Received a service request to evaluate user type: " + evalUserType);
+    Committee committee = this.committeeRepository.getByOid(oid);
 
-    this.databaseModel.execute(
-        "UPDATE grade SET grade = $1 WHERE subject = (SELECT s.id FROM subject s WHERE"
-            + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
-            + evalUserType
-            + "s_grades gg WHERE gg."
-            + evalUserType
-            + "_id = (SELECT pc.id FROM "
-            + evalUserType
-            + " pc WHERE pc.pin = $3) LIMIT 1)",
-        Tuple.of(
-            evaluateGradeDTO.getGrade(), evaluateGradeDTO.getSubject(), evaluateGradeDTO.getPin()));
+    Long gradeID =
+        this.databaseModel.selectLong(
+            "SELECT g.id FROM grade g WHERE g.subject = (SELECT s.id FROM subject s WHERE"
+                + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
+                + evalUserType
+                + "s_grades gg WHERE gg."
+                + evalUserType
+                + "_id = (SELECT pc.id FROM "
+                + evalUserType
+                + " pc WHERE pc.pin = $3) LIMIT 1)",
+            Tuple.of(
+                evaluateGradeDTO.getGrade(),
+                evaluateGradeDTO.getSubject(),
+                evaluateGradeDTO.getPin()),
+            "id");
+
+    LOG.info("Found grade id is: " + gradeID);
+
+    Boolean isCommiteeModifyingGrade =
+        this.databaseModel.selectIfExists(
+            "SELECT EXISTS (SELECT 1 FROM committee_grade cg WHERE cg.grade_id = $1 AND"
+                + " cg.committee_id = $2)",
+            Tuple.of(gradeID, committee.getId()));
+    if (isCommiteeModifyingGrade) {
+      LOG.info(
+          "Grade has already been evaluated by committee: "
+              + committee.getName()
+              + ". Modifying grade to: "
+              + evaluateGradeDTO.getGrade()
+              + " now...");
+
+      this.databaseModel.execute(
+          "UPDATE committee_grade SET grade = $1 WHERE grade_id = $2 AND committee_id =" + " $3",
+          Tuple.of(evaluateGradeDTO.getGrade(), gradeID, committee.getId()));
+    } else {
+      LOG.info(
+          "Grade ISN'T evaluated by committee: "
+              + committee.getName()
+              + ". Creating grade to: "
+              + evaluateGradeDTO.getGrade()
+              + " now...");
+      this.committeeGradeRepository.save(
+          new CommitteeGrade(
+              committee, this.gradeRepository.getById(gradeID), evaluateGradeDTO.getGrade()));
+    }
 
     LOG.info("Now checking if all committees have evaluated the exam to calculate the medium");
 
-    // this.databaseModel.execute(
-    //     "SELECT EXISTS "
-    //         + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
-    //         + evalUserType
-    //         + "s_grades gg WHERE gg."
-    //         + evalUserType
-    //         + "_id = (SELECT pc.id FROM "
-    //         + evalUserType
-    //         + " pc WHERE pc.pin = $3) LIMIT 1)",
-    //     Tuple.of(
-    //         evaluateGradeDTO.getGrade(), evaluateGradeDTO.getSubject(),
-    // evaluateGradeDTO.getPin()));
+    Boolean isAllCommitteesEvaluatedGrade =
+        !this.databaseModel.selectIfExists(
+            "SELECT EXISTS (SELECT 1 FROM committee_grade cg JOIN commission_committees cc"
+                + " ON(cg.committee_id=cc.committee_id) WHERE cg.grade_id = $1 AND cg.committee_id"
+                + " = $2 AND cc.commission_id = $3 AND cg.grade IS NULL)",
+            Tuple.of(gradeID, committee.getId(), committee.getId()));
+
+    if (isAllCommitteesEvaluatedGrade) {
+      LOG.info(
+          "All committees have evaluated grade for the grade id: "
+              + gradeID
+              + ". Now creating a sum of the grades");
+
+      Double gradeSum =
+          this.databaseModel.selectDouble(
+              "SELECT AVG(cg.grade) AS grade_avg"
+                  + " FROM committee_grade cg JOIN grade g ON(cg.grade_id=g.id) WHERE g.id = $1",
+              Tuple.of(gradeID),
+              "grade_avg");
+      Grade grade = this.gradeRepository.getById(gradeID);
+      grade.setGrade(gradeSum);
+      this.gradeRepository.save(grade);
+    } else {
+      LOG.info(
+          "All committees haven't yet evaluated grade for the grade id: " + gradeID + ". Skipping");
+    }
 
     LOG.info("Changed grade to user: " + evalUserType);
   }

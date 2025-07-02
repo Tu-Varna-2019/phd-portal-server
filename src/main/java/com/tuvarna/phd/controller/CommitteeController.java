@@ -122,7 +122,7 @@ public final class CommitteeController extends BaseController {
 
     LOG.info("Received a controller request to evaluate user type: " + evalUserType);
 
-    this.committeeService.evaluateGrade(evaluateGradeDTO, evalUserType);
+    this.committeeService.evaluateGrade(evaluateGradeDTO, evalUserType, jwt.getClaim("oid"));
 
     return send("User evaluated with grade: " + evaluateGradeDTO.getGrade());
   }

@@ -49,4 +49,10 @@ public class CommitteeGrade extends PanacheEntityBase implements IEntity<Committ
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(CommitteeGrade.class);
   }
+
+  public CommitteeGrade(Committee committee, Grade gradeEntry, Double grade) {
+    this.committee = committee;
+    this.gradeEntry = gradeEntry;
+    this.grade = grade;
+  }
 }

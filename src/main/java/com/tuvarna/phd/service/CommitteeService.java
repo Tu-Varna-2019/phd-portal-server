@@ -11,5 +11,5 @@ public sealed interface CommitteeService permits CommitteeServiceImpl {
 
   List<GradeDTO> getExams(String oid);
 
-  void evaluateGrade(EvaluateGradeDTO evaluateGradeDTO, String evalUserType);
+  void evaluateGrade(EvaluateGradeDTO evaluateGradeDTO, String evalUserType, String oid);
 }
