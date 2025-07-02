@@ -47,7 +47,7 @@ public class GradeUtils {
               Phd phd =
                   this.databaseModel
                       .selectMapEntity(
-                          "SELECT name, email FROM phd WHERE id = $1",
+                          "SELECT name, email, pin FROM phd WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Phd())
                       .get(0);
@@ -58,7 +58,7 @@ public class GradeUtils {
               Candidate candidate =
                   this.databaseModel
                       .selectMapEntity(
-                          "SELECT name, email FROM candidate WHERE id = $1",
+                          "SELECT name, email, pin FROM candidate WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Candidate())
                       .get(0);

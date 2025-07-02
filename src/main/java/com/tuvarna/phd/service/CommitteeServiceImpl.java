@@ -118,8 +118,8 @@ public final class CommitteeServiceImpl implements CommitteeService {
                           try {
                             committeeGrade =
                                 this.databaseModel.selectDouble(
-                                    "SELECT cg.grade FROM committee_grade cg WHERE"
-                                        + " cg.committee_id = $1 AND cg.grade_id = $2",
+                                    "SELECT grade FROM committee_grade WHERE"
+                                        + " committee_id = $1 AND grade_id = $2",
                                     Tuple.of(committee.getId(), grade.getId()),
                                     "grade");
                           } catch (NoSuchElementException exception) {
