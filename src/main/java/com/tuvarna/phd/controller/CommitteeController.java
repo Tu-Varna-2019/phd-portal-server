@@ -2,6 +2,8 @@ package com.tuvarna.phd.controller;
 
 import com.sun.istack.NotNull;
 import com.tuvarna.phd.dto.CandidateDTO;
+import com.tuvarna.phd.dto.CommissionDTO;
+import com.tuvarna.phd.dto.CommissionRequestDTO;
 import com.tuvarna.phd.dto.EvaluateGradeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.exception.HttpException;
@@ -12,12 +14,15 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
@@ -125,5 +130,78 @@ public final class CommitteeController extends BaseController {
     this.committeeService.evaluateGrade(evaluateGradeDTO, evalUserType, jwt.getClaim("oid"));
 
     return send("User evaluated with grade: " + evaluateGradeDTO.getGrade());
+  }
+
+  @POST
+  @Operation(summary = "Create commission", description = "Create commission")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commission created",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when creating commission",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commission")
+  public Response createCommission(CommissionRequestDTO commissionDTO) {
+    LOG.info(
+        "Received a controller request to create commission with name " + commissionDTO.getName());
+
+    this.committeeService.createCommission(commissionDTO);
+
+    return send("Commission with name: " + commissionDTO.getName() + " created!");
+  }
+
+  @PUT
+  @Operation(summary = "Modify commission", description = "Modify commission")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commission modified",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when modifying commission",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commission")
+  public Response modifyCommission(
+      CommissionRequestDTO commissionDTO, @RestQuery Optional<String> name) {
+    LOG.info(
+        "Received a controller request to modify commission with name " + commissionDTO.getName());
+
+    this.committeeService.modifyCommission(commissionDTO, name);
+
+    return send(
+        "Commission with name: "
+            + (name.isPresent() ? name.get() : commissionDTO.getName())
+            + " modified!");
+  }
+
+  @GET
+  @Operation(summary = "Get all commissions", description = "Get all commissions")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commissions retrieved",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving commissions!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commissions")
+  public Response getCommissions() {
+    LOG.info("Received a controller request to retrieve all commissions.");
+
+    String oid = jwt.getClaim("oid");
+    List<CommissionDTO> commissions = this.committeeService.getCommissions(oid);
+
+    return send("Commissions retrieved", commissions);
   }
 }

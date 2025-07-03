@@ -12,7 +12,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class CommitteeDTO {
   @NotNull
   @Schema(title = "oid", required = true)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String oid;
 
   @NotNull
@@ -21,6 +20,11 @@ public class CommitteeDTO {
 
   @NotNull
   @Schema(title = "email", required = true)
+  private String email;
+
+  @NotNull
+  @Schema(title = "email", required = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String picture;
 
   @NotNull
@@ -36,9 +40,11 @@ public class CommitteeDTO {
   @Schema(title = "role", required = true)
   private String role;
 
-  public CommitteeDTO(String oid, String name, String picture, String faculty, String role) {
+  public CommitteeDTO(
+      String oid, String name, String email, String picture, String faculty, String role) {
     this.oid = oid;
     this.name = name;
+    this.email = email;
     this.picture = picture;
     this.faculty = faculty;
     this.role = role;

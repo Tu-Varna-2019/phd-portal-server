@@ -50,6 +50,10 @@ public class Commission extends PanacheEntityBase implements IEntity<Commission>
     this.name = name;
   }
 
+  public Commission(String name) {
+    this.name = name;
+  }
+
   @Override
   public Commission toEntity(Row row) {
     JsonObject jsonObject = row.toJson();

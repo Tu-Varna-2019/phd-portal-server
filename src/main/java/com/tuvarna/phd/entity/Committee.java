@@ -14,6 +14,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,9 +68,36 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
     this.email = email;
   }
 
+  public Committee(
+      Long id,
+      String oid,
+      String name,
+      String email,
+      String picture,
+      Faculty faculty,
+      CommitteeRole committeeRole) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.picture = picture;
+    this.faculty = faculty;
+    this.role = committeeRole;
+  }
+
   @Override
   public Committee toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Committee.class);
+  }
+
+  public static List<String> getOids(Set<Committee> committees) {
+    List<String> oids = new ArrayList<>();
+
+    committees.forEach(
+        committee -> {
+          oids.add(committee.getOid());
+        });
+
+    return oids;
   }
 }

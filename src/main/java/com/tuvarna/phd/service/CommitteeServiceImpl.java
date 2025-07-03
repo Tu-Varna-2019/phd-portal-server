@@ -2,15 +2,18 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CommissionDTO;
+import com.tuvarna.phd.dto.CommissionRequestDTO;
 import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.EvaluateGradeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Candidate;
+import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.CommitteeGrade;
 import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.mapper.CandidateMapper;
+import com.tuvarna.phd.mapper.CommissionMapper;
 import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
@@ -28,8 +31,11 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -47,6 +53,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
 
   @Inject CandidateMapper candidateMapper;
   @Inject GradeMapper gradeMapper;
+  @Inject CommissionMapper commissionMapper;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -79,6 +86,67 @@ public final class CommitteeServiceImpl implements CommitteeService {
 
     LOG.info("All candidates retrieved!");
     return candidateDTOs;
+  }
+
+  @Override
+  @CacheResult(cacheName = "committee-commissions-cache")
+  public List<CommissionDTO> getCommissions(String oid) {
+    LOG.info("Service received to retrieve all commissions");
+    List<CommissionDTO> commissionDTOs = new ArrayList<>();
+
+    this.commissionRepository
+        .getAll()
+        .forEach(
+            commission -> {
+              if (Committee.getOids(commission.getMembers()).contains(oid)) {
+                commissionDTOs.add(this.commissionMapper.toDto(commission));
+              }
+            });
+
+    return commissionDTOs;
+  }
+
+  @Override
+  @Transactional
+  @CacheInvalidate(cacheName = "committee-commissions-cache")
+  public void createCommission(CommissionRequestDTO commissionDTO) {
+    LOG.info("Service received to create commission with name " + commissionDTO.getName());
+    Commission commission = this.commissionMapper.toEntity(commissionDTO);
+    Set<Committee> committees = new HashSet<Committee>();
+
+    commissionDTO
+        .getCommittees()
+        .forEach(
+            committee -> {
+              committees.add(this.committeeRepository.getByOid(committee.getOid()));
+            });
+
+    commission.setMembers(committees);
+    this.commissionRepository.save(commission);
+  }
+
+  @Override
+  @Transactional
+  @CacheInvalidate(cacheName = "committee-commissions-cache")
+  public void modifyCommission(CommissionRequestDTO commissionDTO, Optional<String> name) {
+    LOG.info("Service received to modify commission with name " + commissionDTO.getName());
+
+    Commission commission = this.commissionRepository.getByName(commissionDTO.getName());
+
+    Set<Committee> committees = new HashSet<Committee>();
+    commissionDTO
+        .getCommittees()
+        .forEach(
+            committee -> {
+              committees.add(this.committeeRepository.getByOid(committee.getOid()));
+            });
+
+    commission.setMembers(committees);
+    if (name.isPresent()) {
+      commission.setName(name.get());
+    }
+
+    this.commissionRepository.save(commission);
   }
 
   @Override
@@ -135,6 +203,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
                               new CommitteeDTO(
                                   committee.getOid(),
                                   committee.getName(),
+                                  committee.getEmail(),
                                   committee.getPicture(),
                                   committeeGrade,
                                   committee.getFaculty().getName(),
