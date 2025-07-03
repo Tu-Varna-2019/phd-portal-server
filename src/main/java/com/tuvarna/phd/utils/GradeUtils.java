@@ -31,7 +31,7 @@ public class GradeUtils {
 
           try {
             columnId =
-                this.databaseModel.selectLong(
+                this.databaseModel.getLong(
                     "SELECT " + columnName + " FROM " + userType + " WHERE grade_id = $1",
                     Tuple.of(gradeId),
                     columnName);
@@ -46,7 +46,7 @@ public class GradeUtils {
             if (userType.equals("phd_grades")) {
               Phd phd =
                   this.databaseModel
-                      .selectMapEntity(
+                      .getListEntity(
                           "SELECT name, email, pin FROM phd WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Phd())
@@ -57,7 +57,7 @@ public class GradeUtils {
             } else if (userType.equals("candidates_grades")) {
               Candidate candidate =
                   this.databaseModel
-                      .selectMapEntity(
+                      .getListEntity(
                           "SELECT name, email, pin FROM candidate WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Candidate())

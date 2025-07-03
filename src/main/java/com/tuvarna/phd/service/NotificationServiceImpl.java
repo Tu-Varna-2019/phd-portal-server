@@ -82,7 +82,7 @@ public final class NotificationServiceImpl implements NotificationService {
           }
         };
 
-    return this.databaseModel.selectMapString(statement, "oid");
+    return this.databaseModel.getListString(statement, "oid");
   }
 
   @Override

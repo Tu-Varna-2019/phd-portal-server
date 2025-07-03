@@ -52,7 +52,7 @@ public final class AuthServiceImpl implements AuthService {
 
     for (String group : this.groups) {
       statement = ("SELECT EXISTS (SELECT 1 FROM " + group + " WHERE oid = $1)");
-      Boolean isUserFound = this.databaseModel.selectIfExists(statement, Tuple.of(oid));
+      Boolean isUserFound = this.databaseModel.getBoolean(statement, Tuple.of(oid));
 
       if (isUserFound) {
         // NOTE: Exception is doc center

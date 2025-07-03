@@ -22,7 +22,7 @@ public class DatabaseModel {
     this.client.preparedQuery(statement).execute(prepQueries).await().indefinitely();
   }
 
-  public Boolean selectIfExists(String statement, Tuple prepQueries) {
+  public Boolean getBoolean(String statement, Tuple prepQueries) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -32,7 +32,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public String selectString(String statement, Tuple prepQueries, String rowString) {
+  public String getString(String statement, Tuple prepQueries, String rowString) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -42,7 +42,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public Long selectLong(String statement, Tuple prepQueries, String rowLong) {
+  public Long getLong(String statement, Tuple prepQueries, String rowLong) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -52,7 +52,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public Double selectDouble(String statement, Tuple prepQueries, String rowDouble) {
+  public Double getDouble(String statement, Tuple prepQueries, String rowDouble) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -62,7 +62,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public List<Long> selectMapLong(String statement, Tuple prepQueries, String row) {
+  public List<Long> getListLong(String statement, Tuple prepQueries, String row) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -76,7 +76,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public List<Double> selectMapDouble(String statement, Tuple prepQueries, String row) {
+  public List<Double> getListDouble(String statement, Tuple prepQueries, String row) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -90,7 +90,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public List<String> selectMapString(String statement, Tuple prepQueries, String rowString) {
+  public List<String> getListString(String statement, Tuple prepQueries, String rowString) {
     return this.client
         .preparedQuery(statement)
         .execute(prepQueries)
@@ -104,7 +104,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public List<String> selectMapString(String statement, String rowString) {
+  public List<String> getListString(String statement, String rowString) {
     return this.client
         .preparedQuery(statement)
         .execute()
@@ -118,7 +118,7 @@ public class DatabaseModel {
         .indefinitely();
   }
 
-  public <T extends IEntity<T>> List<T> selectMapEntity(
+  public <T extends IEntity<T>> List<T> getListEntity(
       String statement, Optional<Tuple> prepQueries, IEntity<T> entity) {
     try {
       return this.client
@@ -147,7 +147,7 @@ public class DatabaseModel {
     }
   }
 
-  public <T extends IEntity<T>> List<T> selectMapEntity(String statement, IEntity<T> entity) {
+  public <T extends IEntity<T>> List<T> getListEntity(String statement, IEntity<T> entity) {
     try {
       return this.client
           .preparedQuery(statement)

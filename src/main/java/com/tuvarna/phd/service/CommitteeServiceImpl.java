@@ -80,7 +80,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
             + "FROM candidate c JOIN candidate_status s ON (c.status=s.id) JOIN faculty f ON"
             + " (c.faculty=f.id) JOIN curriculum cu ON (c.curriculum=cu.id)";
 
-    List<Candidate> candidates = this.databaseModel.selectMapEntity(statement, new Candidate());
+    List<Candidate> candidates = this.databaseModel.getListEntity(statement, new Candidate());
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     candidates.forEach(candidate -> candidateDTOs.add(this.candidateMapper.toDto(candidate)));
 
@@ -155,7 +155,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
     LOG.info("Service received to retrieve all grades");
 
     List<Long> commissionIds =
-        this.databaseModel.selectMapLong(
+        this.databaseModel.getListLong(
             "SELECT cm.id FROM commission cm JOIN commission_committees cmc ON"
                 + " (cm.id=cmc.commission_id) JOIN committee c ON (cmc.committee_id=c.id) WHERE"
                 + " c.oid = $1",
@@ -185,7 +185,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
                           Double committeeGrade = null;
                           try {
                             committeeGrade =
-                                this.databaseModel.selectDouble(
+                                this.databaseModel.getDouble(
                                     "SELECT grade FROM committee_grade WHERE"
                                         + " committee_id = $1 AND grade_id = $2",
                                     Tuple.of(committee.getId(), grade.getId()),
@@ -239,7 +239,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
     Committee committee = this.committeeRepository.getByOid(oid);
 
     Long gradeID =
-        this.databaseModel.selectLong(
+        this.databaseModel.getLong(
             "SELECT g.id FROM grade g WHERE g.subject = (SELECT s.id FROM subject s WHERE"
                 + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
                 + evalUserType
@@ -257,7 +257,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
     LOG.info("Found grade id is: " + gradeID);
 
     Boolean isCommiteeModifyingGrade =
-        this.databaseModel.selectIfExists(
+        this.databaseModel.getBoolean(
             "SELECT EXISTS (SELECT 1 FROM committee_grade cg WHERE cg.grade_id = $1 AND"
                 + " cg.committee_id = $2)",
             Tuple.of(gradeID, committee.getId()));
@@ -287,7 +287,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
     LOG.info("Now checking if all committees have evaluated the exam to calculate the medium");
 
     Boolean isAllCommitteesEvaluatedGrade =
-        !this.databaseModel.selectIfExists(
+        !this.databaseModel.getBoolean(
             "SELECT EXISTS (SELECT 1 FROM committee_grade cg JOIN commission_committees cc"
                 + " ON(cg.committee_id=cc.committee_id) WHERE cg.grade_id = $1 AND cg.committee_id"
                 + " = $2 AND cc.commission_id = $3 AND cg.grade IS NULL)",
@@ -300,7 +300,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
               + ". Now creating a sum of the grades");
 
       Double gradeSum =
-          this.databaseModel.selectDouble(
+          this.databaseModel.getDouble(
               "SELECT AVG(cg.grade) AS grade_avg"
                   + " FROM committee_grade cg JOIN grade g ON(cg.grade_id=g.id) WHERE g.id = $1",
               Tuple.of(gradeID),

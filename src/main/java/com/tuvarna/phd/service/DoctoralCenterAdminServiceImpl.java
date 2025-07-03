@@ -179,7 +179,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     LOG.info("Received a request to retrieve all doctoral center roles");
 
     List<String> docCenterRoles =
-        this.databaseModel.selectMapString(
+        this.databaseModel.getListString(
             "SELECT role FROM doctoral_center_role", Tuple.tuple(), "role");
 
     LOG.info("All doc center roles have been retrieved: " + docCenterRoles.toString());
