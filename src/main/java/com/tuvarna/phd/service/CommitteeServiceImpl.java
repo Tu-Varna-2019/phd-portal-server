@@ -12,8 +12,10 @@ import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.CommitteeGrade;
 import com.tuvarna.phd.entity.Grade;
+import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
 import com.tuvarna.phd.mapper.CommissionMapper;
+import com.tuvarna.phd.mapper.CommitteeMapper;
 import com.tuvarna.phd.mapper.GradeMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.model.MailModel;
@@ -54,6 +56,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   @Inject CandidateMapper candidateMapper;
   @Inject GradeMapper gradeMapper;
   @Inject CommissionMapper commissionMapper;
+  @Inject CommitteeMapper committeeMapper;
 
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
@@ -107,11 +110,38 @@ public final class CommitteeServiceImpl implements CommitteeService {
   }
 
   @Override
+  @CacheResult(cacheName = "committee-committees-cache")
+  public List<CommitteeDTO> getCommittees() {
+    LOG.info("Service received to retrieve all committees");
+    List<CommitteeDTO> committeeDTOs = new ArrayList<>();
+
+    this.committeeRepository
+        .getAll()
+        .forEach(
+            committee -> {
+              committeeDTOs.add(this.committeeMapper.toDto(committee));
+            });
+
+    return committeeDTOs;
+  }
+
+  @Override
   @Transactional
   @CacheInvalidate(cacheName = "committee-commissions-cache")
   public void createCommission(CommissionRequestDTO commissionDTO) {
     LOG.info("Service received to create commission with name " + commissionDTO.getName());
-    Commission commission = this.commissionMapper.toEntity(commissionDTO);
+
+    Boolean doesCommissionNameExists =
+        this.databaseModel.getBoolean(
+            "SELECT EXISTS (SELECT 1 FROM commission WHERE name = $1)",
+            Tuple.of(commissionDTO.getName()));
+
+    if (doesCommissionNameExists) {
+      throw new HttpException("Commission name already exists!", 400);
+    }
+
+    Commission commission = new Commission();
+    commission.setName(commissionDTO.getName());
     Set<Committee> committees = new HashSet<Committee>();
 
     commissionDTO
@@ -123,6 +153,15 @@ public final class CommitteeServiceImpl implements CommitteeService {
 
     commission.setMembers(committees);
     this.commissionRepository.save(commission);
+  }
+
+  @Override
+  @Transactional
+  @CacheInvalidate(cacheName = "committee-commissions-cache")
+  public void deleteCommission(String name) {
+    LOG.info("Service received to delete commission with name " + name);
+
+    this.commissionRepository.deleteByName(name);
   }
 
   @Override

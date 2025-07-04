@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.tuvarna.phd.dto.CandidateDTO;
 import com.tuvarna.phd.dto.CommissionDTO;
 import com.tuvarna.phd.dto.CommissionRequestDTO;
+import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.EvaluateGradeDTO;
 import com.tuvarna.phd.dto.GradeDTO;
 import com.tuvarna.phd.exception.HttpException;
@@ -12,6 +13,7 @@ import com.tuvarna.phd.validator.CommitteeValidator;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
@@ -155,6 +157,28 @@ public final class CommitteeController extends BaseController {
     return send("Commission with name: " + commissionDTO.getName() + " created!");
   }
 
+  @DELETE
+  @Operation(summary = "Delete commission", description = "Delete commission")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Commission deleted",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when deleting commission",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/commission/{name}")
+  public Response deleteCommission(@PathParam("name") String name) {
+    LOG.info("Received a controller request to delete commission with name " + name);
+
+    this.committeeService.deleteCommission(name);
+
+    return send("Commission: " + name + " deleted!");
+  }
+
   @PUT
   @Operation(summary = "Modify commission", description = "Modify commission")
   @APIResponses(
@@ -203,5 +227,27 @@ public final class CommitteeController extends BaseController {
     List<CommissionDTO> commissions = this.committeeService.getCommissions(oid);
 
     return send("Commissions retrieved", commissions);
+  }
+
+  @GET
+  @Operation(summary = "Get all committees", description = "Get all committees")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Committees retrieved",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving committees!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/committees")
+  public Response getCommittees() {
+    LOG.info("Received a controller request to retrieve all committees.");
+
+    List<CommitteeDTO> committees = this.committeeService.getCommittees();
+
+    return send("Committees retrieved", committees);
   }
 }
