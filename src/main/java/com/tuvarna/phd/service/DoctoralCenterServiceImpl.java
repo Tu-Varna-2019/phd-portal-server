@@ -397,7 +397,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Override
   @Transactional
   // @CacheResult(cacheName = "doc-center-commission-cache")
-  public List<NameDTO> getCommision() {
+  public List<NameDTO> getCommisions() {
     LOG.info("Service received to retrieve all commisions");
     List<NameDTO> commisionNames = new ArrayList<>();
 

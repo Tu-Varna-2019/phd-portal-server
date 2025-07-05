@@ -261,10 +261,10 @@ public final class DoctoralCenterController extends BaseController {
             description = "Error when retrieving commision!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/commission")
-  public Response getCommision() {
+  @Path("/commissions")
+  public Response getCommisions() {
     LOG.info("Received a controller request to retrieve all commisions.");
-    List<NameDTO> commisions = this.doctoralCenterService.getCommision();
+    List<NameDTO> commisions = this.doctoralCenterService.getCommisions();
 
     return send("Commision retrieved", commisions);
   }

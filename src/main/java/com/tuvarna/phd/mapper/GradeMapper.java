@@ -8,7 +8,6 @@ import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Grade;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,10 +19,12 @@ public interface GradeMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "toEntity", ignore = true)
   default GradeDTO toDto(Grade grade, UserDTO examinedUser) {
-    Optional<Commission> commission = Optional.ofNullable(grade.getCommission());
+    Commission commission = grade.getCommission();
+    System.out.println("Commission " + commission + " for graed: " + grade.getId());
+
     List<CommitteeDTO> committeeDTOs = new ArrayList<>();
 
-    if (commission.isPresent()) {
+    if (commission != null) {
       grade
           .getCommission()
           .getMembers()
@@ -43,7 +44,7 @@ public interface GradeMapper {
           grade.getId(),
           grade.getGrade(),
           grade.getEvalDate(),
-          new CommissionDTO(commission.get().getName(), committeeDTOs),
+          new CommissionDTO(commission.getName(), committeeDTOs),
           grade.getReport(),
           grade.getAttachments(),
           examinedUser,
