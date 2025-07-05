@@ -1,7 +1,9 @@
 package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.exception.HttpException;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class CandidateValidator {
 
   private enum VALID_STASUSES {

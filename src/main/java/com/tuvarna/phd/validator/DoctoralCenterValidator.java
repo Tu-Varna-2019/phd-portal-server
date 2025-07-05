@@ -2,7 +2,9 @@ package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.dto.DoctoralCenterDTO;
 import com.tuvarna.phd.exception.HttpException;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class DoctoralCenterValidator {
 
   protected enum VALID_ROLES {

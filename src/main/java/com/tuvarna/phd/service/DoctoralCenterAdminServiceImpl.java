@@ -72,6 +72,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     return unauthorizedUsers;
   }
 
+
   @Override
   @CacheResult(cacheName = "auth-users-cache")
   @Transactional
@@ -89,7 +90,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               phd.getName(),
               phd.getEmail(),
               "phd",
-              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()));
+              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 
@@ -100,7 +102,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               commitee.getName(),
               commitee.getEmail(),
               "committee",
-              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()));
+              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 
@@ -111,7 +114,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               dCenter.getName(),
               dCenter.getEmail(),
               dCenter.getRole().getRole(),
-              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()));
+              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 

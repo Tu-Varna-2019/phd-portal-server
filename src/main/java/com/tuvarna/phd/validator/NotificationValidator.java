@@ -2,7 +2,9 @@ package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.dto.NotificationDTO;
 import com.tuvarna.phd.exception.HttpException;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class NotificationValidator {
 
   private enum VALID_SEVERITY {

@@ -42,7 +42,7 @@ public final class NotificationController extends BaseController {
   @Inject JsonWebToken jwt;
   @Inject NotificationService notificationService;
 
-  private NotificationValidator notificationValidator;
+  @Inject NotificationValidator notificationValidator;
 
   @POST
   @Operation(summary = "Save notification", description = "Save a notification from user action")

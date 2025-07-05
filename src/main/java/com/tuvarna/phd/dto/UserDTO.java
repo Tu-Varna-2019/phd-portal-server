@@ -50,4 +50,13 @@ public class UserDTO {
     this.pin = pin;
     this.group = group;
   }
+
+  public UserDTO(
+      String oid, String name, String email, String group, String pictureBlob, Integer dummy) {
+    this.oid = oid;
+    this.name = name;
+    this.email = email;
+    this.group = group;
+    this.pictureBlob = pictureBlob;
+  }
 }

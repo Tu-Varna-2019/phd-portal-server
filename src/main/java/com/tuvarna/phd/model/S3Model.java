@@ -29,7 +29,7 @@ public class S3Model {
 
   // TODO: Let the client build data url
   public String getDataUrlPicture(String oid, String picture) {
-    if (picture.isEmpty()) return "";
+    if (picture.strip().isEmpty()) return null;
 
     ResponseBytes<GetObjectResponse> oBytes =
         this.client.getObjectAsBytes(this.buildGetRequest(oid + "/avatar/" + picture));

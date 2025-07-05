@@ -49,7 +49,7 @@ public final class DoctoralCenterController extends BaseController {
   @Inject DoctoralCenterService doctoralCenterService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
-  private CandidateValidator candidateValidator;
+  @Inject CandidateValidator candidateValidator;
 
   @PATCH
   @Operation(

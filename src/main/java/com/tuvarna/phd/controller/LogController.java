@@ -45,7 +45,7 @@ public final class LogController extends BaseController {
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
 
-  private LogValidator logValidator;
+  @Inject  LogValidator logValidator;
 
   @POST
   @Operation(summary = "Save log", description = "Save a log from user action")
