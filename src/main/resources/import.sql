@@ -14,17 +14,6 @@ INSERT INTO "faculty" ("id", "name")
       'Cybersecurity'
     );
 
--- NOTE: SupervisorTitle
-INSERT INTO "supervisor_title" ("id", "title")
-  VALUES
-    (
-      nextval('supervisorTypeSequence'),
-      'professor'
-    ),
-    (
-      nextval('supervisorTypeSequence'),
-      'assistant'
-    );
 
 -- NOTE: Doc center role
 INSERT INTO "doctoral_center_role" ("id", "role")
@@ -60,18 +49,6 @@ INSERT INTO "doctoral_center" ("id", "oid", "name", "email", "picture", "role")
       't.teacher1@tu-varna.bg',
       '',
       (SELECT id FROM "doctoral_center_role" WHERE role = 'expert')
-    );
-
--- NOTE: Supervisor
-INSERT INTO "supervisor" ("id", "oid", "name", "email", "picture", "title")
-  VALUES
-    (
-      nextval('supervisor_id_seq'),
-      '56ef9437-2706-4d78-9ea5-f6ba18ca1ef7',
-      'Поддръжка ТУ Варна',
-      't.teacher3@tu-varna.bg',
-      '',
-      (SELECT id FROM "supervisor_title" WHERE title = 'professor')
     );
 
 -- NOTE: Candidate Status
@@ -132,6 +109,18 @@ INSERT INTO "committee_role" ("id", "role")
     (
       nextval('committeeRole_id_seq'),
       'member'
+    );
+
+-- NOTE: CommitteeTitle
+INSERT INTO "committee_title" ("id", "title")
+  VALUES
+    (
+      nextval('committeetitle_id_seq'),
+      'professor'
+    ),
+    (
+      nextval('committeetitle_id_seq'),
+      'assistant'
     );
 
 -- NOTE: Mode
@@ -201,7 +190,7 @@ INSERT INTO "phd" ("id", "oid", "name", "email", "pin","post_code","picture", "s
     );
 
 -- NOTE: Committee
-INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "faculty")
+INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "title", "role", "faculty")
   VALUES
   (
     nextval('committee_id_seq'),
@@ -209,6 +198,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'Поддръжка ТУ Варна',
     't.teacher2@tu-varna.bg',
     '',
+    (SELECT id FROM "committee_title" WHERE title = 'professor'),
     (SELECT id FROM "committee_role" WHERE role = 'chairman'),
     (SELECT id FROM "faculty" WHERE name = 'Software engineering')
   ),
@@ -218,6 +208,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'Поддръжка ТУ Варна',
     't.teacher4@tu-varna.bg',
     '',
+    (SELECT id FROM "committee_title" WHERE title = 'assistant'),
     (SELECT id FROM "committee_role" WHERE role = 'member'),
     (SELECT id FROM "faculty" WHERE name = 'Software engineering')
   ),
@@ -227,6 +218,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'Поддръжка ТУ Варна',
     't.teacher5@tu-varna.bg',
     '',
+    (SELECT id FROM "committee_title" WHERE title = 'assistant'),
     (SELECT id FROM "committee_role" WHERE role = 'member'),
     (SELECT id FROM "faculty" WHERE name = 'Software engineering')
   ),
@@ -236,6 +228,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "role", "facul
     'Поддръжка ТУ Варна',
     't.teacher6@tu-varna.bg',
     '',
+    (SELECT id FROM "committee_title" WHERE title = 'professor'),
     (SELECT id FROM "committee_role" WHERE role = 'member'),
     (SELECT id FROM "faculty" WHERE name = 'Software engineering')
   );

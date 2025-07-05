@@ -46,16 +46,10 @@ import org.jboss.resteasy.reactive.RestQuery;
     scheme = "bearer")
 public final class DoctoralCenterController extends BaseController {
 
-  private final DoctoralCenterService doctoralCenterService;
-  private final CandidateValidator candidateValidator;
+  @Inject DoctoralCenterService doctoralCenterService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
-  @Inject
-  public DoctoralCenterController(
-      DoctoralCenterService doctoralCenterService, CandidateValidator candidateValidator) {
-    this.doctoralCenterService = doctoralCenterService;
-    this.candidateValidator = candidateValidator;
-  }
+  private CandidateValidator candidateValidator;
 
   @PATCH
   @Operation(

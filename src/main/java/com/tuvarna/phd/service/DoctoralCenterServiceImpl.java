@@ -14,7 +14,6 @@ import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.entity.Phd;
 import com.tuvarna.phd.entity.Report;
 import com.tuvarna.phd.entity.Subject;
-import com.tuvarna.phd.entity.Supervisor;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.CandidateMapper;
@@ -34,9 +33,9 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.ReportRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
-import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import com.tuvarna.phd.utils.GradeUtils;
+import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -62,7 +61,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject PhdRepository phdRepository;
   @Inject PhdStatusRepository phdStatusRepository;
   @Inject CommitteeRepository committeeRepository;
-  @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject GradeRepository gradeRepository;
@@ -377,7 +375,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         .getAll()
         .forEach(
             grade -> {
-              UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
+              UserDTO userDTO =
+                  this.gradeUtils.queryEvaluatedUsers(grade.getId(), EVAL_USER_TYPE.phd_candidate);
               gradeDTOs.add(this.gradeMapper.toDto(grade, userDTO));
             });
 
@@ -486,12 +485,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           Committee committee =
               new Committee(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
           this.committeeRepository.save(committee);
-        }
-
-        case "supervisor" -> {
-          Supervisor supervisor =
-              new Supervisor(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
-          this.supervisorRepository.save(supervisor);
         }
 
         default -> throw new HttpException("Group: " + group + " doesn't exist!");

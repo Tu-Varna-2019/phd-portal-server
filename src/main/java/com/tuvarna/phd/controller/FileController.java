@@ -37,9 +37,10 @@ import org.jboss.resteasy.reactive.RestQuery;
 public final class FileController extends BaseController {
 
   @Inject S3ClientService s3ClientService;
-  @Inject S3ClientValidator s3ClientValidator;
   @Inject private Logger LOG;
   @Inject JsonWebToken jwt;
+
+  private S3ClientValidator s3ClientValidator;
 
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)

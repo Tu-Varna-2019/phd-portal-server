@@ -25,6 +25,7 @@ import com.tuvarna.phd.repository.CommitteeRepository;
 import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.ReportRepository;
 import com.tuvarna.phd.utils.GradeUtils;
+import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -213,7 +214,9 @@ public final class CommitteeServiceImpl implements CommitteeService {
             grade -> {
               if (grade.getCommission() != null
                   && commissionIds.contains(grade.getCommission().getId())) {
-                UserDTO userDTO = this.gradeUtils.queryEvaluatedUser(grade.getId());
+                UserDTO userDTO =
+                    this.gradeUtils.queryEvaluatedUsers(
+                        grade.getId(), EVAL_USER_TYPE.phd_candidate);
 
                 List<CommitteeDTO> committeeDTOs = new ArrayList<>();
                 grade

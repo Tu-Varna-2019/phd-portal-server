@@ -41,10 +41,11 @@ import org.jboss.resteasy.reactive.RestCookie;
 public final class LogController extends BaseController {
 
   @Inject LogService logService;
-  @Inject LogValidator logValidator;
   @Inject private LogMapper logMapper;
   @Inject private Logger LOG = Logger.getLogger(LogController.class);
   @Inject JsonWebToken jwt;
+
+  private LogValidator logValidator;
 
   @POST
   @Operation(summary = "Save log", description = "Save a log from user action")

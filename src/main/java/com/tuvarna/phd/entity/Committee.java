@@ -51,9 +51,6 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
 
   @Transient private String pictureBlob;
 
-  @Column(nullable = true, unique = false)
-  private Double grade;
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
@@ -61,6 +58,14 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "role", nullable = false)
   private CommitteeRole role;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "title", nullable = false)
+  private CommitteeTitle title;
+
+  // TODO: create a functionality where he manually adds diserattions topics
+  @Column(nullable = true, unique = false)
+  private List<String> dissertations;
 
   public Committee(String oid, String name, String email) {
     this.oid = oid;

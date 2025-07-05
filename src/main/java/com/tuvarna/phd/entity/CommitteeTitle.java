@@ -22,23 +22,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Cacheable
-@Table(name = "supervisor_title")
-public class SupervisorTitle extends PanacheEntityBase implements IEntity<SupervisorTitle> {
+@Table(name = "committee_title")
+public class CommitteeTitle extends PanacheEntityBase implements IEntity<CommitteeTitle> {
 
   @Id
   @SequenceGenerator(
-      name = "supervisortitleSequence",
-      sequenceName = "supervisortitle_id_seq",
+      name = "committeetitleSequence",
+      sequenceName = "committeetitle_id_seq",
       allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supervisorTypeSequence")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "committeetitleSequence")
   private Long id;
 
   @Column(nullable = false, unique = true)
   private String title;
 
   @Override
-  public SupervisorTitle toEntity(Row row) {
+  public CommitteeTitle toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
-    return jsonObject.mapTo(SupervisorTitle.class);
+    return jsonObject.mapTo(CommitteeTitle.class);
   }
 }
