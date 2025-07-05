@@ -10,9 +10,7 @@ import com.tuvarna.phd.entity.Candidate;
 import com.tuvarna.phd.entity.Commission;
 import com.tuvarna.phd.entity.Committee;
 import com.tuvarna.phd.entity.Grade;
-import com.tuvarna.phd.entity.Mode;
 import com.tuvarna.phd.entity.Phd;
-import com.tuvarna.phd.entity.Report;
 import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.entity.Unauthorized;
 import com.tuvarna.phd.exception.HttpException;
@@ -26,6 +24,7 @@ import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommissionRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
+import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.GradeRepository;
@@ -36,7 +35,9 @@ import com.tuvarna.phd.repository.SubjectRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import com.tuvarna.phd.utils.GradeUtils;
 import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
+import com.tuvarna.phd.utils.PhdUtils;
 import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -67,6 +68,9 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject UnauthorizedRepository uRepository;
   @Inject ReportRepository reportRepository;
   @Inject CommissionRepository commissionRepository;
+  @Inject CurriculumRepository curriculumRepository;
+
+  @Inject PhdUtils phdUtils;
   @Inject GradeUtils gradeUtils;
 
   @Inject CandidateMapper candidateMapper;
@@ -177,7 +181,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
           this.candidateRepository.deleteById(candidate.getId());
 
-          generateReport(phd);
+          this.phdUtils.generateReport(phd);
         } else {
           candidate.setExamStep(1);
           this.candidateRepository.save(candidate);
@@ -271,55 +275,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
       LOG.error("Error in sending email to the doc center pesonnel: " + exception);
       throw new HttpException("Error in sending email to the doc center pesonnel!");
     }
-  }
-
-  private void generateReport(Phd phd) {
-    Integer MONTHLY_REPORT_DELAY = 3;
-
-    Set<Report> reports = new HashSet<>();
-    Date currentDate = new Date();
-    currentDate.setMonth(currentDate.getMonth() + Report.TIME_MONTH_DELAY_CANDIDATE_APPROVAL);
-    phd.setEnrollDate(new java.sql.Date(currentDate.getTime()));
-
-    for (Integer year = 0; year < phd.getCurriculum().getMode().getYearPeriod(); year++) {
-      LOG.info("Now generating the report for year: " + year);
-      for (Integer month = 0; month < 9; month += 3) {
-        // TODO: Verify how to generate the order number
-        // Currently it's unknown to me
-        Date monthDate = new Date();
-        monthDate.setTime(currentDate.getTime());
-        monthDate.setMonth(month + MONTHLY_REPORT_DELAY);
-        monthDate.setYear(currentDate.getYear() + year);
-
-        Report report =
-            new Report(
-                "Индивидуален тримесечен учебен план за подготовка за докоторант",
-                Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
-                monthDate,
-                month + 1);
-        this.reportRepository.save(report);
-        reports.add(report);
-        LOG.info("Now generating the report for month: " + month);
-      }
-
-      Date yearDate = new Date();
-      yearDate.setTime(currentDate.getTime());
-      yearDate.setMonth(11);
-      yearDate.setYear(currentDate.getYear() + year);
-
-      Report report =
-          new Report(
-              "Индивидуален годишен учебен план за подготовка за докоторант",
-              Mode.modeBGtoEN.get(phd.getCurriculum().getMode().getMode()),
-              yearDate,
-              4);
-      this.reportRepository.save(report);
-      reports.add(report);
-    }
-
-    phd.setReports(reports);
-    this.phdRepository.save(phd);
-    LOG.info("Phd report created successfully!");
   }
 
   @Override
@@ -463,21 +418,25 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     LOG.info(
         "Service received a request to set a role: "
             + group
-            + "for unauthorized user: "
+            + " for unauthorized user: "
             + usersDTO.toString());
 
     for (UnauthorizedDTO userDTO : usersDTO) {
-
       Unauthorized user = this.uRepository.getByOid(userDTO.getOid());
       switch (group) {
-        // TODO: maybe move this create to separate method in client
         case "phd" -> {
-
-          // TODO: Need to retrive the pin from Azure AD somehow...
-          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail(), "111111111");
+          Phd phd = new Phd(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
           phd.setStatus(this.phdStatusRepository.getByStatus("enrolled"));
-          // TODO: generate all reports
+
+          // NOTE: Have to set a curriculum for the reports to get generated
+          phd.setCurriculum(
+              this.curriculumRepository.getByNameAndModeId(
+                  "Automated information processing and management systems",
+                  this.databaseModel.getLong(
+                      "SELECT id FROM mode WHERE mode = $1", Tuple.of("regular"), "id")));
+
           this.phdRepository.save(phd);
+          this.phdUtils.generateReport(phd);
         }
 
         case "committee" -> {
@@ -501,10 +460,10 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
 
   @Override
   @Transactional
-  // @CacheResult(cacheName = "doc-center-roles-cache")
+  @CacheResult(cacheName = "doc-center-roles-cache")
   public List<String> getDoctoralCenterRoles() {
     LOG.info("Received a request to retrieve all doctoral center roles");
-    List<String> docCenterPermitRoles = List.of("phd", "committee", "supervisor");
+    List<String> docCenterPermitRoles = List.of("phd", "committee");
 
     LOG.info("All doc center roles have been retrieved: " + docCenterPermitRoles.toString());
     return docCenterPermitRoles;

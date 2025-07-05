@@ -24,7 +24,7 @@ public class CurriculumRepository
   }
 
   public Curriculum getByNameAndModeId(String name, Long modeId) {
-    return find("name = ?1 and mode.mode = ?2", name, modeId)
+    return find("name = ?1 and mode.id = ?2", name, modeId)
         .firstResultOptional()
         .orElseThrow(
             () -> new HttpException("Curriculum name is not found: " + name + " " + modeId));

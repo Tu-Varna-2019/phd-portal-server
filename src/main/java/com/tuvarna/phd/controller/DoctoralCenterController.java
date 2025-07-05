@@ -135,7 +135,7 @@ public final class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = Unauthorized.class))),
       })
-  @Path("/unauthorized-users")
+  @Path("/unauthorized")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users that have allowed status");
 
@@ -168,7 +168,7 @@ public final class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedDTO.class))),
       })
-  @Path("/unauthorized-users/group")
+  @Path("/unauthorized")
   public Response setRoleForUnauthorizedUsers(
       List<UnauthorizedDTO> usersDTO, @RestQuery String group) {
 
