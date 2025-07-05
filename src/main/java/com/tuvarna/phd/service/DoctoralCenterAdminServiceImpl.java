@@ -20,7 +20,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.cache.CacheInvalidate;
-import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -63,7 +62,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
-  @CacheResult(cacheName = "unauth-users-cache")
+  // @CacheResult(cacheName = "unauth-users-cache")
   @Transactional
   public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -73,7 +72,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
-  @CacheResult(cacheName = "auth-users-cache")
+  // @CacheResult(cacheName = "auth-users-cache")
   @Transactional
   public List<UserDTO> getAuthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -89,7 +88,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               phd.getName(),
               phd.getEmail(),
               "phd",
-              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()));
+              this.s3Model.getDataUrlPicture(phd.getOid(), phd.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 
@@ -100,7 +100,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               commitee.getName(),
               commitee.getEmail(),
               "committee",
-              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()));
+              this.s3Model.getDataUrlPicture(commitee.getOid(), commitee.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 
@@ -111,7 +112,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
               dCenter.getName(),
               dCenter.getEmail(),
               dCenter.getRole().getRole(),
-              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()));
+              this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()),
+              0);
       authenticatedUsers.add(user);
     }
 
@@ -172,7 +174,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
 
   @Override
   @Transactional
-  @CacheResult(cacheName = "doc-center-roles-cache")
+  // @CacheResult(cacheName = "doc-center-roles-cache")
   public List<String> getDoctoralCenterRoles() {
     LOG.info("Received a request to retrieve all doctoral center roles");
 

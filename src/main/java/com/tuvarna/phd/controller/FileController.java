@@ -40,7 +40,7 @@ public final class FileController extends BaseController {
   @Inject private Logger LOG;
   @Inject JsonWebToken jwt;
 
-  private S3ClientValidator s3ClientValidator;
+  @Inject S3ClientValidator s3ClientValidator;
 
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)

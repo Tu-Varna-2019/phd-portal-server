@@ -27,7 +27,6 @@ import com.tuvarna.phd.repository.ModeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
 import io.quarkus.cache.CacheInvalidate;
-import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -80,6 +79,7 @@ public final class CandidateServiceImpl implements CandidateService {
             .toEntity(candidateDTO)
             .setFaculty(this.facultyRepository.getByName(candidateDTO.getFaculty()))
             .setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
+    candidate.setExamStep(1);
 
     this.registerCandidate(candidate, candidateDTO.getCurriculum());
   }
@@ -215,7 +215,7 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  @CacheResult(cacheName = "curriculum-cache")
+  // @CacheResult(cacheName = "curriculum-cache")
   public List<CurriculumDTO> getCurriculums() {
     LOG.info("Received a service request to retrieve all curriculums");
     List<Curriculum> curriculums = this.curriculumRepository.getAll();
@@ -269,7 +269,7 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  @CacheResult(cacheName = "candidate-approved-status-cache")
+  // @CacheResult(cacheName = "candidate-approved-status-cache")
   public List<CandidateDTO> getContests() {
     LOG.info(
         "Received a service request to retrieve all constests for accepted candidates into phd");
@@ -289,7 +289,7 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  @CacheResult(cacheName = "candidate-reviewing-status-cache")
+  // @CacheResult(cacheName = "candidate-reviewing-status-cache")
   public List<CandidateDTO> getCandidatesInReview() {
     LOG.info("Received a service request to retrieve all candidates that are currently in review");
 
@@ -308,7 +308,7 @@ public final class CandidateServiceImpl implements CandidateService {
   }
 
   @Override
-  @CacheResult(cacheName = "faculty-cache")
+  // @CacheResult(cacheName = "faculty-cache")
   public List<Faculty> getFaculties() {
     LOG.info("Received a service request to retrieve all faculties");
     List<Faculty> faculties = this.facultyRepository.listAll();

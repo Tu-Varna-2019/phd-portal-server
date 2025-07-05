@@ -60,12 +60,14 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
   @Column(nullable = true, unique = false)
   private String address;
 
-  @Column(name = "post_code", nullable = false, unique = false)
+  @Column(name = "post_code", nullable = true, unique = false)
   private String postCode;
 
   @Password
-  @Column(nullable = false, unique = true, length = 10)
+  @Column(nullable = true, unique = true, length = 10)
   // TODO: Encrypt this pls
+  // TODO: Need to retrive the pin from Azure AD somehow...
+  // Currenly set to nullabe true because of it
   // ЕГН
   private String pin;
 
@@ -108,11 +110,10 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
       inverseJoinColumns = @JoinColumn(name = "grade_id"))
   private Set<Grade> grades;
 
-  public Phd(String oid, String name, String email, String pin) {
+  public Phd(String oid, String name, String email) {
     this.oid = oid;
     this.name = name;
     this.email = email;
-    this.pin = pin;
   }
 
   public Phd(

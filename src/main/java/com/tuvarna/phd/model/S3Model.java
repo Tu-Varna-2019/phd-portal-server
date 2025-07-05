@@ -29,7 +29,8 @@ public class S3Model {
 
   // TODO: Let the client build data url
   public String getDataUrlPicture(String oid, String picture) {
-    if (picture.isEmpty()) return "";
+    // NOTE: Make it return "" becase the client profile is not showing
+    if (picture == null || picture.strip().isEmpty()) return "";
 
     ResponseBytes<GetObjectResponse> oBytes =
         this.client.getObjectAsBytes(this.buildGetRequest(oid + "/avatar/" + picture));

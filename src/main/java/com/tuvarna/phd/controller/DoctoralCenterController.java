@@ -49,7 +49,7 @@ public final class DoctoralCenterController extends BaseController {
   @Inject DoctoralCenterService doctoralCenterService;
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
 
-  private CandidateValidator candidateValidator;
+  @Inject CandidateValidator candidateValidator;
 
   @PATCH
   @Operation(
@@ -135,7 +135,7 @@ public final class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = Unauthorized.class))),
       })
-  @Path("/unauthorized-users")
+  @Path("/unauthorized")
   public Response getUnauthorizedUsers() {
     LOG.info("Received a request to get all unauthorized users that have allowed status");
 
@@ -168,7 +168,7 @@ public final class DoctoralCenterController extends BaseController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UnauthorizedDTO.class))),
       })
-  @Path("/unauthorized-users/group")
+  @Path("/unauthorized")
   public Response setRoleForUnauthorizedUsers(
       List<UnauthorizedDTO> usersDTO, @RestQuery String group) {
 
@@ -261,10 +261,10 @@ public final class DoctoralCenterController extends BaseController {
             description = "Error when retrieving commision!",
             content = @Content(mediaType = "application/json")),
       })
-  @Path("/commission")
-  public Response getCommision() {
+  @Path("/commissions")
+  public Response getCommisions() {
     LOG.info("Received a controller request to retrieve all commisions.");
-    List<NameDTO> commisions = this.doctoralCenterService.getCommision();
+    List<NameDTO> commisions = this.doctoralCenterService.getCommisions();
 
     return send("Commision retrieved", commisions);
   }

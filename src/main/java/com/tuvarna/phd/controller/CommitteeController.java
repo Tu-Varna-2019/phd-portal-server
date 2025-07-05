@@ -52,7 +52,7 @@ public final class CommitteeController extends BaseController {
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterController.class);
   @Inject JsonWebToken jwt;
 
-  private CommitteeValidator committeeValidator;
+  @Inject CommitteeValidator committeeValidator;
 
   @GET
   @Operation(summary = "Get all candidates", description = "Get all candidates")

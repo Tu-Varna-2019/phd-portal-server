@@ -22,7 +22,7 @@ public sealed interface DoctoralCenterService permits DoctoralCenterServiceImpl 
 
   List<GradeDTO> getExams();
 
-  List<NameDTO> getCommision();
+  List<NameDTO> getCommisions();
 
   void setCommissionOnGrade(Long id, String commissionName);
 }

@@ -1,7 +1,9 @@
 package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.exception.HttpException;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class LogValidator {
 
   private enum VALID_GROUPS {
