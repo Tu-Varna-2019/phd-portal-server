@@ -79,6 +79,7 @@ public final class CandidateServiceImpl implements CandidateService {
             .toEntity(candidateDTO)
             .setFaculty(this.facultyRepository.getByName(candidateDTO.getFaculty()))
             .setStatus(this.candidateStatusRepository.getByStatus(candidateDTO.getStatus()));
+    candidate.setExamStep(1);
 
     this.registerCandidate(candidate, candidateDTO.getCurriculum());
   }
