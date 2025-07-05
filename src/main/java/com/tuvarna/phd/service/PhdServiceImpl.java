@@ -21,7 +21,6 @@ import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.utils.GradeUtils;
 import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
 import io.quarkus.cache.CacheInvalidate;
-import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -51,7 +50,7 @@ public final class PhdServiceImpl implements PhdService {
   @Inject private Logger LOG = Logger.getLogger(PhdServiceImpl.class);
 
   @Override
-  @CacheResult(cacheName = "curriculum-cache")
+  // @CacheResult(cacheName = "curriculum-cache")
   public List<CurriculumDTO> getCurriculums() {
     LOG.info("Received a service request to retrieve all curriculums");
     List<Curriculum> curriculums = this.curriculumRepository.getAll();
@@ -105,7 +104,7 @@ public final class PhdServiceImpl implements PhdService {
   }
 
   @Override
-  @CacheResult(cacheName = "faculty-cache")
+  // @CacheResult(cacheName = "faculty-cache")
   public List<Faculty> getFaculties() {
     LOG.info("Received a service request to retrieve all faculties");
     List<Faculty> faculties = this.facultyRepository.listAll();
@@ -115,7 +114,7 @@ public final class PhdServiceImpl implements PhdService {
   }
 
   @Override
-  @CacheResult(cacheName = "phd-exams-cache")
+  // @CacheResult(cacheName = "phd-exams-cache")
   public List<GradeDTO> getExams(String oid) {
     LOG.info("Service received to retrieve all grades");
 

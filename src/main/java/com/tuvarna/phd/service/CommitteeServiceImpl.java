@@ -27,7 +27,6 @@ import com.tuvarna.phd.repository.ReportRepository;
 import com.tuvarna.phd.utils.GradeUtils;
 import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
 import io.quarkus.cache.CacheInvalidate;
-import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -62,7 +61,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   @Inject private Logger LOG = Logger.getLogger(DoctoralCenterServiceImpl.class);
 
   @Override
-  @CacheResult(cacheName = "committee-candidates-cache")
+  // @CacheResult(cacheName = "committee-candidates-cache")
   public List<CandidateDTO> getCandidates(String fields) {
     LOG.info("Received a service request to retrieve all candidates");
     List<String> fieldsList = Arrays.asList(fields.split(","));
@@ -93,7 +92,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   }
 
   @Override
-  @CacheResult(cacheName = "committee-commissions-cache")
+  // @CacheResult(cacheName = "committee-commissions-cache")
   public List<CommissionDTO> getCommissions(String oid) {
     LOG.info("Service received to retrieve all commissions");
     List<CommissionDTO> commissionDTOs = new ArrayList<>();
@@ -111,7 +110,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   }
 
   @Override
-  @CacheResult(cacheName = "committee-committees-cache")
+  // @CacheResult(cacheName = "committee-committees-cache")
   public List<CommitteeDTO> getCommittees() {
     LOG.info("Service received to retrieve all committees");
     List<CommitteeDTO> committeeDTOs = new ArrayList<>();
@@ -190,7 +189,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
   }
 
   @Override
-  @CacheResult(cacheName = "committee-exams-cache")
+  // @CacheResult(cacheName = "committee-exams-cache")
   public List<GradeDTO> getExams(String oid) {
     LOG.info("Service received to retrieve all grades");
 

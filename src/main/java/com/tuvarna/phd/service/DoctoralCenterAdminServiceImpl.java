@@ -20,7 +20,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.cache.CacheInvalidate;
-import io.quarkus.cache.CacheResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -63,7 +62,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   }
 
   @Override
-  @CacheResult(cacheName = "unauth-users-cache")
+  // @CacheResult(cacheName = "unauth-users-cache")
   @Transactional
   public List<Unauthorized> getUnauthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -72,9 +71,8 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     return unauthorizedUsers;
   }
 
-
   @Override
-  @CacheResult(cacheName = "auth-users-cache")
+  // @CacheResult(cacheName = "auth-users-cache")
   @Transactional
   public List<UserDTO> getAuthorizedUsers() {
     LOG.info("Service received to retrieve all unauthorized users");
@@ -176,7 +174,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
 
   @Override
   @Transactional
-  @CacheResult(cacheName = "doc-center-roles-cache")
+  // @CacheResult(cacheName = "doc-center-roles-cache")
   public List<String> getDoctoralCenterRoles() {
     LOG.info("Received a request to retrieve all doctoral center roles");
 
