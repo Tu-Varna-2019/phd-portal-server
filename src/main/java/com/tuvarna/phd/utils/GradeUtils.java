@@ -19,9 +19,33 @@ public class GradeUtils {
   @Inject DatabaseModel databaseModel;
   @Inject private Logger LOG = Logger.getLogger(GradeUtils.class);
 
-  public UserDTO queryEvaluatedUser(Long gradeId) {
-    List<String> evaluatedUserTypes = List.of("phd_grades", "candidates_grades");
-    List<String> evaluatedUserTypeIDs = List.of("phd_id", "candidate_id");
+  public static enum EVAL_USER_TYPE {
+    phd,
+    candidate,
+    phd_candidate
+  }
+
+  private List<String> getUserGradeTable(EVAL_USER_TYPE eOptional) {
+
+    return switch (eOptional) {
+      case EVAL_USER_TYPE.phd -> List.of("phd_grades");
+      case EVAL_USER_TYPE.candidate -> List.of("candidates_grades");
+      case EVAL_USER_TYPE.phd_candidate -> List.of("phd_grades", "candidates_grades");
+    };
+  }
+
+  private List<String> getUserColumnIds(EVAL_USER_TYPE eOptional) {
+
+    return switch (eOptional) {
+      case EVAL_USER_TYPE.phd -> List.of("phd_id");
+      case EVAL_USER_TYPE.candidate -> List.of("candidate_id");
+      case EVAL_USER_TYPE.phd_candidate -> List.of("phd_id", "candidate_id");
+    };
+  }
+
+  public UserDTO queryEvaluatedUsers(Long gradeId, EVAL_USER_TYPE eOptional) {
+    List<String> evaluatedUserTypes = getUserGradeTable(eOptional);
+    List<String> evaluatedUserTypeIDs = getUserColumnIds(eOptional);
     List<UserDTO> userDto = new ArrayList<>();
 
     evaluatedUserTypes.forEach(
@@ -31,7 +55,7 @@ public class GradeUtils {
 
           try {
             columnId =
-                this.databaseModel.selectLong(
+                this.databaseModel.getLong(
                     "SELECT " + columnName + " FROM " + userType + " WHERE grade_id = $1",
                     Tuple.of(gradeId),
                     columnName);
@@ -46,7 +70,7 @@ public class GradeUtils {
             if (userType.equals("phd_grades")) {
               Phd phd =
                   this.databaseModel
-                      .selectMapEntity(
+                      .getListEntity(
                           "SELECT name, email, pin FROM phd WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Phd())
@@ -57,7 +81,7 @@ public class GradeUtils {
             } else if (userType.equals("candidates_grades")) {
               Candidate candidate =
                   this.databaseModel
-                      .selectMapEntity(
+                      .getListEntity(
                           "SELECT name, email, pin FROM candidate WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Candidate())

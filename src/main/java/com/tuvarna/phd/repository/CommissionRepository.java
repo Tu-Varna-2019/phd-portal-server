@@ -37,4 +37,8 @@ public final class CommissionRepository
   public void deleteById(Long id) {
     delete("id", id);
   }
+
+  public void deleteByName(String name) {
+    delete("name", name);
+  }
 }

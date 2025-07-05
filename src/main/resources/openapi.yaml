@@ -1,0 +1,1664 @@
+---
+openapi: 3.0.3
+info:
+  title: PHD Portal REST PI (dev)
+  description: TuVarna Master Thesis for developing PHD portal
+  termsOfService: Free of charge
+  contact:
+    name: Iliyan Kostov
+    url: https://github.com/Tu-Varna-2019/phd-portal-server
+    email: iliyan.kostov@X
+  license:
+    name: GPL 3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+tags:
+- name: Admin doctoral center endpoint
+  description: Endpoint for serving admin doctoral center services
+- name: Authentication endpoint
+  description: Endpoint for serving authentication services
+- name: Candidate endpoint
+  description: Endpoint for serving candidate services
+- name: Committee endpoint
+  description: Endpoint for serving Committee services
+- name: Doctoral center endpoint
+  description: Endpoint for serving doctoral center services
+- name: File endpoint
+  description: Endpoint for serving file services
+- name: Logs endpoint
+  description: Endpoint for serving logs services
+- name: Notification endpoint
+  description: Endpoint for serving notifications  services
+- name: Phd endpoint
+  description: Endpoint for serving phd services
+paths:
+  /api.tuvarna.phd.com/v1/auth/login:
+    post:
+      tags:
+      - Authentication endpoint
+      summary: Verify the user is present in the database
+      description: Verify the user is present in the database
+      responses:
+        "200":
+          description: user is present indeed!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+        "401":
+          description: User is not present and therefore not allowed!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+  /api.tuvarna.phd.com/v1/candidate/apply:
+    post:
+      tags:
+      - Candidate endpoint
+      summary: Register to phd as a candidate
+      description: Register to phd as a candidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateApplyDTO"
+      responses:
+        "200":
+          description: Candidate registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateApplyDTO"
+        "400":
+          description: Error when registering to phd as a candidate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateApplyDTO"
+  /api.tuvarna.phd.com/v1/candidate/contests:
+    get:
+      tags:
+      - Candidate endpoint
+      summary: Get phd contests
+      description: Get phd contests
+      responses:
+        "200":
+          description: Phd contests retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+        "400":
+          description: Error when retrieving phd contests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+  /api.tuvarna.phd.com/v1/candidate/curriculums:
+    get:
+      tags:
+      - Candidate endpoint
+      summary: Get curriculums
+      description: Get curriculums
+      responses:
+        "200":
+          description: Curriculums retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumDTO"
+        "400":
+          description: Error in retrieving curriculums
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumDTO"
+  /api.tuvarna.phd.com/v1/candidate/faculty:
+    get:
+      tags:
+      - Candidate endpoint
+      summary: Get faculties
+      description: Get faculties
+      responses:
+        "200":
+          description: Faculties retrieved
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Error when retrieving faculties
+          content:
+            application/json:
+              schema:
+                type: string
+  /api.tuvarna.phd.com/v1/candidate/in-review:
+    get:
+      tags:
+      - Candidate endpoint
+      summary: Get candidates in review
+      description: Get candidates in review
+      responses:
+        "200":
+          description: Candidates in review retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+        "400":
+          description: Error when retrieving candidates in review!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+  /api.tuvarna.phd.com/v1/candidate/subjects:
+    get:
+      tags:
+      - Candidate endpoint
+      summary: Get subjects
+      description: Get subjects
+      parameters:
+      - name: curriculumName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: facultyName
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Subjects retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectDTO"
+        "400":
+          description: Error when retrieving subjects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectDTO"
+  /api.tuvarna.phd.com/v1/candidate/upload:
+    post:
+      tags:
+      - Candidate endpoint
+      summary: Upload a file
+      description: Upload a biography file to s3
+      parameters:
+      - name: candidate
+        in: cookie
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BlobDTO"
+      responses:
+        "200":
+          description: Success
+          content:
+            multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+        "404":
+          description: file not found
+          content:
+            multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+  /api.tuvarna.phd.com/v1/committee/candidates:
+    get:
+      tags:
+      - Committee endpoint
+      summary: Get all candidates
+      description: Get all candidates
+      parameters:
+      - name: fields
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Candidates retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+        "400":
+          description: Error when approving/rejecting phd's candidate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+  /api.tuvarna.phd.com/v1/committee/commission:
+    put:
+      tags:
+      - Committee endpoint
+      summary: Modify commission
+      description: Modify commission
+      parameters:
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommissionRequestDTO"
+      responses:
+        "200":
+          description: Commission modified
+          content:
+            application/json: {}
+        "400":
+          description: Error when modifying commission
+          content:
+            application/json: {}
+    post:
+      tags:
+      - Committee endpoint
+      summary: Create commission
+      description: Create commission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommissionRequestDTO"
+      responses:
+        "200":
+          description: Commission created
+          content:
+            application/json: {}
+        "400":
+          description: Error when creating commission
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/committee/commission/{name}:
+    delete:
+      tags:
+      - Committee endpoint
+      summary: Delete commission
+      description: Delete commission
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commission deleted
+          content:
+            application/json: {}
+        "400":
+          description: Error when deleting commission
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/committee/commissions:
+    get:
+      tags:
+      - Committee endpoint
+      summary: Get all commissions
+      description: Get all commissions
+      responses:
+        "200":
+          description: Commissions retrieved
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving commissions!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/committee/committees:
+    get:
+      tags:
+      - Committee endpoint
+      summary: Get all committees
+      description: Get all committees
+      responses:
+        "200":
+          description: Committees retrieved
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving committees!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/committee/grade/evaluate/{type}:
+    patch:
+      tags:
+      - Committee endpoint
+      summary: Evaluate phd/candidate
+      description: Evaluate phd/candidate
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateGradeDTO"
+      responses:
+        "200":
+          description: Phd/Candidate evaluated
+          content:
+            application/json: {}
+        "400":
+          description: Error when evaluating phd/candidate
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/committee/grades:
+    get:
+      tags:
+      - Committee endpoint
+      summary: Get all grades
+      description: Get all grades
+      responses:
+        "200":
+          description: grades retrieved
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving grades!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/admin/authorized-users:
+    get:
+      tags:
+      - Admin doctoral center endpoint
+      summary: User management
+      description: Get all authorized users
+      responses:
+        "200":
+          description: All authorized users retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: Error when retrieving authtenticated users!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      tags:
+      - Admin doctoral center endpoint
+      summary: Delete a user
+      description: Delete a user from the auth list
+      parameters:
+      - name: group
+        in: query
+        schema:
+          type: string
+      - name: oid
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User deleted!
+          content:
+            application/json: {}
+        "400":
+          description: Error when deleting user!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/admin/roles:
+    get:
+      tags:
+      - Admin doctoral center endpoint
+      summary: Doctoral Center roles
+      description: Get all doctoral center roles
+      responses:
+        "200":
+          description: All doc center roles retrieved
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Error when retrieving al doc center roles
+          content:
+            application/json:
+              schema:
+                type: string
+  /api.tuvarna.phd.com/v1/doctoralcenter/admin/unauthorized-users:
+    get:
+      tags:
+      - Admin doctoral center endpoint
+      summary: Unauthorized users
+      description: "Get all users, that attempted to sign in to the Phd platform"
+      responses:
+        "200":
+          description: All unauthorized users retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+        "400":
+          description: Error when retrieving unauthorized users!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+  /api.tuvarna.phd.com/v1/doctoralcenter/admin/unauthorized-users/group:
+    post:
+      tags:
+      - Admin doctoral center endpoint
+      summary: Set group for unauthorized users
+      description: Set a group for unauthorized users
+      parameters:
+      - name: group
+        in: query
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+      responses:
+        "200":
+          description: Group set to unauthorized user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+        "400":
+          description: Error when setting a group for a unauthorized users!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+  /api.tuvarna.phd.com/v1/doctoralcenter/admin/unauthorized-users/is-allowed:
+    patch:
+      tags:
+      - Admin doctoral center endpoint
+      summary: Allow/Deny unauthorized users
+      description: Allow/Deny unauthorized users
+      parameters:
+      - name: isAllowed
+        in: query
+        schema:
+          type: boolean
+      - name: oid
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Unauthorized users allowed/denied
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: ' Error in setting allowed/denied for unauthorized users'
+          content:
+            application/json:
+              schema:
+                type: string
+  /api.tuvarna.phd.com/v1/doctoralcenter/candidate/{email}/application/{status}:
+    patch:
+      tags:
+      - Doctoral center endpoint
+      summary: Candidate application
+      description: Approve or reject candidate for exams
+      parameters:
+      - name: email
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Candidate approved
+          content:
+            application/json: {}
+        "400":
+          description: Error when approving/rejecting candidate
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/candidates:
+    get:
+      tags:
+      - Doctoral center endpoint
+      summary: Get all candidates
+      description: Get all candidates
+      parameters:
+      - name: fields
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Candidates retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+        "400":
+          description: Error when approving/rejecting phd's candidate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDTO"
+  /api.tuvarna.phd.com/v1/doctoralcenter/commission:
+    get:
+      tags:
+      - Doctoral center endpoint
+      summary: Get commision
+      description: Get commision
+      responses:
+        "200":
+          description: Commision retrieved!
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving commision!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/grade/{id}/commission/{name}:
+    patch:
+      tags:
+      - Doctoral center endpoint
+      summary: Set commision to a grade
+      description: Set commision to a grade
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commision set for grade!
+          content:
+            application/json: {}
+        "400":
+          description: Error when setting commision to an grade!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/grades:
+    get:
+      tags:
+      - Doctoral center endpoint
+      summary: Get all grades
+      description: Get all grades
+      responses:
+        "200":
+          description: grades retrieved
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving grades!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/doctoralcenter/roles:
+    get:
+      tags:
+      - Doctoral center endpoint
+      summary: Doctoral Center roles
+      description: Get all doctoral center roles
+      responses:
+        "200":
+          description: All doc center roles retrieved
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Error when retrieving al doc center roles
+          content:
+            application/json:
+              schema:
+                type: string
+  /api.tuvarna.phd.com/v1/doctoralcenter/unauthorized-users:
+    get:
+      tags:
+      - Doctoral center endpoint
+      summary: Unauthorized users
+      description: "Get all users, that attempted to sign in to the Phd platform and\
+        \ are allowed"
+      responses:
+        "200":
+          description: All unauthorized users retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unauthorized"
+        "400":
+          description: Error when retrieving unauthorized users!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unauthorized"
+  /api.tuvarna.phd.com/v1/doctoralcenter/unauthorized-users/group:
+    post:
+      tags:
+      - Doctoral center endpoint
+      summary: Set group for unauthorized users
+      description: Set a group for unauthorized users
+      parameters:
+      - name: group
+        in: query
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+      responses:
+        "200":
+          description: Group set to unauthorized user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+        "400":
+          description: Error when setting a group for a unauthorized users!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedDTO"
+  /api.tuvarna.phd.com/v1/file:
+    delete:
+      tags:
+      - File endpoint
+      summary: Delete a file
+      description: Deletes a file from s3 bucket
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+      - name: group
+        in: cookie
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FilenameDTO"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilenameDTO"
+        "404":
+          description: file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilenameDTO"
+  /api.tuvarna.phd.com/v1/file/download:
+    get:
+      tags:
+      - File endpoint
+      summary: Download file
+      description: Download an s3 file
+      parameters:
+      - name: key
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+        "404":
+          description: file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+  /api.tuvarna.phd.com/v1/file/upload:
+    post:
+      tags:
+      - File endpoint
+      summary: Upload a file
+      description: Upload a file to s3
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+      - name: group
+        in: cookie
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BlobDTO"
+      responses:
+        "200":
+          description: Success
+          content:
+            multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+        "404":
+          description: file not found
+          content:
+            multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/BlobDTO"
+  /api.tuvarna.phd.com/v1/logs:
+    get:
+      tags:
+      - Logs endpoint
+      summary: Get logs
+      description: "Get logs, depending on a role"
+      parameters:
+      - name: role
+        in: cookie
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Log retrived!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+        "400":
+          description: Error when retriving log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+    post:
+      tags:
+      - Logs endpoint
+      summary: Save log
+      description: Save a log from user action
+      parameters:
+      - name: group
+        in: cookie
+        schema:
+          type: string
+      - name: role
+        in: cookie
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sendLogDTO"
+      responses:
+        "200":
+          description: Log saved!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+        "400":
+          description: Error when saving log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+    delete:
+      tags:
+      - Logs endpoint
+      summary: delete logs
+      description: Delete logs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/LogDTO"
+      responses:
+        "200":
+          description: Logs deleted!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+        "400":
+          description: Error when deleting logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogDTO"
+  /api.tuvarna.phd.com/v1/notify:
+    get:
+      tags:
+      - Notification endpoint
+      summary: Get notifications
+      description: "Get notifications, depending on a role"
+      responses:
+        "200":
+          description: notification retrived!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+        "400":
+          description: Error when retreiving notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+    post:
+      tags:
+      - Notification endpoint
+      summary: Save notification
+      description: Save a notification from user action
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationDTO"
+      responses:
+        "200":
+          description: notification saved!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+        "400":
+          description: Error when saving notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+    delete:
+      tags:
+      - Notification endpoint
+      summary: delete notifications
+      description: Delete notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/IdDTO"
+      responses:
+        "200":
+          description: Нотификации са изтрити успешно!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+        "400":
+          description: Error when deleting notifications
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDTO"
+  /api.tuvarna.phd.com/v1/phd/curriculums:
+    get:
+      tags:
+      - Phd endpoint
+      summary: Get curriculums
+      description: Get curriculums
+      responses:
+        "200":
+          description: Curriculums retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumDTO"
+        "400":
+          description: Error in retrieving curriculums
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumDTO"
+  /api.tuvarna.phd.com/v1/phd/faculty:
+    get:
+      tags:
+      - Phd endpoint
+      summary: Get faculties
+      description: Get faculties
+      responses:
+        "200":
+          description: Faculties retrieved
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Error when retrieving faculties
+          content:
+            application/json:
+              schema:
+                type: string
+  /api.tuvarna.phd.com/v1/phd/grades:
+    get:
+      tags:
+      - Phd endpoint
+      summary: Get all grades
+      description: Get all grades
+      responses:
+        "200":
+          description: grades retrieved
+          content:
+            application/json: {}
+        "400":
+          description: Error when retrieving grades!
+          content:
+            application/json: {}
+  /api.tuvarna.phd.com/v1/phd/subjects:
+    get:
+      tags:
+      - Phd endpoint
+      summary: Get subjects
+      description: Get subjects
+      parameters:
+      - name: curriculumName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: facultyName
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Subjects retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectDTO"
+        "400":
+          description: Error when retrieving subjects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectDTO"
+components:
+  schemas:
+    BlobDTO:
+      description: Blob DTO
+      required:
+      - data
+      - filename
+      - mimetype
+      type: object
+      properties:
+        data:
+          format: binary
+          title: data
+          type: string
+        filename:
+          title: filename
+          type: string
+        mimetype:
+          title: mimetype
+          type: string
+    CandidateApplyDTO:
+      description: Candidate apply DTO
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        pin:
+          title: pin
+          type: string
+        country:
+          title: country
+          type: string
+        city:
+          title: city
+          type: string
+        address:
+          title: address
+          type: string
+        biography:
+          title: biography
+          type: string
+        yearAccepted:
+          format: int64
+          title: yearAccepted
+          type: integer
+        postCode:
+          format: int64
+          title: post_code
+          type: integer
+        curriculum:
+          title: curriculum
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/CurriculumCreateDTO"
+        faculty:
+          title: faculty
+          type: string
+        status:
+          title: status
+          type: string
+    CandidateDTO:
+      description: Candidate DTO
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        exam_step:
+          title: exam_step
+          type: string
+        pin:
+          title: pin
+          type: string
+        country:
+          title: country
+          type: string
+        city:
+          title: city
+          type: string
+        address:
+          title: address
+          type: string
+        post_code:
+          title: post_code
+          type: string
+        yearAccepted:
+          format: int64
+          title: yearAccepted
+          type: integer
+        biography:
+          title: biography
+          type: string
+        curriculum:
+          title: curriculum
+          type: string
+        faculty:
+          title: faculty
+          type: string
+        status:
+          title: status
+          type: string
+    CandidateStatusDTO:
+      description: Candidate status DTO
+      required:
+      - status
+      - email
+      type: object
+      properties:
+        status:
+          title: status
+          type: string
+        email:
+          title: email
+          type: string
+    CommisionDTO:
+      description: Committee DTO
+      required:
+      - name
+      - committees
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        committees:
+          title: committees
+          type: array
+          items:
+            $ref: "#/components/schemas/CommitteeDTO"
+    CommissionRequestDTO:
+      description: Commission request DTO
+      required:
+      - name
+      - committees
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        committees:
+          title: committees
+          type: array
+          items:
+            $ref: "#/components/schemas/CommitteeRequestDTO"
+    CommitteeDTO:
+      description: Committee DTO
+      required:
+      - oid
+      - name
+      - email
+      - picture
+      - grade
+      - faculty
+      - role
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        picture:
+          title: email
+          type: string
+        grade:
+          format: double
+          title: grade
+          type: number
+        faculty:
+          title: faculty
+          type: string
+        role:
+          title: role
+          type: string
+    CommitteeRequestDTO:
+      description: Committee request DTO
+      required:
+      - oid
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+    CurriculumCreateDTO:
+      description: Curriculum DTO
+      required:
+      - name
+      - mode
+      - faculty
+      - subjects
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        mode:
+          title: mode
+          type: string
+        faculty:
+          title: faculty
+          type: string
+        subjects:
+          title: subjects
+          type: array
+          items:
+            type: string
+    CurriculumDTO:
+      description: Curriculum DTO
+      required:
+      - name
+      - mode
+      - yearPeriod
+      - faculty
+      - subjects
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+        mode:
+          title: mode
+          type: string
+        yearPeriod:
+          title: year_period
+          type: string
+        faculty:
+          title: faculty
+          type: string
+        subjects:
+          title: subjects
+          type: array
+          items:
+            type: string
+    Date:
+      format: date
+      type: string
+      example: 2022-03-10
+    DoctoralCenterDTO:
+      description: Doctoral Center DTO
+      required:
+      - oid
+      - name
+      - email
+      - picture
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        picture:
+          title: picture
+          type: string
+        role:
+          title: role
+          type: string
+    EvaluateGradeDTO:
+      description: Evaluate grade DTO
+      required:
+      - grade
+      - subject
+      - pin
+      type: object
+      properties:
+        grade:
+          format: double
+          title: grade
+          type: number
+        subject:
+          title: subject
+          type: string
+        pin:
+          title: pin
+          type: string
+    FileBlobDTO:
+      description: FileBlob DTO
+      required:
+      - data
+      - mimetype
+      type: object
+      properties:
+        data:
+          format: binary
+          title: data
+          type: string
+        mimetype:
+          title: mimetype
+          type: string
+    FilenameDTO:
+      description: Filename DTO
+      required:
+      - filename
+      type: object
+      properties:
+        filename:
+          title: filename
+          type: string
+    GradeDTO:
+      description: Grade DTO
+      required:
+      - gradeId
+      - grade
+      - evalDate
+      - commission
+      - report
+      - attachments
+      - evaluatedUser
+      - subject
+      type: object
+      properties:
+        gradeId:
+          format: int64
+          title: id
+          type: integer
+        grade:
+          format: double
+          title: grade
+          type: number
+        evalDate:
+          title: eval_date
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/Date"
+        commission:
+          title: commision
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/CommisionDTO"
+        report:
+          title: report
+          type: string
+        attachments:
+          title: attachments
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        evaluatedUser:
+          title: evaluatedUser
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/UserDTO"
+        subject:
+          title: subject
+          type: string
+    IdDTO:
+      description: Id DTO
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          format: int64
+          title: id
+          type: integer
+    Instant:
+      format: date-time
+      type: string
+      example: 2022-03-10T16:15:50Z
+    LogDTO:
+      description: Log DTO
+      required:
+      - id
+      - description
+      - timestamp
+      - action
+      - level
+      - user
+      type: object
+      properties:
+        id:
+          title: id
+          type: string
+        description:
+          title: description
+          type: string
+        timestamp:
+          title: timestamp
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/Instant"
+        action:
+          title: action
+          type: string
+        level:
+          title: level
+          type: string
+        user:
+          title: user
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/UserPrincipalDTO"
+    NameDTO:
+      description: Name DTO
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+    NotificationClientDTO:
+      description: Notification DTO
+      required:
+      - title
+      - description
+      - severity
+      - creation
+      type: object
+      properties:
+        title:
+          title: title
+          type: string
+        description:
+          title: description
+          type: string
+        severity:
+          title: severity
+          type: string
+        creation:
+          title: creation
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/Timestamp"
+    NotificationDTO:
+      description: Notification DTO
+      required:
+      - title
+      - description
+      - severity
+      - creation
+      - scope
+      - group
+      - recipients
+      type: object
+      properties:
+        title:
+          title: title
+          type: string
+        description:
+          title: description
+          type: string
+        severity:
+          title: severity
+          type: string
+        creation:
+          title: creation
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/Timestamp"
+        scope:
+          title: scope
+          type: string
+        group:
+          title: group
+          type: string
+        recipients:
+          title: recipients
+          type: array
+          items:
+            type: string
+    PhdDTO:
+      description: PHD DTO
+      required:
+      - oid
+      - name
+      - picture
+      - email
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        picture:
+          title: picture
+          type: string
+        country:
+          title: country
+          type: string
+        city:
+          title: city
+          type: string
+        address:
+          title: address
+          type: string
+        pin:
+          title: pin
+          type: string
+        dissertation:
+          title: dissertation
+          type: string
+        status:
+          title: status
+          type: string
+        email:
+          title: email
+          type: string
+    SubjectDTO:
+      description: Subject DTO
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+    Timestamp:
+      type: object
+      properties:
+        nanos:
+          format: int32
+          type: integer
+        time:
+          format: int64
+          type: integer
+    Unauthorized:
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+        oid:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        timestamp:
+          $ref: "#/components/schemas/Timestamp"
+        allowed:
+          type: boolean
+    UnauthorizedDTO:
+      description: Unauthorized DTO
+      required:
+      - oid
+      - name
+      - email
+      - timestamp
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        timestamp:
+          title: timestamp
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/Timestamp"
+    UserDTO:
+      description: User DTO
+      required:
+      - oid
+      - name
+      - email
+      - pin
+      - pictureBlob
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        pin:
+          title: pin
+          type: string
+        group:
+          title: group
+          type: string
+        pictureBlob:
+          title: pictureBlob
+          type: string
+    UserPrincipalDTO:
+      description: User Principal DTO
+      required:
+      - email
+      - group
+      type: object
+      properties:
+        oid:
+          title: oid
+          type: string
+        name:
+          title: name
+          type: string
+        email:
+          title: email
+          type: string
+        group:
+          title: group
+          type: string
+    sendLogDTO:
+      description: Log DTO
+      required:
+      - description
+      - timestamp
+      - action
+      - level
+      type: object
+      properties:
+        description:
+          title: description
+          type: string
+        timestamp:
+          title: timestamp
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/Instant"
+        action:
+          title: action
+          type: string
+        level:
+          title: level
+          type: string
+  securitySchemes:
+    Basic Auth:
+      type: http
+      scheme: basic
+    Bearer:
+      type: openIdConnect
+      scheme: bearer
+    SecurityScheme:
+      type: openIdConnect
+      description: Authentication
+      openIdConnectUrl: https://sts.windows.net/31886941-8a86-4f93-8f42-d140eaea36ad//.well-known/openid-configuration

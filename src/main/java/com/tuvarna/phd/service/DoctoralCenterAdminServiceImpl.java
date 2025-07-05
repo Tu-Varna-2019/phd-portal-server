@@ -18,7 +18,6 @@ import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
-import com.tuvarna.phd.repository.SupervisorRepository;
 import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
@@ -38,7 +37,6 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   @Inject PhdRepository phdRepository;
   @Inject PhdStatusRepository phdStatusRepository;
   @Inject CommitteeRepository committeeRepository;
-  @Inject SupervisorRepository supervisorRepository;
   @Inject CandidateRepository candidateRepository;
   @Inject UnauthorizedRepository uRepository;
   @Inject CandidateMapper candidateMapper;
@@ -179,7 +177,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     LOG.info("Received a request to retrieve all doctoral center roles");
 
     List<String> docCenterRoles =
-        this.databaseModel.selectMapString(
+        this.databaseModel.getListString(
             "SELECT role FROM doctoral_center_role", Tuple.tuple(), "role");
 
     LOG.info("All doc center roles have been retrieved: " + docCenterRoles.toString());

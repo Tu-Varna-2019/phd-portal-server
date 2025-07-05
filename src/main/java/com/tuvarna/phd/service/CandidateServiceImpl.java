@@ -119,7 +119,7 @@ public final class CandidateServiceImpl implements CandidateService {
             (user) -> {
               String statement = ("SELECT EXISTS (SELECT 1 FROM " + user + " WHERE email = $1)");
               Boolean isEmailFound =
-                  this.databaseModel.selectIfExists(statement, Tuple.of(candidateEmail));
+                  this.databaseModel.getBoolean(statement, Tuple.of(candidateEmail));
 
               if (isEmailFound) {
                 LOG.error(
@@ -143,7 +143,7 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Now sending email for the doc centers to review the candidate's application...");
 
     this.databaseModel
-        .selectMapString(
+        .getListString(
             "SELECT d.email FROM doctoral_center d JOIN doctoral_center_role dc ON(d.role ="
                 + " dc.id) WHERE dc.role = 'manager' OR dc.role = 'admin'",
             "email")
@@ -192,7 +192,7 @@ public final class CandidateServiceImpl implements CandidateService {
   @CacheInvalidate(cacheName = "curriculum-cache")
   public void createCurriculum(CurriculumDTO curriculumDTO) {
     Boolean doesCurriculumNameExist =
-        this.databaseModel.selectIfExists(
+        this.databaseModel.getBoolean(
             "SELECT EXISTS (SELECT FROM curriculum WHERE name = $1)",
             Tuple.of(curriculumDTO.getName()));
     if (doesCurriculumNameExist) throw new HttpException("Curriculum name already exists!");
@@ -255,7 +255,7 @@ public final class CandidateServiceImpl implements CandidateService {
     LOG.info("Received a service request to retrieve all subjects by faculty");
 
     List<Subject> subjects =
-        this.databaseModel.selectMapEntity(
+        this.databaseModel.getListEntity(
             "SELECT s.name FROM subject s JOIN"
                 + " committee c ON(s.teacher=c.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " f.name = $1",
@@ -276,7 +276,7 @@ public final class CandidateServiceImpl implements CandidateService {
 
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     List<Candidate> candidates =
-        this.databaseModel.selectMapEntity(
+        this.databaseModel.getListEntity(
             "SELECT c.name, c.year_accepted, f.name AS facultyName FROM candidate c JOIN"
                 + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'approved'",
@@ -295,7 +295,7 @@ public final class CandidateServiceImpl implements CandidateService {
 
     List<CandidateDTO> candidateDTOs = new ArrayList<>();
     List<Candidate> candidates =
-        this.databaseModel.selectMapEntity(
+        this.databaseModel.getListEntity(
             "SELECT c.name, f.name AS facultyName FROM candidate c JOIN"
                 + " candidate_status cs ON(c.status=cs.id) JOIN faculty f ON(c.faculty=f.id) WHERE"
                 + " cs.status = 'reviewing'",

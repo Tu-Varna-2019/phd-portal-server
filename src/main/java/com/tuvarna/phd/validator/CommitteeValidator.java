@@ -1,11 +1,9 @@
 package com.tuvarna.phd.validator;
 
 import com.tuvarna.phd.exception.HttpException;
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Arrays;
 import java.util.List;
 
-@ApplicationScoped
 public class CommitteeValidator {
 
   private enum VALID_EVAL_USER_TYPES {

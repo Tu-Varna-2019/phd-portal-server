@@ -14,6 +14,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,9 +51,6 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
 
   @Transient private String pictureBlob;
 
-  @Column(nullable = true, unique = false)
-  private Double grade;
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "faculty", nullable = false)
   private Faculty faculty;
@@ -59,15 +59,50 @@ public non-sealed class Committee extends PanacheEntityBase implements IUserEnti
   @JoinColumn(name = "role", nullable = false)
   private CommitteeRole role;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "title", nullable = false)
+  private CommitteeTitle title;
+
+  // TODO: create a functionality where he manually adds diserattions topics
+  @Column(nullable = true, unique = false)
+  private List<String> dissertations;
+
   public Committee(String oid, String name, String email) {
     this.oid = oid;
     this.name = name;
     this.email = email;
   }
 
+  public Committee(
+      Long id,
+      String oid,
+      String name,
+      String email,
+      String picture,
+      Faculty faculty,
+      CommitteeRole committeeRole) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.picture = picture;
+    this.faculty = faculty;
+    this.role = committeeRole;
+  }
+
   @Override
   public Committee toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
     return jsonObject.mapTo(Committee.class);
+  }
+
+  public static List<String> getOids(Set<Committee> committees) {
+    List<String> oids = new ArrayList<>();
+
+    committees.forEach(
+        committee -> {
+          oids.add(committee.getOid());
+        });
+
+    return oids;
   }
 }

@@ -33,6 +33,7 @@ public interface GradeMapper {
                     new CommitteeDTO(
                         committee.getOid(),
                         committee.getName(),
+                        committee.getEmail(),
                         committee.getPicture(),
                         committee.getFaculty().getName(),
                         committee.getRole().getRole()));

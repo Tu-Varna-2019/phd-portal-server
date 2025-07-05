@@ -88,7 +88,7 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "supervisor", nullable = true)
-  private Supervisor supervisor;
+  private Committee supervisor;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "faculty", nullable = true)

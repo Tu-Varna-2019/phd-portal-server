@@ -46,7 +46,7 @@ public final class S3ClientServiceImpl implements S3ClientService {
     // FIX: Cookie for doctoral center is with hyphen '-' and the table is with `_`
     String statement = "SELECT picture FROM " + group.replace("-", "_") + " WHERE oid = $1";
 
-    return this.databaseModel.selectString(statement, Tuple.of(oid), "picture");
+    return this.databaseModel.getString(statement, Tuple.of(oid), "picture");
   }
 
   @Override
