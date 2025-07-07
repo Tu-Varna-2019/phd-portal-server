@@ -156,11 +156,11 @@ public final class PhdController extends BaseController {
             content = @Content(mediaType = "application/json")),
       })
   @Path("/grades")
-  public Response getExams() {
+  public Response getGrades() {
     LOG.info("Received a controller request to retrieve all grades.");
 
     String oid = jwt.getClaim("oid");
-    List<GradeDTO> grades = this.phdService.getExams(oid);
+    List<GradeDTO> grades = this.phdService.getGrades(oid);
 
     return send("Grades retrieved", grades);
   }

@@ -11,9 +11,7 @@ public sealed interface PhdService permits PhdServiceImpl {
 
   List<Faculty> getFaculties();
 
-  void deleteCurriculum();
-
-  List<GradeDTO> getExams(String oid);
+  List<GradeDTO> getGrades(String oid);
 
   List<SubjectDTO> getSubjectsByCurriculum(String curriculumName);
 

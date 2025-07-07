@@ -20,7 +20,6 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.utils.GradeUtils;
 import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
-import io.quarkus.cache.CacheInvalidate;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -115,7 +114,7 @@ public final class PhdServiceImpl implements PhdService {
 
   @Override
   // @CacheResult(cacheName = "phd-exams-cache")
-  public List<GradeDTO> getExams(String oid) {
+  public List<GradeDTO> getGrades(String oid) {
     LOG.info("Service received to retrieve all grades");
 
     Boolean isPhdEvaluated =
@@ -191,8 +190,4 @@ public final class PhdServiceImpl implements PhdService {
 
     return gradeDTOs;
   }
-
-  @Override
-  @CacheInvalidate(cacheName = "curriculum-cache")
-  public void deleteCurriculum() {}
 }

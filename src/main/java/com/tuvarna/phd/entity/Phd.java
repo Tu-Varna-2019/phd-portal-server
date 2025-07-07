@@ -1,5 +1,6 @@
 package com.tuvarna.phd.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.security.jpa.Password;
 import io.vertx.core.json.JsonObject;
@@ -101,6 +102,7 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
       name = "phd_reports",
       joinColumns = @JoinColumn(name = "phd_id"),
       inverseJoinColumns = @JoinColumn(name = "report_id"))
+  @JsonIgnore
   private Set<Report> reports;
 
   @ManyToMany
@@ -108,6 +110,7 @@ public non-sealed class Phd extends PanacheEntityBase implements IUserEntity<Phd
       name = "phd_grades",
       joinColumns = @JoinColumn(name = "phd_id"),
       inverseJoinColumns = @JoinColumn(name = "grade_id"))
+  @JsonIgnore
   private Set<Grade> grades;
 
   public Phd(String oid, String name, String email) {
