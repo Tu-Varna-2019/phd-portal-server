@@ -10,7 +10,9 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -163,5 +165,27 @@ public final class PhdController extends BaseController {
     List<GradeDTO> grades = this.phdService.getGrades(oid);
 
     return send("Grades retrieved", grades);
+  }
+
+  @PATCH
+  @Operation(summary = "Set attachment to grade", description = "Set attachment to grade")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Attachments set to grade successfully!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when setting attachments to grade!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grade/{id}")
+  public Response setAttachmentsToGrade(List<String> attachments, @PathParam("id") Long gradeId) {
+    LOG.info("Received a controller request to set attachments to grade " + gradeId);
+
+    this.phdService.setAttachmentToGrade(gradeId, attachments);
+
+    return send("Attachments set for grade id: " + gradeId);
   }
 }

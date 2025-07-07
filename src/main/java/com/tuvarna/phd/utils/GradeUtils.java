@@ -43,9 +43,9 @@ public class GradeUtils {
     };
   }
 
-  public UserDTO queryEvaluatedUsers(Long gradeId, EVAL_USER_TYPE eOptional) {
-    List<String> evaluatedUserTypes = getUserGradeTable(eOptional);
-    List<String> evaluatedUserTypeIDs = getUserColumnIds(eOptional);
+  public UserDTO queryEvaluatedUsers(Long gradeId, EVAL_USER_TYPE evalUserType) {
+    List<String> evaluatedUserTypes = getUserGradeTable(evalUserType);
+    List<String> evaluatedUserTypeIDs = getUserColumnIds(evalUserType);
     List<UserDTO> userDto = new ArrayList<>();
 
     evaluatedUserTypes.forEach(
@@ -71,7 +71,7 @@ public class GradeUtils {
               Phd phd =
                   this.databaseModel
                       .getListEntity(
-                          "SELECT name, email, pin FROM phd WHERE id = $1",
+                          "SELECT oid, name, email, pin FROM phd WHERE id = $1",
                           Optional.of(Tuple.of(columnId)),
                           new Phd())
                       .get(0);
@@ -94,8 +94,14 @@ public class GradeUtils {
         });
 
     if (userDto.isEmpty()) {
-      LOG.error("Grade id: " + gradeId + " not found in any of the tables!");
-      throw new HttpException("Grade id: " + gradeId + " not found in any of the tables!");
+      // NOTE: throw an error if it hasn't found the user in ANY of the tables
+      if (evalUserType == EVAL_USER_TYPE.phd_candidate) {
+        LOG.error("Grade id: " + gradeId + " not found in " + evalUserType);
+        throw new HttpException("Grade id: " + gradeId + " not found in any of the tables!");
+      } else {
+        LOG.warn("Grade id: " + gradeId + " not found in " + evalUserType);
+        return null;
+      }
     }
 
     return userDto.get(0);

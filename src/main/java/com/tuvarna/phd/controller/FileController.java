@@ -76,7 +76,9 @@ public final class FileController extends BaseController {
 
     file.generateUniqueFilename();
     this.s3ClientService.upload(file, oid, type);
+
     if (type.equals("avatar")) {
+      LOG.info("User: " + oid + " requested to upload a picture to his profile...");
       String oldPicture = this.s3ClientService.getPictureByOid(group, oid);
       if (!oldPicture.isEmpty()) this.s3ClientService.delete(oid, type, oldPicture);
       this.s3ClientService.setPictureByOid(file.getUniqueFilename(), group, oid);

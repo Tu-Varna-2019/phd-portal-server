@@ -13,6 +13,8 @@ public sealed interface PhdService permits PhdServiceImpl {
 
   List<GradeDTO> getGrades(String oid);
 
+  void setAttachmentToGrade(Long gradeId, List<String> attachments);
+
   List<SubjectDTO> getSubjectsByCurriculum(String curriculumName);
 
   List<SubjectDTO> getSubjectsByFaculty(String faculty);
