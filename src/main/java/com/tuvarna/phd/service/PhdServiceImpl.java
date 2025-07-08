@@ -4,6 +4,7 @@ import com.tuvarna.phd.dto.CommissionDTO;
 import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.ReportResponseDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Curriculum;
@@ -12,6 +13,7 @@ import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.mapper.CurriculumMapper;
 import com.tuvarna.phd.mapper.PhdMapper;
+import com.tuvarna.phd.mapper.ReportMapper;
 import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.CurriculumRepository;
@@ -46,6 +48,7 @@ public final class PhdServiceImpl implements PhdService {
   @Inject PhdMapper pMapper;
   @Inject SubjectMapper subjectMapper;
   @Inject CurriculumMapper curriculumMapper;
+  @Inject ReportMapper reportMapper;
 
   @Inject DatabaseModel databaseModel;
 
@@ -113,6 +116,23 @@ public final class PhdServiceImpl implements PhdService {
 
     LOG.info("Faculties retrieved");
     return faculties;
+  }
+
+  @Override
+  // @CacheResult(cacheName = "faculty-cache")
+  public List<ReportResponseDTO> getReports(String oid) {
+    LOG.info("Received a service request to retrieve all reports");
+    List<ReportResponseDTO> reports = new ArrayList<>();
+
+    this.pRepository
+        .getByOid(oid)
+        .getReports()
+        .forEach(
+            report -> {
+              reports.add(this.reportMapper.toDto(report));
+            });
+
+    return reports;
   }
 
   @Override

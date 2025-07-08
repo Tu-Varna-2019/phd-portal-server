@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.ReportResponseDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.exception.HttpException;
@@ -142,6 +143,35 @@ public final class PhdController extends BaseController {
     List<Faculty> faculties = this.phdService.getFaculties();
 
     return send("Faculties retrieved", faculties);
+  }
+
+  @GET
+  @Operation(summary = "Get reports", description = "Get reports")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Repots retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving repots",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/reports")
+  public Response getRepots() {
+    LOG.info("Received a request to retrieve all reports");
+
+    String oid = jwt.getClaim("oid");
+    List<ReportResponseDTO> responseDTOs = this.phdService.getReports(oid);
+
+    return send("Reports retrieved", responseDTOs);
   }
 
   @GET
