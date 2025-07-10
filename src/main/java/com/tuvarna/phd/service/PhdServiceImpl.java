@@ -4,13 +4,16 @@ import com.tuvarna.phd.dto.CommissionDTO;
 import com.tuvarna.phd.dto.CommitteeDTO;
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.ReportResponseDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.dto.UserDTO;
 import com.tuvarna.phd.entity.Curriculum;
 import com.tuvarna.phd.entity.Faculty;
+import com.tuvarna.phd.entity.Grade;
 import com.tuvarna.phd.entity.Subject;
 import com.tuvarna.phd.mapper.CurriculumMapper;
 import com.tuvarna.phd.mapper.PhdMapper;
+import com.tuvarna.phd.mapper.ReportMapper;
 import com.tuvarna.phd.mapper.SubjectMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.CurriculumRepository;
@@ -20,14 +23,15 @@ import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
 import com.tuvarna.phd.utils.GradeUtils;
 import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
-import io.quarkus.cache.CacheInvalidate;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -44,6 +48,7 @@ public final class PhdServiceImpl implements PhdService {
   @Inject PhdMapper pMapper;
   @Inject SubjectMapper subjectMapper;
   @Inject CurriculumMapper curriculumMapper;
+  @Inject ReportMapper reportMapper;
 
   @Inject DatabaseModel databaseModel;
 
@@ -114,13 +119,44 @@ public final class PhdServiceImpl implements PhdService {
   }
 
   @Override
+  // @CacheResult(cacheName = "faculty-cache")
+  public List<ReportResponseDTO> getReports(String oid) {
+    LOG.info("Received a service request to retrieve all reports");
+    List<ReportResponseDTO> reports = new ArrayList<>();
+
+    this.pRepository
+        .getByOid(oid)
+        .getReports()
+        .forEach(
+            report -> {
+              reports.add(this.reportMapper.toDto(report));
+            });
+
+    return reports;
+  }
+
+  @Override
+  public void setAttachmentToGrade(Long gradeId, List<String> attachments) {
+    LOG.info("Received a service request to set attachments to grade id: " + gradeId);
+    Grade grade = this.gradeRepository.getById(gradeId);
+
+    Set<String> grades = grade.getAttachments();
+    grades.addAll(new HashSet<>(attachments));
+    grade.setAttachments(grades);
+
+    this.gradeRepository.save(grade);
+  }
+
+  @Override
   // @CacheResult(cacheName = "phd-exams-cache")
-  public List<GradeDTO> getExams(String oid) {
+  public List<GradeDTO> getGrades(String oid) {
     LOG.info("Service received to retrieve all grades");
+    Long phdId =
+        this.databaseModel.getLong("SELECT id FROM phd WHERE oid = $1", Tuple.of(oid), "id");
 
     Boolean isPhdEvaluated =
         this.databaseModel.getBoolean(
-            "SELECT EXISTS (SELECT 1 FROM phd_grades WHERE phd_id = $1)", Tuple.of(oid));
+            "SELECT EXISTS (SELECT 1 FROM phd_grades WHERE phd_id = $1)", Tuple.of(phdId));
 
     if (!isPhdEvaluated) {
       LOG.info("Didn't find any phd evals. Moving on...");
@@ -136,7 +172,7 @@ public final class PhdServiceImpl implements PhdService {
                   this.gradeUtils.queryEvaluatedUsers(grade.getId(), EVAL_USER_TYPE.phd);
 
               // NOTE: Get exams for the signed in phd
-              if (userDTO.getOid().equals(oid)) {
+              if (userDTO != null && userDTO.getOid().equals(oid)) {
                 List<CommitteeDTO> committeeDTOs = new ArrayList<>();
                 grade
                     .getCommission()
@@ -179,7 +215,6 @@ public final class PhdServiceImpl implements PhdService {
                         new CommissionDTO(grade.getCommission().getName(), committeeDTOs),
                         grade.getReport(),
                         grade.getAttachments(),
-                        userDTO,
                         grade.getSubject().getName());
 
                 // NOTE: Cannot use gradeMapper because we need to get the commitete grade from the
@@ -191,8 +226,4 @@ public final class PhdServiceImpl implements PhdService {
 
     return gradeDTOs;
   }
-
-  @Override
-  @CacheInvalidate(cacheName = "curriculum-cache")
-  public void deleteCurriculum() {}
 }

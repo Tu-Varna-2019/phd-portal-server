@@ -30,7 +30,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "subject")
-public class Subject extends PanacheEntityBase implements IEntity<Subject> {
+public class Subject extends PanacheEntityBase implements IEntity<Subject>, Comparable<Subject> {
 
   @Id
   @SequenceGenerator(name = "subjectSequence", sequenceName = "subject_id_seq", allocationSize = 1)
@@ -39,6 +39,12 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
 
   @Column(nullable = false, unique = true)
   private String name;
+
+  @Column(nullable = false, unique = false)
+  private Integer semester;
+
+  @Column(nullable = false, unique = false)
+  private Integer course;
 
   @ManyToMany(mappedBy = "subjects", fetch = FetchType.EAGER)
   @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
@@ -61,5 +67,10 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject> {
   @Override
   public String toString() {
     return "Name: " + this.name;
+  }
+
+  @Override
+  public int compareTo(Subject subject) {
+    return Integer.compare(this.course, subject.getCourse());
   }
 }

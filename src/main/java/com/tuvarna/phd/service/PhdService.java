@@ -2,6 +2,7 @@ package com.tuvarna.phd.service;
 
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.ReportResponseDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Faculty;
 import java.util.List;
@@ -11,9 +12,11 @@ public sealed interface PhdService permits PhdServiceImpl {
 
   List<Faculty> getFaculties();
 
-  void deleteCurriculum();
+  List<ReportResponseDTO> getReports(String oid);
 
-  List<GradeDTO> getExams(String oid);
+  List<GradeDTO> getGrades(String oid);
+
+  void setAttachmentToGrade(Long gradeId, List<String> attachments);
 
   List<SubjectDTO> getSubjectsByCurriculum(String curriculumName);
 

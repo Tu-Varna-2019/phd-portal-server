@@ -23,6 +23,18 @@ public class SubjectRepository
         .orElseThrow(() -> new HttpException("Subject name is not found: " + name));
   }
 
+  public Subject getByCourse(Integer course) {
+    return find("course", course)
+        .firstResultOptional()
+        .orElseThrow(() -> new HttpException("Subject course is not found: " + course));
+  }
+
+  public Subject getBySemester(Integer semester) {
+    return find("semester", semester)
+        .firstResultOptional()
+        .orElseThrow(() -> new HttpException("Subject semester is not found: " + semester));
+  }
+
   @Override
   public void save(Subject subject) {
     subject.persist();

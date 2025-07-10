@@ -182,6 +182,8 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           this.candidateRepository.deleteById(candidate.getId());
 
           this.phdUtils.generateReport(phd);
+          this.phdUtils.generateExams(phd);
+          this.phdRepository.save(phd);
         } else {
           candidate.setExamStep(1);
           this.candidateRepository.save(candidate);

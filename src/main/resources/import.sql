@@ -241,49 +241,49 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "title", "role
 
 -- NOTE: Subjects
 -- Mandatory
-INSERT INTO "subject" ("id", "name","teacher")
+INSERT INTO "subject" ("id", "name", "semester", "course", "teacher")
   VALUES
     (
       -- Mandatory
-      1, 'English', 3
+      1, 'English', 1, 1, 3
     ),
     (
-      2, 'Methods of Research and Development of dissertation', 1
+      2, 'Methods of Research and Development of dissertation', 1, 1, 1
     ),
     (
-      3, 'Block C (PhD minimum)', 3
+      3, 'Block C (PhD minimum)', 1, 1, 3
     ),
     (
       -- Optional
-      4, 'Cryptography and data protection', 1
+      4, 'Cryptography and data protection', 2, 1, 1
     ),
     (
-      5, 'Processing of visual information', 3
+      5, 'Processing of visual information', 2, 1, 3
     ),
     (
-      6, 'Programming technologies on the Internet', 2
+      6, 'Programming technologies on the Internet', 2, 1, 2
     ),
     (
-      7, 'Multimedia systems and technologies', 2
+      7, 'Multimedia systems and technologies', 1, 2, 2
     ),
     (
-      8, 'Modern Software Technologies', 3
+      8, 'Modern Software Technologies', 1, 2, 3
     ),
     (
-      9, 'Programming in Mathlab/ C#/ Java/ Python or other language', 1
+      9, 'Programming in Mathlab/ C#/ Java/ Python or other language', 1, 2, 1
     ),
     (
-      10, 'Databases and Information Technology', 2
+      10, 'Databases and Information Technology', 2, 2, 2
     ),
     (
-      11, 'Machine learning', 3
+      11, 'Machine learning', 2, 2, 3
     ),
     (
-      12, 'Bioinformatics', 1
+      12, 'Bioinformatics', 2, 2, 1
     ),
     (
     -- NOTE: Needed for the mandatory exams
-      13, 'Automated information processing and management systems', 2
+      13, 'Automated information processing and management systems', 1, 1, 2
     );
 
 -- NOTE: Curriculum - Subjects

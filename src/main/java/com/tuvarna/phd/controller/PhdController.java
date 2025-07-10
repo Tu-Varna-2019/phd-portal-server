@@ -2,6 +2,7 @@ package com.tuvarna.phd.controller;
 
 import com.tuvarna.phd.dto.CurriculumDTO;
 import com.tuvarna.phd.dto.GradeDTO;
+import com.tuvarna.phd.dto.ReportResponseDTO;
 import com.tuvarna.phd.dto.SubjectDTO;
 import com.tuvarna.phd.entity.Faculty;
 import com.tuvarna.phd.exception.HttpException;
@@ -10,7 +11,9 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -143,6 +146,35 @@ public final class PhdController extends BaseController {
   }
 
   @GET
+  @Operation(summary = "Get reports", description = "Get reports")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Repots retrieved",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when retrieving repots",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = String.class))),
+      })
+  @Path("/reports")
+  public Response getRepots() {
+    LOG.info("Received a request to retrieve all reports");
+
+    String oid = jwt.getClaim("oid");
+    List<ReportResponseDTO> responseDTOs = this.phdService.getReports(oid);
+
+    return send("Reports retrieved", responseDTOs);
+  }
+
+  @GET
   @Operation(summary = "Get all grades", description = "Get all grades")
   @APIResponses(
       value = {
@@ -156,12 +188,34 @@ public final class PhdController extends BaseController {
             content = @Content(mediaType = "application/json")),
       })
   @Path("/grades")
-  public Response getExams() {
+  public Response getGrades() {
     LOG.info("Received a controller request to retrieve all grades.");
 
     String oid = jwt.getClaim("oid");
-    List<GradeDTO> grades = this.phdService.getExams(oid);
+    List<GradeDTO> grades = this.phdService.getGrades(oid);
 
     return send("Grades retrieved", grades);
+  }
+
+  @PATCH
+  @Operation(summary = "Set attachment to grade", description = "Set attachment to grade")
+  @APIResponses(
+      value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "Attachments set to grade successfully!",
+            content = @Content(mediaType = "application/json")),
+        @APIResponse(
+            responseCode = "400",
+            description = "Error when setting attachments to grade!",
+            content = @Content(mediaType = "application/json")),
+      })
+  @Path("/grade/{id}")
+  public Response setAttachmentsToGrade(List<String> attachments, @PathParam("id") Long gradeId) {
+    LOG.info("Received a controller request to set attachments to grade " + gradeId);
+
+    this.phdService.setAttachmentToGrade(gradeId, attachments);
+
+    return send("Attachments set for grade id: " + gradeId);
   }
 }

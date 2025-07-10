@@ -75,6 +75,12 @@ public class Grade extends PanacheEntityBase implements IEntity<Grade> {
     this.id = id;
   }
 
+  public Grade(String report, Date evalDate, Subject subject) {
+    this.report = report;
+    this.evalDate = evalDate;
+    this.subject = subject;
+  }
+
   @Override
   public Grade toEntity(Row row) {
     JsonObject jsonObject = row.toJson();
