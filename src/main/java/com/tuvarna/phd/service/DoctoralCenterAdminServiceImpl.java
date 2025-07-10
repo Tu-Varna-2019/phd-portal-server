@@ -54,7 +54,20 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   public void deleteAuthorizedUser(String oid, String group) {
     switch (group) {
       case "phd" -> this.phdRepository.deleteByOid(oid);
-      case "committee" -> this.committeeRepository.deleteByOid(oid);
+      case "committee" -> {
+        Boolean isCommitteeATeacher =
+            this.databaseModel.getBoolean(
+                "SELECT EXISTS (SELECT 1 FROM subject WHERE teacher = (SELECT id FROM committee"
+                    + " WHERE oid = $1))",
+                Tuple.of(oid));
+
+        if (isCommitteeATeacher) {
+          throw new HttpException(
+              "Cannot delete committe. He is a teacher in subject already!", 400);
+        } else {
+          this.committeeRepository.deleteByOid(oid);
+        }
+      }
       case "doctoral-center" -> this.doctoralCenterRepository.deleteByOid(oid);
 
       default -> throw new HttpException("Group is incorrect!", 400);
