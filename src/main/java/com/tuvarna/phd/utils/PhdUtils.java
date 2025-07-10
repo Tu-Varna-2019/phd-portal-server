@@ -98,6 +98,8 @@ public class PhdUtils {
 
       for (Integer semester = 0; semester < 2; semester++) {
         final int finalSemester = semester;
+        LOG.info("Now generating exams for semester: " + semester);
+
         Set<Subject> subjectsPerSemester =
             subjectsPerCourse.stream()
                 .filter(subject -> subject.getSemester() == finalSemester)
