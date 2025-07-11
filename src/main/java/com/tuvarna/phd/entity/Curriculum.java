@@ -48,7 +48,7 @@ public class Curriculum extends PanacheEntityBase implements IEntity<Curriculum>
   @Column(nullable = false, unique = false)
   private String name;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "mode", nullable = false)
   private Mode mode;
 

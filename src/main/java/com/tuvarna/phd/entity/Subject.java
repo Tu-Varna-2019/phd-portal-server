@@ -50,7 +50,7 @@ public class Subject extends PanacheEntityBase implements IEntity<Subject>, Comp
   @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
   private Set<Curriculum> curriculums;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "teacher", nullable = true)
   private Committee teacher;
 

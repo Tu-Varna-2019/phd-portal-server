@@ -40,11 +40,11 @@ public class Grade extends PanacheEntityBase implements IEntity<Grade> {
   @Column(name = "eval_date", nullable = false, unique = false)
   private Date evalDate;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "commision", nullable = true)
   private Commission commission;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "subject", nullable = false)
   private Subject subject;
 
