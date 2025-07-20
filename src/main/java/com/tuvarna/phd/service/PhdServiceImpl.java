@@ -154,6 +154,7 @@ public final class PhdServiceImpl implements PhdService {
     Long phdId =
         this.databaseModel.getLong("SELECT id FROM phd WHERE oid = $1", Tuple.of(oid), "id");
 
+    // NOTE: Brakes when commission is null
     Boolean isPhdEvaluated =
         this.databaseModel.getBoolean(
             "SELECT EXISTS (SELECT 1 FROM phd_grades WHERE phd_id = $1)", Tuple.of(phdId));
