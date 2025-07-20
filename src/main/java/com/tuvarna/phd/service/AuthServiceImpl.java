@@ -95,6 +95,8 @@ public final class AuthServiceImpl implements AuthService {
       case "phd" -> {
         Phd phd = this.phdRepository.getByOid(oid);
         phd.setPictureBlob(this.s3Model.getDataUrlPicture(oid, phd.getPicture()));
+        phd.setCurriculum(null);
+        phd.setGrades(null);
         return phd;
       }
       case "committee" -> {

@@ -54,7 +54,20 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   public void deleteAuthorizedUser(String oid, String group) {
     switch (group) {
       case "phd" -> this.phdRepository.deleteByOid(oid);
-      case "committee" -> this.committeeRepository.deleteByOid(oid);
+      case "committee" -> {
+        Boolean isCommitteeATeacher =
+            this.databaseModel.getBoolean(
+                "SELECT EXISTS (SELECT 1 FROM subject WHERE teacher = (SELECT id FROM committee"
+                    + " WHERE oid = $1))",
+                Tuple.of(oid));
+
+        if (isCommitteeATeacher) {
+          throw new HttpException(
+              "Cannot delete committe. He is a teacher in subject already!", 400);
+        } else {
+          this.committeeRepository.deleteByOid(oid);
+        }
+      }
       case "doctoral-center" -> this.doctoralCenterRepository.deleteByOid(oid);
 
       default -> throw new HttpException("Group is incorrect!", 400);
@@ -75,7 +88,7 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
   // @CacheResult(cacheName = "auth-users-cache")
   @Transactional
   public List<UserDTO> getAuthorizedUsers() {
-    LOG.info("Service received to retrieve all unauthorized users");
+    LOG.info("Service received to retrieve all authorized users");
     List<UserDTO> authenticatedUsers = new ArrayList<>();
     List<Phd> phds = this.phdRepository.getAll();
     List<Committee> committees = this.committeeRepository.getAll();
@@ -106,12 +119,14 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
     }
 
     for (DoctoralCenter dCenter : doctoralCenters) {
+      String role = (dCenter.getRole() != null) ? dCenter.getRole().getRole() : "unknown";
+
       UserDTO user =
           new UserDTO(
               dCenter.getOid(),
               dCenter.getName(),
               dCenter.getEmail(),
-              dCenter.getRole().getRole(),
+              role,
               this.s3Model.getDataUrlPicture(dCenter.getOid(), dCenter.getPicture()),
               0);
       authenticatedUsers.add(user);
