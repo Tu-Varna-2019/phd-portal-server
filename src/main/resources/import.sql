@@ -234,7 +234,7 @@ INSERT INTO "committee" ("id", "oid", "name", "email", "picture", "title", "role
   );
 
 -- -- NOTE: Commision
--- INSERT INTO "commision" ("id", "members")
+-- INSERT INTO "commission" ("id", "members")
 --   VALUES
 --   nextval('commission_id_seq'),
 --   {1,2,3,4};
