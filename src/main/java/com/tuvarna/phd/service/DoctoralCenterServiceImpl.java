@@ -24,9 +24,12 @@ import com.tuvarna.phd.repository.CandidateRepository;
 import com.tuvarna.phd.repository.CandidateStatusRepository;
 import com.tuvarna.phd.repository.CommissionRepository;
 import com.tuvarna.phd.repository.CommitteeRepository;
+import com.tuvarna.phd.repository.CommitteeRoleRepository;
+import com.tuvarna.phd.repository.CommitteeTitleRepository;
 import com.tuvarna.phd.repository.CurriculumRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRepository;
 import com.tuvarna.phd.repository.DoctoralCenterRoleRepository;
+import com.tuvarna.phd.repository.FacultyRepository;
 import com.tuvarna.phd.repository.GradeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.PhdStatusRepository;
@@ -38,6 +41,7 @@ import com.tuvarna.phd.utils.GradeUtils.EVAL_USER_TYPE;
 import com.tuvarna.phd.utils.PhdUtils;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.vertx.core.impl.NoStackTraceThrowable;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -60,7 +64,12 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   @Inject DoctoralCenterRoleRepository doctoralCenterRoleRepository;
   @Inject PhdRepository phdRepository;
   @Inject PhdStatusRepository phdStatusRepository;
+  @Inject FacultyRepository facultyRepository;
+
+  @Inject CommitteeRoleRepository committeeRoleRepository;
   @Inject CommitteeRepository committeeRepository;
+  @Inject CommitteeTitleRepository committeeTitleRepository;
+
   @Inject CandidateRepository candidateRepository;
   @Inject CandidateStatusRepository candidateStatusRepository;
   @Inject GradeRepository gradeRepository;
@@ -246,7 +255,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     try {
       this.mailModel.send(
           candidateTitle, candidateTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
-    } catch (IOException exception) {
+    } catch (IOException | NoStackTraceThrowable exception) {
       LOG.error("Error in sending email to the canidate: " + exception);
       throw new HttpException("Error in sending email to the candidate!");
     }
@@ -260,7 +269,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
           try {
             this.mailModel.send(
                 docTitle, docTemplate, candidateEmail, Map.of("$CANDIDATE", candidateEmail));
-          } catch (IOException exception) {
+          } catch (IOException | NoStackTraceThrowable exception) {
             LOG.error("Error in sending email to the doc center pesonnel: " + exception);
             throw new HttpException("Error in sending email to the doc center pesonnel!");
           }
@@ -273,7 +282,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
     try {
       this.mailModel.send(
           "Вашата докторантска кандидатура в Ту-Варна", TEMPLATES.REJECTED, candidate.getEmail());
-    } catch (IOException exception) {
+    } catch (IOException | NoStackTraceThrowable exception) {
       LOG.error("Error in sending email to the doc center pesonnel: " + exception);
       throw new HttpException("Error in sending email to the doc center pesonnel!");
     }
@@ -367,7 +376,7 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
                 TEMPLATES.COMMITTEE_ADDED_TO_EXAM,
                 committee.getEmail(),
                 Map.of("$EVAL_DATE", evalDate.toString()));
-          } catch (IOException exception) {
+          } catch (IOException | NoStackTraceThrowable exception) {
             LOG.error(
                 "Error in sending email to committee: "
                     + committee.getEmail()
@@ -444,6 +453,12 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
         case "committee" -> {
           Committee committee =
               new Committee(userDTO.getOid(), userDTO.getName(), userDTO.getEmail());
+          // NOTE: Give the option for the user to decide which faculty the committee belongs to
+          committee.setFaculty(this.facultyRepository.getByName("Software engineering"));
+          // NOTE: Give the option for the user to decide which role the committee belongs to
+          committee.setRole(this.committeeRoleRepository.getByRole("member"));
+          // NOTE: Give the option for the user to decide which title the committee belongs to
+          committee.setTitle(this.committeeTitleRepository.getByTitle("assistant"));
           this.committeeRepository.save(committee);
         }
 
@@ -461,7 +476,6 @@ public final class DoctoralCenterServiceImpl implements DoctoralCenterService {
   }
 
   @Override
-  @Transactional
   @CacheResult(cacheName = "doc-center-roles-cache")
   public List<String> getDoctoralCenterRoles() {
     LOG.info("Received a request to retrieve all doctoral center roles");

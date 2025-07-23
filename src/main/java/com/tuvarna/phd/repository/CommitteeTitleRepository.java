@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class CommitteeTitleRepository implements PanacheRepositoryBase<CommitteeTitle, Integer> {
 
-  public CommitteeTitle getByRole(String title) {
+  public CommitteeTitle getByTitle(String title) {
     return find("title", title)
         .firstResultOptional()
         .orElseThrow(() -> new HttpException("Committee title: " + title + " doesn't exist!", 404));

@@ -181,6 +181,14 @@ public final class DoctoralCenterAdminServiceImpl implements DoctoralCenterAdmin
             + " for oid unauthorized user: "
             + oid);
 
+    Boolean doesOidExist =
+        this.databaseModel.getBoolean(
+            "SELECT EXISTS (SELECT 1 FROM unauthorized WHERE oid = $1)", Tuple.of(oid));
+
+    if (!doesOidExist) {
+      throw new HttpException("User with such oid doesn't exist!", 400);
+    }
+
     this.databaseModel.execute(
         "UPDATE unauthorized SET allowed = $1 WHERE oid = $2", Tuple.of(isAllowed, oid));
 
