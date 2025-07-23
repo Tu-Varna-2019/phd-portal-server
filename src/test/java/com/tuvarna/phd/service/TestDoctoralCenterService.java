@@ -1,7 +1,7 @@
 package com.tuvarna.phd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.tuvarna.phd.entity.Commission;
@@ -81,8 +81,8 @@ public class TestDoctoralCenterService {
     assertEquals("commission1", commission.getName());
     assertEquals(commission, grade.getCommission());
 
-    doNothing()
-        .when(this.mailModel)
+    doThrow(new IOException("Mail server down"))
+        .when(mailModel)
         .send(
             "Вие сте добавен в изпит",
             TEMPLATES.COMMITTEE_ADDED_TO_EXAM,

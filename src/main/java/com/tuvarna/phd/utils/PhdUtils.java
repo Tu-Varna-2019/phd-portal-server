@@ -124,7 +124,8 @@ public class PhdUtils {
       }
     }
 
+    // NOTE: It's not saving the result to the table phd_grades ?
     phd.setGrades(grades);
-    LOG.info("Phd grade created successfully!");
+    LOG.info("Phd grades created successfully!");
   }
 }

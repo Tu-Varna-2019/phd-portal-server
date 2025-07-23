@@ -29,8 +29,8 @@ public class GradeUtils {
 
     return switch (eOptional) {
       case EVAL_USER_TYPE.phd -> List.of("phd_grades");
-      case EVAL_USER_TYPE.candidate -> List.of("candidates_grades");
-      case EVAL_USER_TYPE.phd_candidate -> List.of("phd_grades", "candidates_grades");
+      case EVAL_USER_TYPE.candidate -> List.of("candidate_grades");
+      case EVAL_USER_TYPE.phd_candidate -> List.of("phd_grades", "candidate_grades");
     };
   }
 
@@ -78,7 +78,7 @@ public class GradeUtils {
               userDto.add(
                   new UserDTO(phd.getOid(), phd.getName(), phd.getEmail(), phd.getPin(), "phd"));
 
-            } else if (userType.equals("candidates_grades")) {
+            } else if (userType.equals("candidate_grades")) {
               Candidate candidate =
                   this.databaseModel
                       .getListEntity(

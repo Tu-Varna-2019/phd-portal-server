@@ -106,6 +106,7 @@ public final class CommitteeController extends BaseController {
     String oid = jwt.getClaim("oid");
     List<GradeDTO> grades = this.committeeService.getExams(oid);
 
+    LOG.info("Grades retrieved: " + grades.toString());
     return send("Grades retrieved", grades);
   }
 
