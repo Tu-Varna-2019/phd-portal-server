@@ -8,6 +8,7 @@ import com.tuvarna.phd.exception.HttpException;
 import com.tuvarna.phd.mapper.NotificationMapper;
 import com.tuvarna.phd.model.DatabaseModel;
 import com.tuvarna.phd.repository.NotificationRepository;
+import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -100,9 +101,19 @@ public final class NotificationServiceImpl implements NotificationService {
   @Override
   @Transactional
   public void delete(List<IdDTO> notificationIds) {
-    LOG.info("Service received a request to delete logs");
+    LOG.info("Service received a request to delete notifications");
 
-    for (IdDTO id : notificationIds) this.notificationRepository.deleteById(id.getId());
+    for (IdDTO id : notificationIds) {
+      Boolean doesNotificationIdExist =
+          this.databaseModel.getBoolean(
+              "SELECT EXISTS (SELECT 1 FROM notification WHERE id = $1)", Tuple.of(id.getId()));
+
+      if (!doesNotificationIdExist) {
+        throw new HttpException("Notification with id: " + id.getId() + " doesn't exist!");
+      }
+
+      this.notificationRepository.deleteById(id.getId());
+    }
 
     LOG.info("Notifications deleted!");
   }
