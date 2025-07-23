@@ -128,7 +128,8 @@ public final class DoctoralCenterAdminController extends BaseController {
   public Response seIsAllowedForUnauthorizedUsers(
       @RestQuery String oid, @RestQuery Boolean isAllowed) {
 
-    LOG.info("Received a request to set isAllowed for unauthorized user oid: " + oid);
+    LOG.info(
+        "Received a request to set isAllowed " + isAllowed + " for unauthorized user oid: " + oid);
     this.doctoralCenterAdminService.changeUnauthorizedUserIsAllowed(oid, isAllowed);
 
     return send("Unauthorized user changed isAllowed to: " + isAllowed);

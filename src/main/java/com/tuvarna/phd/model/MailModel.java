@@ -2,6 +2,7 @@ package com.tuvarna.phd.model;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
+import io.vertx.core.impl.NoStackTraceThrowable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.File;
@@ -44,7 +45,7 @@ public class MailModel {
 
   public void send(
       String title, TEMPLATES template, String email, Map<String, String> replaceTemplateParams)
-      throws IOException {
+      throws IOException, NoStackTraceThrowable {
     String absolutePath = new File(template.getPath()).getCanonicalPath();
     StringBuilder body = new StringBuilder(Files.readString(Path.of(absolutePath)));
 
@@ -65,7 +66,8 @@ public class MailModel {
         .indefinitely();
   }
 
-  public void send(String title, TEMPLATES template, String email) throws IOException {
+  public void send(String title, TEMPLATES template, String email)
+      throws IOException, NoStackTraceThrowable {
     String absolutePath = new File(template.getPath()).getCanonicalPath();
     String body = Files.readString(Path.of(absolutePath));
 

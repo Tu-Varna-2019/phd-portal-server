@@ -161,7 +161,7 @@ public final class PhdServiceImpl implements PhdService {
 
     if (!isPhdEvaluated) {
       LOG.info("Didn't find any phd evals. Moving on...");
-      return null;
+      return List.of();
     }
 
     List<GradeDTO> gradeDTOs = new ArrayList<>();
@@ -169,11 +169,15 @@ public final class PhdServiceImpl implements PhdService {
         .getAll()
         .forEach(
             grade -> {
+              GradeDTO gradeDTO = null;
+
               UserDTO userDTO =
                   this.gradeUtils.queryEvaluatedUsers(grade.getId(), EVAL_USER_TYPE.phd);
 
               // NOTE: Get exams for the signed in phd
-              if (userDTO != null && userDTO.getOid().equals(oid)) {
+              if (userDTO != null
+                  && grade.getCommission() != null
+                  && userDTO.getOid().equals(oid)) {
                 List<CommitteeDTO> committeeDTOs = new ArrayList<>();
                 grade
                     .getCommission()
@@ -208,7 +212,7 @@ public final class PhdServiceImpl implements PhdService {
                                   committee.getRole().getRole()));
                         });
 
-                GradeDTO gradeDTO =
+                gradeDTO =
                     new GradeDTO(
                         grade.getId(),
                         grade.getGrade(),
@@ -218,7 +222,20 @@ public final class PhdServiceImpl implements PhdService {
                         grade.getAttachments(),
                         grade.getSubject().getName());
 
-                // NOTE: Cannot use gradeMapper because we need to get the commitete grade from the
+              } else if (userDTO != null && userDTO.getOid().equals(oid)) {
+                gradeDTO =
+                    new GradeDTO(
+                        grade.getId(),
+                        grade.getGrade(),
+                        grade.getEvalDate(),
+                        grade.getReport(),
+                        grade.getAttachments(),
+                        grade.getSubject().getName());
+              }
+
+              if (gradeDTO != null) {
+                // NOTE: Cannot use gradeMapper because we need to get the commitete
+                // grade from the
                 // committee_grade table
                 // this.gradeMapper.toDto(grade, userDTO)
                 gradeDTOs.add(gradeDTO);

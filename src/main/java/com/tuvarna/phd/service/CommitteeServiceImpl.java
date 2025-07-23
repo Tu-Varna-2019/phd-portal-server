@@ -161,6 +161,14 @@ public final class CommitteeServiceImpl implements CommitteeService {
   public void deleteCommission(String name) {
     LOG.info("Service received to delete commission with name " + name);
 
+    Boolean doesCommissionNameExist =
+        this.databaseModel.getBoolean(
+            "SELECT EXISTS ( SELECT 1 FROM commission WHERE name = $1)", Tuple.of(name));
+    if (!doesCommissionNameExist) {
+      LOG.error("Commission with name: " + name + " doesn't exist!");
+      throw new HttpException("Commission with name: " + name + " doesn't exist!", 400);
+    }
+
     this.commissionRepository.deleteByName(name);
   }
 
@@ -203,7 +211,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
 
     if (commissionIds.isEmpty()) {
       LOG.info("Didn't find any commissions. Moving on...");
-      return null;
+      return List.of();
     }
 
     List<GradeDTO> gradeDTOs = new ArrayList<>();
@@ -284,7 +292,7 @@ public final class CommitteeServiceImpl implements CommitteeService {
             "SELECT g.id FROM grade g WHERE g.subject = (SELECT s.id FROM subject s WHERE"
                 + " s.name= $2) AND id = (SELECT gg.grade_id FROM "
                 + evalUserType
-                + "s_grades gg WHERE gg."
+                + "_grades gg WHERE gg."
                 + evalUserType
                 + "_id = (SELECT pc.id FROM "
                 + evalUserType

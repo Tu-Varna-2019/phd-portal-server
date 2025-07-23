@@ -85,4 +85,19 @@ public class GradeDTO {
     this.attachments = attachments;
     this.subject = subject;
   }
+
+  public GradeDTO(
+      Long gradeId,
+      Double grade,
+      Date evalDate,
+      String report,
+      Set<String> attachments,
+      String subject) {
+    this.gradeId = gradeId;
+    this.grade = grade;
+    this.evalDate = evalDate;
+    this.report = report;
+    this.attachments = attachments;
+    this.subject = subject;
+  }
 }

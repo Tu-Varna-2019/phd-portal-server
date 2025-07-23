@@ -105,7 +105,7 @@ public non-sealed class Candidate extends PanacheEntityBase implements IUserEnti
 
   @ManyToMany
   @JoinTable(
-      name = "candidates_grades",
+      name = "candidate_grades",
       joinColumns = @JoinColumn(name = "candidate_id"),
       inverseJoinColumns = @JoinColumn(name = "grade_id"))
   private Set<Grade> grades;

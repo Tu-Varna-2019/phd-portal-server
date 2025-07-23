@@ -105,7 +105,7 @@ public final class DoctoralCenterController extends BaseController {
   public Response getCandidates(@NotNull @RestQuery String fields) {
     if (fields == null || fields.isEmpty()) {
       LOG.warn("Client requested to retrieve all candidates with empty fields");
-      throw new HttpException("Fields for candidate cannot be empty!");
+      throw new HttpException("Fields for candidate cannot be empty!", 500);
     }
 
     LOG.info("Received a request to retrieve all candidates with fields: " + fields);

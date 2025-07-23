@@ -27,6 +27,7 @@ import com.tuvarna.phd.repository.ModeRepository;
 import com.tuvarna.phd.repository.PhdRepository;
 import com.tuvarna.phd.repository.SubjectRepository;
 import io.quarkus.cache.CacheInvalidate;
+import io.vertx.core.impl.NoStackTraceThrowable;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -155,7 +156,7 @@ public final class CandidateServiceImpl implements CandidateService {
                     TEMPLATES.CANDIDATE_APPLY,
                     email,
                     Map.of("$CANDIDATE", candidateEmail));
-              } catch (IOException exception) {
+              } catch (IOException | NoStackTraceThrowable exception) {
                 LOG.error("Error in sending email to the doc centers: " + exception);
                 throw new ServerErrorException("Error in sending email to the doc centers!", 500);
               }
@@ -167,7 +168,7 @@ public final class CandidateServiceImpl implements CandidateService {
           "Вашата кандидатура беше изпратена успешно!",
           TEMPLATES.CANDIDATE_APPLY_CONFIRMATION,
           candidateEmail);
-    } catch (IOException exception) {
+    } catch (IOException | NoStackTraceThrowable exception) {
       LOG.error("Error in sending email to the candidate: " + exception);
       throw new ServerErrorException("Error in sending email to the candidate!", 500);
     }

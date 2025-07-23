@@ -30,10 +30,9 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
 
   private Response mapExceptionToResponse(Exception exception) {
     return switch (exception) {
-      case HttpException e ->
-          Response.status(e.getStatus())
-              .entity(new ControllerResponse(exception.getMessage()))
-              .build();
+      case HttpException e -> {
+        yield Response.status(e.getStatus()).entity(new ControllerResponse(e.getMessage())).build();
+      }
 
       case ForbiddenException e -> {
         yield Response.status(403)
@@ -53,7 +52,7 @@ public class ControllerExceptionMapper implements ExceptionMapper<Exception> {
       }
 
       case BadRequestException e -> {
-        yield Response.status(400).entity(e.getMessage()).build();
+        yield Response.status(400).entity(new ControllerResponse(e.getMessage())).build();
       }
 
       default -> {
