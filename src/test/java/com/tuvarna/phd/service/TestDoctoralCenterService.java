@@ -18,6 +18,7 @@ import com.tuvarna.phd.repository.UnauthorizedRepository;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.vertx.core.impl.NoStackTraceThrowable;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.sql.Date;
@@ -64,7 +65,7 @@ public class TestDoctoralCenterService {
   }
 
   @Test
-  public void testSetCommissionOnGrade() throws IOException {
+  public void testSetCommissionOnGrade() throws IOException, NoStackTraceThrowable {
     Long id = 1L;
     String name = "commission1";
 
@@ -82,6 +83,7 @@ public class TestDoctoralCenterService {
     assertEquals(commission, grade.getCommission());
 
     doThrow(new IOException("Mail server down"))
+        .doThrow(new NoStackTraceThrowable("Error"))
         .when(mailModel)
         .send(
             "Вие сте добавен в изпит",
