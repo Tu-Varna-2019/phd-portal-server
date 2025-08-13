@@ -20,7 +20,7 @@ dependencies {
 
     // AWS
     // BUG: 3.8.0 is incompatible
-    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.7.0'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:3.9.0'
     implementation 'software.amazon.awssdk:aws-crt-client:2.31.68'
 
     // Elastisearch
